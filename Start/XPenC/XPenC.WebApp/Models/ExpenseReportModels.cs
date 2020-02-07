@@ -2,25 +2,25 @@ using System;
 
 namespace XPenC.WebApp.Models
 {
-    public class ExpenseReportDetails
+    public class ERDetails
     {
         public int Id { get; set; }
 
         public string Client { get; set; }
 
-        public DateTime CreatedOn { get; set; }
+        public DateTime CreateDate { get; set; }
         
-        public DateTime ModifiedOn { get; set; }
+        public DateTime ChangeDate { get; set; }
 
-        public ExpenseReportItem[] Items { get; set; }
+        public Item[] Items { get; set; }
         
-        public decimal MealTotal { get; set; }
+        public decimal Meal { get; set; }
 
-        public decimal Total { get; set; }
+        public decimal SumIts { get; set; }
 
-        public class ExpenseReportItem
+        public class Item
         {
-            public int? Number { get; set; }
+            public int? ItemId { get; set; }
 
             public DateTime? Date { get; set; }
 
@@ -32,50 +32,50 @@ namespace XPenC.WebApp.Models
         }
     }
 
-    public class ExpenseReportListItem
+    public class ERListItem
     {
         public int Id { get; set; }
 
-        public string Client { get; set; }
+        public string Name { get; set; }
 
-        public DateTime CreatedOn { get; set; }
+        public DateTime Created { get; set; }
 
-        public DateTime ModifiedOn { get; set; }
+        public DateTime Changed { get; set; }
     }
 
-    public class ExpenseReportUpdateInput
+    public class ERUpdate
     {
-        public ExpenseReportUpdateInput()
+        public ERUpdate()
         {
-            Items = Array.Empty<ExpenseReportItem>();
-            NewItem = new ExpenseReportItem();
+            Items = Array.Empty<Item>();
+            NewItem = new Item();
         }
 
         public int Id { get; set; }
 
-        public string Client { get; set; }
+        public string ClientText { get; set; }
 
-        public ExpenseReportItem[] Items { get; set; }
+        public Item[] Items { get; set; }
 
-        public ExpenseReportItem NewItem { get; set; }
+        public Item NewItem { get; set; }
 
-        public class ExpenseReportItem
+        public class Item
         {
-            public ExpenseReportItem()
+            public Item()
             {
-                Date = DateTime.Now;
-                Value = 0;
+                ItemDate = DateTime.Now;
+                Price = 0;
             }
 
             public int? Number { get; set; }
 
-            public DateTime? Date { get; set; }
+            public DateTime? ItemDate { get; set; }
 
-            public string ExpenseType { get; set; }
+            public string Type { get; set; }
 
             public string Description { get; set; }
 
-            public decimal? Value { get; set; }
+            public decimal? Price { get; set; }
         }
     }
 }

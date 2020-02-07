@@ -1,4 +1,4 @@
-﻿@model XPenC.WebApp.Models.ExpenseReportDetails
+﻿@model XPenC.WebApp.Models.ERDetails
 
 
 <div class="report">
@@ -30,13 +30,13 @@
                 Meals
             </div>
             <div class="col-2 d-flex justify-content-end">
-                @($"{Model.MealTotal:C}")
+                @($"{Model.Meal:C}")
             </div>
             <div class="offset-8 col-2 label">
                 Grand Total
             </div>
             <div class="col-2 d-flex justify-content-end">
-                @($"{Model.Total:C}")
+                @($"{Model.SumIts:C}")
             </div>
         </div>
         <div class="row"><div class="col"><hr /></div></div>
@@ -57,7 +57,7 @@
         @foreach (var item in Model.Items)
         {
             <div class="row@(item.Value > 50 && item.ExpenseType == "Meal" ? " red" : "")">
-                <div class="col-1">@item.Number</div>
+                <div class="col-1">@item.ItemId</div>
                 <div class="col-2">@($"{item.Date:d}")</div>
                 <div class="col-3">@item.ExpenseType</div>
                 <div class="col-4">@item.Description</div>
@@ -72,7 +72,7 @@
                 Last Modification
             </div>
             <div class="col-3 d-flex justify-content-end">
-                @Html.DisplayFor(model => model.ModifiedOn)
+                @Html.DisplayFor(model => model.ChangeDate)
             </div>
         </div>
     </section>

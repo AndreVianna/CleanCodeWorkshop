@@ -26,7 +26,7 @@ namespace XPenC.WebApp.Controllers
             db.Open();
             try
             {
-                var rslt = new List<ExpenseReportListItem>();
+                var rslt = new List<ERListItem>();
                 using (var cmd = db.CreateCommand())
                 {
                     cmd.CommandText = "SELECT * FROM ExpenseReports ORDER BY ModifiedOn DESC;";
@@ -34,12 +34,12 @@ namespace XPenC.WebApp.Controllers
                     {
                         while (r.Read())
                         {
-                            var item = new ExpenseReportListItem
+                            var item = new ERListItem
                             {
-                                Id = r.GetInt32(r.GetOrdinal("Id")),
-                                Client = r.IsDBNull(r.GetOrdinal("Client")) ? null : r.GetString(r.GetOrdinal("Client")),
-                                CreatedOn = r.GetDateTime(r.GetOrdinal("CreatedOn")),
-                                ModifiedOn = r.GetDateTime(r.GetOrdinal("ModifiedOn")),
+                                Id = r.GetInt32(0),
+                                Name = r.IsDBNull(1) ? null : r.GetString(1),
+                                Created = r.GetDateTime(2),
+                                Changed = r.GetDateTime(2),
                             };
                             rslt.Add(item);
                         }
@@ -66,7 +66,7 @@ namespace XPenC.WebApp.Controllers
             db.Open();
             try
             {
-                var rslt = new ExpenseReportDetails();
+                var rslt = new ERDetails();
                 using (var cmd = db.CreateCommand())
                 {
                     cmd.CommandText = "SELECT *" +
@@ -81,26 +81,27 @@ namespace XPenC.WebApp.Controllers
                             return NotFound();
                         }
                         var first = true;
-                        var items = new List<ExpenseReportDetails.ExpenseReportItem>();
+                        var items = new List<ERDetails.Item>();
                         while (r.Read())
                         {
                             if (first)
                             {
                                 rslt.Id = id.Value;
-                                rslt.Client = r.IsDBNull(r.GetOrdinal("Client")) ? null : r.GetString(r.GetOrdinal("Client"));
-                                rslt.CreatedOn = r.GetDateTime(r.GetOrdinal("CreatedOn"));
-                                rslt.ModifiedOn = r.GetDateTime(r.GetOrdinal("ModifiedOn"));
+                                rslt.Client = r.IsDBNull(1) ? null : r.GetString(1);
+                                rslt.CreateDate = r.GetDateTime(2);
+                                rslt.ChangeDate = r.GetDateTime(3);
                                 first = false;
                             }
 
                             if (!r.IsDBNull(r.GetOrdinal("ExpenseReportId")))
                             {
-                                var item = new ExpenseReportDetails.ExpenseReportItem
+                                var item = new ERDetails.Item
                                 {
-                                    Number = r.GetInt32(r.GetOrdinal("ItemNumber")),
-                                    Date = r.IsDBNull(r.GetOrdinal("Date")) ? (DateTime?)null : r.GetDateTime(r.GetOrdinal("Date")),
-                                    ExpenseType = r.IsDBNull(r.GetOrdinal("ExpenseType")) ? null : r.GetString(r.GetOrdinal("ExpenseType")),
-                                    Value = r.IsDBNull(r.GetOrdinal("Value")) ? 0 : r.GetDecimal(r.GetOrdinal("Value")),
+                                    ItemId = r.GetInt32(7),
+                                    Date = r.IsDBNull(8) ? (DateTime?)null : r.GetDateTime(8),
+                                    ExpenseType = r.IsDBNull(9) ? null : r.GetString(9),
+                                    Value = r.IsDBNull(11) ? 0 : r.GetDecimal(11),
+                                    Description = r.IsDBNull(10) ? null : r.GetString(10),
                                 };
                                 switch (item.ExpenseType)
                                 {
@@ -120,8 +121,8 @@ namespace XPenC.WebApp.Controllers
                     }
                 }
 
-                rslt.MealTotal = rslt.Items.Where(i => i.ExpenseType == "Meal").Sum(i => i.Value ?? 0);
-                rslt.Total = rslt.Items.Sum(i => i.Value ?? 0);
+                rslt.Meal = rslt.Items.Where(i => i.ExpenseType == "Meal").Sum(i => i.Value ?? 0);
+                rslt.SumIts = rslt.Items.Sum(i => i.Value ?? 0);
                 return View(rslt);
             }
             finally
@@ -192,7 +193,7 @@ namespace XPenC.WebApp.Controllers
             db.Open();
             try
             {
-                var rslt = new ExpenseReportUpdateInput();
+                var rslt = new ERUpdate();
                 using (var cmd = db.CreateCommand())
                 {
                     cmd.CommandText = "SELECT *" +
@@ -207,35 +208,37 @@ namespace XPenC.WebApp.Controllers
                             return NotFound();
                         }
                         var first = true;
-                        var items = new List<ExpenseReportUpdateInput.ExpenseReportItem>();
+                        var items = new List<ERUpdate.Item>();
                         while (r.Read())
                         {
+
                             if (first)
                             {
                                 rslt.Id = id.Value;
-                                rslt.Client = r.IsDBNull(r.GetOrdinal("Client")) ? null : r.GetString(r.GetOrdinal("Client"));
+                                rslt.ClientText = r.IsDBNull(1) ? null : r.GetString(1);
                                 first = false;
                             }
 
-                            if (!r.IsDBNull(r.GetOrdinal("ExpenseReportId")))
+                            if (!r.IsDBNull(6))
                             {
-                                var item = new ExpenseReportUpdateInput.ExpenseReportItem
+                                var item = new ERUpdate.Item
                                 {
-                                    Number = r.GetInt32(r.GetOrdinal("ItemNumber")),
-                                    Date = r.IsDBNull(r.GetOrdinal("Date")) ? (DateTime?)null : r.GetDateTime(r.GetOrdinal("Date")),
-                                    ExpenseType = r.IsDBNull(r.GetOrdinal("ExpenseType")) ? null : r.GetString(r.GetOrdinal("ExpenseType")),
-                                    Value = r.IsDBNull(r.GetOrdinal("Value")) ? 0 : r.GetDecimal(r.GetOrdinal("Value")),
+                                    Number = r.GetInt32(7),
+                                    ItemDate = r.IsDBNull(8) ? (DateTime?)null : r.GetDateTime(8),
+                                    Type = r.IsDBNull(9) ? null : r.GetString(9),
+                                    Price = r.IsDBNull(11) ? 0 : r.GetDecimal(11),
+                                    Description = r.IsDBNull(10) ? null : r.GetString(10),
                                 };
-                                switch (item.ExpenseType)
+                                switch (item.Type)
                                 {
-                                    case "O": item.ExpenseType = "Office"; break;
-                                    case "M": item.ExpenseType = "Meal"; break;
-                                    case "L": item.ExpenseType = "Lodging (Hotel)"; break;
-                                    case "L*": item.ExpenseType = "Lodging (Other)"; break;
-                                    case "TL": item.ExpenseType = "Transportation (Land)"; break;
-                                    case "TA": item.ExpenseType = "Transportation (Air)"; break;
-                                    case "Ot": item.ExpenseType = "Other"; break;
-                                    default: item.ExpenseType = "Unknown"; break;
+                                    case "O": item.Type = "Office"; break;
+                                    case "M": item.Type = "Meal"; break;
+                                    case "L": item.Type = "Lodging (Hotel)"; break;
+                                    case "L*": item.Type = "Lodging (Other)"; break;
+                                    case "TL": item.Type = "Transportation (Land)"; break;
+                                    case "TA": item.Type = "Transportation (Air)"; break;
+                                    case "Ot": item.Type = "Other"; break;
+                                    default: item.Type = "Unknown"; break;
                                 }
                                 items.Add(item);
                             }
@@ -264,7 +267,7 @@ namespace XPenC.WebApp.Controllers
         // POST: ExpenseReports/Update/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(int? id, string action, ExpenseReportUpdateInput input)
+        public IActionResult Update(int? id, string action, ERUpdate input)
         {
             if (id == null)
             {
@@ -273,7 +276,7 @@ namespace XPenC.WebApp.Controllers
 
             if (input == null || input.Id != id)
             {
-                return RedirectToAction("Error", "Home", new { message = "Bad request while updating expense report." });
+                return BadRequest("The update request data is not valid.");
             }
 
             var cs = _configuration["ConnectionStrings:DataContext"];
@@ -281,7 +284,7 @@ namespace XPenC.WebApp.Controllers
             db.Open();
             try
             {
-                var oldValues = new ExpenseReportUpdateInput();
+                var old = new ERUpdate();
                 using (var cmd = db.CreateCommand())
                 {
                     cmd.CommandText = "SELECT *" +
@@ -291,40 +294,51 @@ namespace XPenC.WebApp.Controllers
                     cmd.Parameters.AddWithValue("id", id);
                     using (var r = cmd.ExecuteReader())
                     {
-                        if (!r.HasRows)
+                        var items = new List<ERUpdate.Item>();
+                        var stop = true;
+                        while (r.Read())
+                        {
+                            stop = false;
+                            old.Id = id.Value;
+                            old.ClientText = r.IsDBNull(1) ? null : r.GetString(1);
+                            if (!r.IsDBNull(6))
+                            {
+                                var item =
+                                new ERUpdate.Item
+                                {
+                                    Number = r.GetInt32(7),
+                                    ItemDate = r.IsDBNull(8) ? (DateTime?)null : r.GetDateTime(8),
+                                    Type = r.IsDBNull(9) ? null : r.GetString(9),
+                                    Price = r.IsDBNull(11) ? 0 : r.GetDecimal(11),
+                                    Description = r.IsDBNull(10) ? null : r.GetString(10),
+                                };
+                                switch (item.Type)
+                                {
+                                    case "O": item.Type = "Office"; break;
+                                    case "M": item.Type = "Meal"; break;
+                                    case "L": item.Type = "Lodging (Hotel)"; break;
+                                    case "L*": item.Type = "Lodging (Other)"; break;
+                                    case "TL": item.Type = "Transportation (Land)"; break;
+                                    case "TA": item.Type = "Transportation (Air)"; break;
+                                    case "Ot": item.Type = "Other"; break;
+                                    default: item.Type = "Unknown"; break;
+                                }
+
+                                items.Add(item);
+                            }
+                        }
+                        if (stop)
                         {
                             return NotFound();
                         }
-                        var first = true;
-                        var items = new List<ExpenseReportUpdateInput.ExpenseReportItem>();
-                        while (r.Read())
-                        {
-                            if (first)
-                            {
-                                oldValues.Id = id.Value;
-                                oldValues.Client = r.IsDBNull(r.GetOrdinal("Client")) ? null : r.GetString(r.GetOrdinal("Client"));
-                                first = false;
-                            }
-
-                            if (!r.IsDBNull(r.GetOrdinal("ExpenseReportId")))
-                            {
-                                items.Add(new ExpenseReportUpdateInput.ExpenseReportItem
-                                {
-                                    Number = r.GetInt32(r.GetOrdinal("ItemNumber")),
-                                    Date = r.IsDBNull(r.GetOrdinal("Date")) ? (DateTime?)null : r.GetDateTime(r.GetOrdinal("Date")),
-                                    ExpenseType = r.IsDBNull(r.GetOrdinal("ExpenseType")) ? null : r.GetString(r.GetOrdinal("ExpenseType")),
-                                    Value = r.IsDBNull(r.GetOrdinal("Value")) ? 0 : r.GetDecimal(r.GetOrdinal("Value")),
-                                });
-                            }
-                        }
-                        oldValues.Items = items.ToArray();
+                        old.Items = items.ToArray();
                     }
                 }
 
                 var trans = db.BeginTransaction();
                 try
                 {
-                    if (string.IsNullOrWhiteSpace(input.Client))
+                    if (string.IsNullOrWhiteSpace(input.ClientText))
                     {
                         ModelState.AddModelError("Client", "The client field is required.");
                         return View(input);
@@ -346,7 +360,7 @@ namespace XPenC.WebApp.Controllers
                             cmd.ExecuteNonQuery();
                         }
 
-                        var items = oldValues.Items.ToList();
+                        var items = old.Items.ToList();
                         var removeItem = items.Find(i => i.Number == number);
                         items.Remove(removeItem);
                         input.Items = items.ToArray();
@@ -356,27 +370,27 @@ namespace XPenC.WebApp.Controllers
                     if (action == "Add")
                     {
                         var block = false;
-                        if (input.NewItem.Date is null)
+                        if (input.NewItem.ItemDate is null)
                         {
                             ModelState.AddModelError("NewItem.Date", "The new expense date is required.");
                             block = true;
                         }
-                        if (input.NewItem.Date > DateTime.Now)
+                        if (input.NewItem.ItemDate > DateTime.Now)
                         {
                             ModelState.AddModelError("NewItem.Value", "The new expense date must not be in the future.");
                             block = true;
                         }
-                        if (string.IsNullOrWhiteSpace(input.NewItem.ExpenseType))
+                        if (string.IsNullOrWhiteSpace(input.NewItem.Type))
                         {
                             ModelState.AddModelError("NewItem.ExpenseType", "The new expense type is required.");
                             block = true;
                         }
-                        if (input.NewItem.Value is null)
+                        if (input.NewItem.Price is null)
                         {
                             ModelState.AddModelError("NewItem.Value", "The new expense value is required.");
                             block = true;
                         }
-                        if (input.NewItem.Value < 0)
+                        if (input.NewItem.Price <= 0)
                         {
                             ModelState.AddModelError("NewItem.Value", "The new expense value must be greater than zero.");
                             block = true;
@@ -385,7 +399,7 @@ namespace XPenC.WebApp.Controllers
                         if (block)
                         {
                             trans.Rollback();
-                            input.Items = oldValues.Items;
+                            input.Items = old.Items;
                             ViewData["ExpenseTypes"] = new List<SelectListItem>
                             {
                                 new SelectListItem("Office", "O"),
@@ -420,33 +434,35 @@ namespace XPenC.WebApp.Controllers
                         using (var cmd = db.CreateCommand())
                         {
                             cmd.CommandText = "INSERT INTO ExpenseReportItems " +
-                                              "(ExpenseReportId, ItemNumber, Date, ExpenseType, Value) " +
+                                              "(ExpenseReportId, ItemNumber, Date, ExpenseType, Value, Description) " +
                                               "VALUES " +
-                                              "(@id, @number, @date, @expenseType, @value) ";
+                                              "(@id, @number, @date, @expenseType, @value, @description) ";
                             cmd.Parameters.AddWithValue("id", id);
                             cmd.Parameters.AddWithValue("number", nextNumber);
-                            cmd.Parameters.AddWithValue("date", input.NewItem.Date);
-                            cmd.Parameters.AddWithValue("expenseType", input.NewItem.ExpenseType);
-                            cmd.Parameters.AddWithValue("value", input.NewItem.Value);
+                            cmd.Parameters.AddWithValue("date", input.NewItem.ItemDate);
+                            cmd.Parameters.AddWithValue("expenseType", input.NewItem.Type);
+                            cmd.Parameters.AddWithValue("value", input.NewItem.Price);
+                            cmd.Parameters.AddWithValue("description", input.NewItem.Description);
                             cmd.Transaction = trans;
                             cmd.ExecuteNonQuery();
                         }
 
-                        var items = oldValues.Items.ToList();
-                        items.Add(new ExpenseReportUpdateInput.ExpenseReportItem
+                        var items = old.Items.ToList();
+                        items.Add(new ERUpdate.Item
                         {
                             Number = input.Items.Length + 1,
-                            Date = input.NewItem.Date,
-                            ExpenseType = input.NewItem.ExpenseType,
-                            Value = input.NewItem.Value,
+                            ItemDate = input.NewItem.ItemDate,
+                            Type = input.NewItem.Type,
+                            Price = input.NewItem.Price,
+                            Description = input.NewItem.Description,
                         });
                         input.Items = items.ToArray();
-                        input.NewItem = new ExpenseReportUpdateInput.ExpenseReportItem();
+                        input.NewItem = new ERUpdate.Item();
 
                         changed = true;
                     }
 
-                    if (changed || input.Client != oldValues.Client)
+                    if (changed || input.ClientText != old.ClientText)
                     {
                         using (var cmd = db.CreateCommand())
                         {
@@ -455,7 +471,7 @@ namespace XPenC.WebApp.Controllers
                                               "ModifiedOn = @modified " +
                                               "WHERE Id = @id";
                             cmd.Parameters.AddWithValue("id", id);
-                            cmd.Parameters.AddWithValue("client", input.Client);
+                            cmd.Parameters.AddWithValue("client", input.ClientText);
                             cmd.Parameters.AddWithValue("modified", DateTime.Now);
                             cmd.Transaction = trans;
                             cmd.ExecuteNonQuery();
@@ -469,7 +485,7 @@ namespace XPenC.WebApp.Controllers
                     }
                     return RedirectToAction(nameof(Update), new { id });
                 }
-                catch (Exception ex)
+                catch
                 {
                     trans.Rollback();
                     throw;
@@ -498,7 +514,7 @@ namespace XPenC.WebApp.Controllers
             db.Open();
             try
             {
-                var rslt = new ExpenseReportDetails();
+                var rslt = new ERDetails();
                 using (var cmd = db.CreateCommand())
                 {
                     cmd.CommandText = "SELECT * FROM ExpenseReports WHERE Id=@id;";
@@ -508,9 +524,9 @@ namespace XPenC.WebApp.Controllers
                         if (r.Read())
                         {
                             rslt.Id = id.Value;
-                            rslt.Client = r.IsDBNull(r.GetOrdinal("Client")) ? null : r.GetString(r.GetOrdinal("Client"));
-                            rslt.CreatedOn = r.GetDateTime(r.GetOrdinal("CreatedOn"));
-                            rslt.ModifiedOn = r.GetDateTime(r.GetOrdinal("ModifiedOn"));
+                            rslt.Client = r.IsDBNull(1) ? null : r.GetString(1);
+                            rslt.CreateDate = r.GetDateTime(2);
+                            rslt.ChangeDate = r.GetDateTime(3);
                         }
                     }
                 }

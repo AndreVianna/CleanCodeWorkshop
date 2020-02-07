@@ -1,4 +1,4 @@
-﻿@model IEnumerable<XPenC.WebApp.Models.ExpenseReportListItem>
+﻿@model IEnumerable<XPenC.WebApp.Models.ERListItem>
 
 <h1>Expense Reports</h1>
 
@@ -9,13 +9,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ModifiedOn)
+                @Html.DisplayNameFor(model => model.Changed)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedOn)
+                @Html.DisplayNameFor(model => model.Created)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Client)
+                @Html.DisplayNameFor(model => model.Name)
             </th>
             <th></th>
         </tr>
@@ -24,13 +24,13 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.ModifiedOn)
+                @Html.DisplayFor(modelItem => item.Changed)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatedOn)
+                @Html.DisplayFor(modelItem => item.Created)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Client)
+                @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
                 <a asp-action="Update" asp-route-id="@item.Id">Update</a> |
