@@ -1,0 +1,87 @@
+﻿@model XPenC.WebApp.Models.ExpenseReportDetails
+
+
+<div class="report">
+    <section class="logo d-flex justify-content-between align-items-start">
+        <div><img height="60" src="/img/logo_small.png"/></div>
+        <div><span>@($"{DateTime.Now:MMMM d, yyyy}")</span></div>
+    </section>
+    <section class="top">
+        <h1>Expense Report @Model.Id</h1>
+        <hr/>
+    </section>
+    <section class="details">
+        <div class="row">
+            <div class="col-2 label">
+                Client
+            </div>
+            <div class="col-10">
+                @Html.DisplayFor(model => model.Client)
+            </div>
+        </div>
+        <div class="row"><div class="col"><hr /></div></div>
+        <div class="row">
+            <div class="col">
+                <h4>Totals</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="offset-8 col-2 label">
+                Meals
+            </div>
+            <div class="col-2 d-flex justify-content-end">
+                @($"{Model.MealTotal:C}")
+            </div>
+            <div class="offset-8 col-2 label">
+                Grand Total
+            </div>
+            <div class="col-2 d-flex justify-content-end">
+                @($"{Model.Total:C}")
+            </div>
+        </div>
+        <div class="row"><div class="col"><hr /></div></div>
+    </section>
+    <section class="items">
+        <div class="row">
+            <div class="col">
+                <h4>Expenses</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-1 label">#</div>
+            <div class="col-2 label">Date</div>
+            <div class="col-3 label">Type</div>
+            <div class="col-4 label">Description</div>
+            <div class="col-2 d-flex justify-content-end label">Value</div>
+        </div>
+        @foreach (var item in Model.Items)
+        {
+            <div class="row@(item.Value > 50 && item.ExpenseType == "Meal" ? " red" : "")">
+                <div class="col-1">@item.Number</div>
+                <div class="col-2">@($"{item.Date:d}")</div>
+                <div class="col-3">@item.ExpenseType</div>
+                <div class="col-4">@item.Description</div>
+                <div class="col-2 d-flex justify-content-end">@($"{item.Value:C}")</div>
+            </div>
+        }
+    </section>
+    <section class="bottom">
+        <div class="row"><div class="col"><hr /></div></div>
+        <div class="row">
+            <div class="offset-7 col-2 label d-flex justify-content-end">
+                Last Modification
+            </div>
+            <div class="col-3 d-flex justify-content-end">
+                @Html.DisplayFor(model => model.ModifiedOn)
+            </div>
+        </div>
+    </section>
+</div>
+<div class="printOnly">
+    <div class="container">
+        &copy; 2020 - XPenC
+    </div>
+</div>
+<div class="doNotPrint">
+    <a asp-action="Index">Back to List</a>
+</div>
