@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using XPenC.BusinessLogic;
+using XPenC.BusinessLogic.Contracts;
+using XPenC.DataAccess.Contracts;
+using XPenC.DataAccess.SqlServer;
 
 namespace XPenC.WebApp
 {
@@ -19,6 +23,9 @@ namespace XPenC.WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            services.AddScoped<IDataContext>(provider => new SqlServerDataContext(provider.GetService<IConfiguration>(), "DataContext"));
+            services.AddScoped<IExpenseReportOperations, ExpenseReportOperations>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

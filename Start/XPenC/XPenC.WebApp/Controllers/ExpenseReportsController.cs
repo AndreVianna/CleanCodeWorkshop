@@ -442,7 +442,7 @@ namespace XPenC.WebApp.Controllers
                             cmd.Parameters.AddWithValue("date", input.NewItem.ItemDate);
                             cmd.Parameters.AddWithValue("expenseType", input.NewItem.Type);
                             cmd.Parameters.AddWithValue("value", input.NewItem.Price);
-                            cmd.Parameters.AddWithValue("description", input.NewItem.Description);
+                            cmd.Parameters.AddWithValue("description", (object)input.NewItem.Description ?? DBNull.Value);
                             cmd.Transaction = trans;
                             cmd.ExecuteNonQuery();
                         }

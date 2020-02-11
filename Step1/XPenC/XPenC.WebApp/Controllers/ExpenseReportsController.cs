@@ -156,8 +156,7 @@ namespace XPenC.WebApp.Controllers
             var commandText = "SELECT * " +
                               "FROM ExpenseReports " +
                               "ORDER BY ModifiedOn DESC;";
-            var command = _connectionHandler.CreateCommand(commandText);
-            return command.ReadRowsAs(ConvertToExpenseReportListItem).ToList();
+            return _connectionHandler.ReadRowsAs(commandText, null, ConvertToExpenseReportListItem).ToList();
         }
 
         private static ExpenseReportListItem ConvertToExpenseReportListItem(SqlDataReader r)
@@ -177,8 +176,8 @@ namespace XPenC.WebApp.Controllers
                               "FROM ExpenseReports r " +
                               "LEFT JOIN ExpenseReportItems i ON r.Id = i.ExpenseReportId " +
                               "WHERE r.Id=@id;";
-            var command = _connectionHandler.CreateCommand(commandText, new Dictionary<string, object> { ["id"] = id });
-            return command.ReadRowsInto<ExpenseReportDetails>(UpdateExpenseReportDetails);
+            var parameters = new Dictionary<string, object> { ["id"] = id };
+            return _connectionHandler.ReadRowsInto<ExpenseReportDetails>(commandText, parameters, UpdateExpenseReportDetails);
         }
 
         private static void UpdateExpenseReportDetails(ExpenseReportDetails record, SqlDataReader r)
@@ -211,14 +210,14 @@ namespace XPenC.WebApp.Controllers
                               "VALUES " +
                               "(@created, @modified, @mealTotal, @total);" +
                               "SELECT SCOPE_IDENTITY();";
-            var command = _connectionHandler.CreateCommand(commandText, new Dictionary<string, object>
+            var parameters = new Dictionary<string, object>
             {
                 ["created"] = now,
                 ["modified"] = now,
                 ["mealTotal"] = 0,
                 ["total"] = 0,
-            });
-            return command.ReadRowAs(r => Convert.ToInt32(r.GetDecimal(0)));
+            };
+            return _connectionHandler.ReadRowAs(commandText, parameters, r => Convert.ToInt32(r.GetDecimal(0)));
         }
 
         private static ExpenseReportUpdateInput ConvertToExpenseReportUpdateInput(ExpenseReportDetails source)
@@ -334,12 +333,12 @@ namespace XPenC.WebApp.Controllers
             var commandText = "DELETE FROM ExpenseReportItems " +
                           "WHERE ExpenseReportId = @id " +
                           "AND ItemNumber = @number";
-            var command = _connectionHandler.CreateCommand(commandText, new Dictionary<string, object>
+            var parameters = new Dictionary<string, object>
             {
                 ["id"] = originalValue.Id,
                 ["number"] = itemNumber,
-            });
-            command.ExecuteNonQuery();
+            };
+            _connectionHandler.ExecuteNonQuery(commandText, parameters);
 
             var itemToRemove = originalValue.Items.ToList().Find(i => i.Number == itemNumber);
             originalValue.Items.Remove(itemToRemove);
@@ -352,7 +351,7 @@ namespace XPenC.WebApp.Controllers
                           "(ExpenseReportId, ItemNumber, Date, ExpenseType, Value, Description) " +
                           "VALUES " +
                           "(@id, @number, @date, @expenseType, @value, @description)";
-            var command = _connectionHandler.CreateCommand(commandText, new Dictionary<string, object>
+            var parameters = new Dictionary<string, object>
             {
                 ["id"] = originalValue.Id,
                 ["number"] = nextNumber,
@@ -360,8 +359,8 @@ namespace XPenC.WebApp.Controllers
                 ["expenseType"] = newItem.ExpenseType,
                 ["value"] = newItem.Value,
                 ["description"] = newItem.Description,
-            });
-            command.ExecuteNonQuery();
+            };
+            _connectionHandler.ExecuteNonQuery(commandText, parameters);
 
             originalValue.Items.Add(new ExpenseReportItemDetails
             {
@@ -378,12 +377,11 @@ namespace XPenC.WebApp.Controllers
                               "FROM ExpenseReportItems " +
                               "WHERE ExpenseReportId = @id " +
                               "ORDER BY 1 DESC";
-            var command = _connectionHandler.CreateCommand(commandText, new Dictionary<string, object>
+            var parameters = new Dictionary<string, object>
             {
                 ["id"] = id,
-            });
-            var nextNumber = command.ReadRowAs(r => r.GetInt32(r.GetOrdinal("ItemNumber")), 1);
-            return nextNumber;
+            };
+            return _connectionHandler.ReadRowAs(commandText, parameters, r => r.GetInt32(r.GetOrdinal("ItemNumber")), 1);
         }
 
         private void ExecuteUpdateMainRecordDetails(ExpenseReportUpdateInput input)
@@ -391,12 +389,12 @@ namespace XPenC.WebApp.Controllers
             var commandText = "UPDATE ExpenseReports SET " +
                               "Client = @client " +
                               "WHERE Id = @id";
-            var command = _connectionHandler.CreateCommand(commandText, new Dictionary<string, object>
+            var parameters = new Dictionary<string, object>
             {
                 ["id"] = input.Id,
                 ["client"] = input.Client,
-            });
-            command.ExecuteNonQuery();
+            };
+            _connectionHandler.ExecuteNonQuery(commandText, parameters);
         }
 
         private void UpdateLastModificationDate(ExpenseReportUpdateInput input)
@@ -404,22 +402,22 @@ namespace XPenC.WebApp.Controllers
             var commandText = "UPDATE ExpenseReports SET " +
                               "ModifiedOn = @modified " +
                               "WHERE Id = @id";
-            var command = _connectionHandler.CreateCommand(commandText, new Dictionary<string, object>
+            var parameters = new Dictionary<string, object>
             {
                 ["id"] = input.Id,
                 ["modified"] = DateTime.Now,
-            });
-            command.ExecuteNonQuery();
+            };
+            _connectionHandler.ExecuteNonQuery(commandText, parameters);
         }
 
         private void ExecuteDeleteReport(int id)
         {
             var commandText = "DELETE FROM ExpenseReports WHERE Id=@id;";
-            var command = _connectionHandler.CreateCommand(commandText, new Dictionary<string, object>
+            var parameters = new Dictionary<string, object>
             {
                 ["id"] = id,
-            });
-            command.ExecuteNonQuery();
+            };
+            _connectionHandler.ExecuteNonQuery(commandText, parameters);
         }
     }
 
@@ -454,82 +452,81 @@ namespace XPenC.WebApp.Controllers
             Dispose(true);
         }
 
-        public SqlCommandWrapper CreateCommand(string commandText, IDictionary<string, object> parameters = null)
+        private SqlCommand CreateCommand(string commandText, IDictionary<string, object> parameters)
         {
-            using (var command = _transaction.Connection.CreateCommand())
+            var command = _transaction.Connection.CreateCommand();
+            command.CommandText = commandText;
+            command.Transaction = _transaction;
+            if (parameters != null && parameters.Count > 0)
             {
-                command.CommandText = commandText;
-                command.Transaction = _transaction;
-                if (parameters != null && parameters.Count > 0)
+                foreach (var parameter in parameters)
                 {
-                    foreach (var parameter in parameters)
+                    command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
+                }
+            }
+            return command;
+        }
+
+        public T ReadRowAs<T>(string commandText, IDictionary<string, object> parameters, Func<SqlDataReader, T> convertResult, T defaultValue = default)
+        {
+            using (var command = CreateCommand(commandText, parameters))
+            {
+                using (var row = command.ExecuteReader())
+                {
+                    if (row.Read())
+                        return convertResult(row);
+                    return defaultValue;
+                }
+            }
+        }
+
+        public IEnumerable<T> ReadRowsAs<T>(string commandText, IDictionary<string, object> parameters, Func<SqlDataReader, T> convertResult)
+        {
+            var result = new List<T>();
+            using (var command = CreateCommand(commandText, parameters))
+            {
+                using (var row = command.ExecuteReader())
+                {
+                    while (row.Read())
                     {
-                        command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+                        result.Add(convertResult(row));
                     }
                 }
-                return new SqlCommandWrapper(command);
+            }
+            return result;
+        }
+
+        public T ReadRowsInto<T>(string commandText, IDictionary<string, object> parameters, Action<T, SqlDataReader> updateResult)
+            where T : class, new()
+        {
+            var result = new T();
+            using (var command = CreateCommand(commandText, parameters))
+            {
+                using (var row = command.ExecuteReader())
+                {
+                    if (!row.HasRows)
+                        return null;
+
+                    while (row.Read())
+                    {
+                        updateResult(result, row);
+                    }
+                }
+            }
+            return result;
+        }
+
+        public void ExecuteNonQuery(string commandText, IDictionary<string, object> parameters)
+        {
+            using (var command = CreateCommand(commandText, parameters))
+            {
+                command.ExecuteNonQuery();
             }
         }
 
         public void CommitChanges()
         {
             _transaction.Commit();
-        }
-    }
-
-    public class SqlCommandWrapper
-    {
-        private readonly SqlCommand _command;
-
-        public SqlCommandWrapper(SqlCommand command)
-        {
-            _command = command;
-        }
-
-        
-        public T ReadRowAs<T>(Func<SqlDataReader, T> convertResult, T defaultValue = default)
-        {
-            using (var r = _command.ExecuteReader())
-            {
-                if (r.Read())
-                    return convertResult(r);
-                return defaultValue;
-            }
-        }
-
-        public IEnumerable<T> ReadRowsAs<T>(Func<SqlDataReader, T> convertResult)
-        {
-            var result = new List<T>();
-            using (var r = _command.ExecuteReader())
-            {
-                while (r.Read())
-                {
-                    result.Add(convertResult(r));
-                }
-            }
-            return result;
-        }
-
-        public T ReadRowsInto<T>(Action<T, SqlDataReader> updateResult)
-            where T : class, new()
-        {
-            var result = new T();
-            using (var r = _command.ExecuteReader())
-            {
-                if (!r.HasRows)
-                    return null;
-
-                while (r.Read())
-                {
-                    updateResult(result, r);
-                }
-            }
-            return result;
-        }
-
-        public void ExecuteNonQuery()
-        {
-            _command.ExecuteNonQuery();
         }
     }
 }
