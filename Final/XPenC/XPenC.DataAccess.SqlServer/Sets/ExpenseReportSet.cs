@@ -76,17 +76,13 @@ namespace XPenC.DataAccess.SqlServer
         {
             var commandText = "UPDATE ExpenseReports SET " +
                               "Client = @client, " +
-                              "ModifiedOn = @modifiedOn, " +
-                              "Total = @total, " +
-                              "MealTotal = @mealTotal " +
+                              "ModifiedOn = @modifiedOn " +
                               "WHERE Id = @id";
             var parameters = new Dictionary<string, object>
             {
                 ["id"] = source.Id,
                 ["client"] = (object)source.Client ?? DBNull.Value,
                 ["modifiedOn"] = (object)source.ModifiedOn ?? DBNull.Value,
-                ["total"] = source.Total,
-                ["mealTotal"] = source.MealTotal,
             };
             _sqlConnectionHandler.Execute(commandText, parameters);
 

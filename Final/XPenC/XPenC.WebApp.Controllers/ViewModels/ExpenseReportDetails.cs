@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace XPenC.BusinessLogic.Contracts.Models
+namespace XPenC.WebApp.ViewModels
 {
-    public class ExpenseReport
+    public class ExpenseReportDetails
     {
-        public ExpenseReport()
+        public ExpenseReportDetails()
         {
-            Items = new List<ExpenseReportItem>();
+            Items = new List<ExpenseReportItemDetails>();
         }
 
         public int Id { get; set; }
@@ -15,13 +15,13 @@ namespace XPenC.BusinessLogic.Contracts.Models
         public string Client { get; set; }
 
         public DateTime CreatedOn { get; set; }
-
+        
         public DateTime ModifiedOn { get; set; }
 
+        public IList<ExpenseReportItemDetails> Items { get; set; }
+        
         public decimal MealTotal { get; set; }
 
         public decimal Total { get; set; }
-
-        public ICollection<ExpenseReportItem> Items { get; set; }
     }
 }

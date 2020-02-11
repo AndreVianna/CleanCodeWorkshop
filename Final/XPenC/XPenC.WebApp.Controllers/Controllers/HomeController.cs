@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using XPenC.WebApp.Models;
+using XPenC.WebApp.ViewModels;
 
 namespace XPenC.WebApp.Controllers
 {

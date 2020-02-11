@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace XPenC.BusinessLogic.Contracts.Models
+namespace XPenC.DataAccess.Contracts.Schema
 {
-    public class ExpenseReport
+    public class ExpenseReportEntity
     {
-        public ExpenseReport()
+        public ExpenseReportEntity()
         {
-            Items = new List<ExpenseReportItem>();
+            Items = new List<ExpenseReportItemEntity>();
         }
+
 
         public int Id { get; set; }
 
@@ -16,12 +17,12 @@ namespace XPenC.BusinessLogic.Contracts.Models
 
         public DateTime CreatedOn { get; set; }
 
-        public DateTime ModifiedOn { get; set; }
+        public DateTime? ModifiedOn { get; set; }
 
         public decimal MealTotal { get; set; }
 
         public decimal Total { get; set; }
 
-        public ICollection<ExpenseReportItem> Items { get; set; }
+        public ICollection<ExpenseReportItemEntity> Items { get; set; }
     }
 }

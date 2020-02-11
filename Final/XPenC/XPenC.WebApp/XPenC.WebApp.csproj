@@ -16,7 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
+    <ProjectReference Include="..\XPenC.BusinessLogic.Contracts\XPenC.BusinessLogic.Contracts.csproj" />
+    <ProjectReference Include="..\XPenC.BusinessLogic\XPenC.BusinessLogic.csproj" />
+    <ProjectReference Include="..\XPenC.DataAccess.Contracts\XPenC.DataAccess.Contracts.csproj" />
+    <ProjectReference Include="..\XPenC.DataAccess.SqlServer\XPenC.DataAccess.SqlServer.csproj" />
+    <ProjectReference Include="..\XPenC.WebApp.Controllers\XPenC.WebApp.Controllers.csproj" />
   </ItemGroup>
 
 

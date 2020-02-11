@@ -1,16 +1,12 @@
-using System;
+﻿using System;
 
-namespace XPenC.WebApp.ViewModels
+namespace XPenC.BusinessLogic.Contracts.Models
 {
-    public class ExpenseReportItemDetails
+    public class ExpenseReportItem
     {
-        public ExpenseReportItemDetails()
-        {
-            Date = DateTime.Now;
-            Value = 0;
-        }
+        public int ExpenseReportId { get; set; }
 
-        public int Number { get; set; }
+        public int ItemNumber { get; set; }
 
         public DateTime? Date { get; set; }
 

@@ -19,7 +19,5 @@ namespace XPenC.WebApp.ViewModels
         public string Description { get; set; }
 
         public decimal? Value { get; set; }
-
-        public bool IsAboveMaximum { get; set; }
     }
 }

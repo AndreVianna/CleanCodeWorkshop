@@ -4,24 +4,17 @@ using System.Linq;
 using XPenC.BusinessLogic.Contracts;
 using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.DataAccess.Contracts;
-using static XPenC.BusinessLogic.ConversionHelper;
 
 namespace XPenC.BusinessLogic
 {
     public class ExpenseReportOperations : IExpenseReportOperations
     {
         private readonly IDataContext _dataContext;
-        private const decimal MAXIMUM_MEAL_VALUE = 50m;
 
         public ExpenseReportOperations(IDataContext dataContext)
         {
             _dataContext = dataContext;
         }
-
-        public static bool IsExpenseAboveMaximum(ExpenseReportItem item) => item.ExpenseType == ExpenseType.Meal && item.Value > MAXIMUM_MEAL_VALUE;
-        public static decimal CalculateReportTotal(IEnumerable<ExpenseReportItem> items) => items.Sum(i => i.Value ?? 0);
-        public static decimal CalculateReportMealTotal(IEnumerable<ExpenseReportItem> items) => items.Where(i => i.ExpenseType == ExpenseType.Meal).Sum(i => i.Value ?? 0);
-
 
         public ExpenseReport CreateWithDefaults()
         {
@@ -35,25 +28,24 @@ namespace XPenC.BusinessLogic
 
         public void Add(ExpenseReport source)
         {
-            var entity = ToExpenseReportEntity(source);
-            _dataContext.ExpenseReports.Add(entity);
-            source.Id = entity.Id;
+            _dataContext.ExpenseReports.Add(ConversionHelper.ToExpenseReportEntity(source));
         }
 
         public List<ExpenseReport> GetList()
         {
-            return _dataContext.ExpenseReports.GetAll().Select(ToExpenseReport).ToList();
+            return _dataContext.ExpenseReports.GetAll().Select(ConversionHelper.ToExpenseReport).ToList();
         }
 
         public ExpenseReport Find(int id)
         {
-            return ToExpenseReport(_dataContext.ExpenseReports.Find(id));
+            return ConversionHelper.ToExpenseReport(_dataContext.ExpenseReports.Find(id));
         }
 
         public void RemoveItem(ExpenseReport source, int itemNumber)
         {
             var itemToRemove = source.Items.ToList().Find(i => i.ItemNumber == itemNumber);
             source.Items.Remove(itemToRemove);
+            _dataContext.ExpenseReports.Update(ConversionHelper.ToExpenseReportEntity(source));
         }
 
         public void AddItem(ExpenseReport source, ExpenseReportItem newItem)
@@ -67,12 +59,18 @@ namespace XPenC.BusinessLogic
                 ExpenseType = newItem.ExpenseType,
                 Value = newItem.Value,
             });
+            _dataContext.ExpenseReports.Update(ConversionHelper.ToExpenseReportEntity(source));
         }
 
         public void Update(ExpenseReport source)
         {
+            _dataContext.ExpenseReports.Update(ConversionHelper.ToExpenseReportEntity(source));
+        }
+
+        public void UpdateLastModificationDate(ExpenseReport source)
+        {
             source.ModifiedOn = DateTime.Now;
-            _dataContext.ExpenseReports.Update(ToExpenseReportEntity(source));
+            _dataContext.ExpenseReports.Update(ConversionHelper.ToExpenseReportEntity(source));
         }
 
         public void Delete(int id)

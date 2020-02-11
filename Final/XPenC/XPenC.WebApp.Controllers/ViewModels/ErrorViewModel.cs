@@ -1,4 +1,4 @@
-namespace XPenC.WebApp.Models
+namespace XPenC.WebApp.ViewModels
 {
     public class ErrorViewModel
     {

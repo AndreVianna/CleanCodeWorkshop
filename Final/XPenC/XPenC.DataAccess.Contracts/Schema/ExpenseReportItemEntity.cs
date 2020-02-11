@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace XPenC.BusinessLogic.Contracts.Models
+namespace XPenC.DataAccess.Contracts.Schema
 {
-    public class ExpenseReportItem
+    public class ExpenseReportItemEntity
     {
         public int ExpenseReportId { get; set; }
 
@@ -10,12 +10,10 @@ namespace XPenC.BusinessLogic.Contracts.Models
 
         public DateTime? Date { get; set; }
 
-        public ExpenseType ExpenseType { get; set; }
+        public string ExpenseType { get; set; }
 
         public string Description { get; set; }
 
         public decimal? Value { get; set; }
-
-        public bool IsAboveMaximum { get; set; }
     }
 }
