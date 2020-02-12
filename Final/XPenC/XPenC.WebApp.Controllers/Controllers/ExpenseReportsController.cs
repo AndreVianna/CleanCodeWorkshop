@@ -154,27 +154,18 @@ namespace XPenC.WebApp.Controllers
         public void ExecuteUpdateAction(string action, ExpenseReport originalValue, ExpenseReportUpdateInput input)
         {
             var updateActions = new List<Action>();
-            if (input.Client != originalValue.Client)
-            {
-                originalValue.Client = input.Client;
-                updateActions.Add(() => _expenseReportOperations.Update(originalValue));
-            }
 
             if (action.StartsWith("Remove"))
             {
                 var itemNumber = Convert.ToInt32(action.Replace("Remove", ""));
                 updateActions.Add(() => _expenseReportOperations.RemoveItem(originalValue, itemNumber));
             }
-
-            if (action == "Add")
+            else if (action == "Add")
             {
                 updateActions.Add(() => _expenseReportOperations.AddItem(originalValue, ConversionHelper.ToExpenseReportItem(input)));
             }
-
-            if (updateActions.Count > 0)
-            {
-                updateActions.Add(() => _expenseReportOperations.UpdateLastModificationDate(originalValue));
-            }
+            originalValue.Client = input.Client;
+            updateActions.Add(() => _expenseReportOperations.Update(originalValue));
 
             foreach (var updateAction in updateActions)
             {
@@ -222,13 +213,13 @@ namespace XPenC.WebApp.Controllers
         {
             ViewData["ExpenseTypes"] = new List<SelectListItem>
             {
-                new SelectListItem("Office", "O"),
-                new SelectListItem("Meal", "M"),
-                new SelectListItem("Lodging (Hotel)", "L"),
-                new SelectListItem("Lodging (Other)", "L*"),
-                new SelectListItem("Transportation (Land)", "TL"),
-                new SelectListItem("Transportation (Air)", "TA"),
-                new SelectListItem("Other", "Ot"),
+                new SelectListItem("Office", ExpenseType.Office.ToString()),
+                new SelectListItem("Meal", ExpenseType.Meal.ToString()),
+                new SelectListItem("Lodging (Hotel)", ExpenseType.HotelLodging.ToString()),
+                new SelectListItem("Lodging (Other)", ExpenseType.OtherLodging.ToString()),
+                new SelectListItem("Transportation (Land)", ExpenseType.LandTransportation.ToString()),
+                new SelectListItem("Transportation (Air)", ExpenseType.AirTransportation.ToString()),
+                new SelectListItem("Other", ExpenseType.Other.ToString()),
             };
         }
     }

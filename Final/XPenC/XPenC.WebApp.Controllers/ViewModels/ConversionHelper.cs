@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using XPenC.BusinessLogic.Contracts;
 using XPenC.BusinessLogic.Contracts.Models;
 
 namespace XPenC.WebApp.ViewModels
@@ -12,7 +14,7 @@ namespace XPenC.WebApp.ViewModels
                 Id = source.Id,
                 Client = source.Client,
                 CreatedOn = source.CreatedOn,
-                ModifiedOn = source.ModifiedOn ?? source.CreatedOn,
+                ModifiedOn = source.ModifiedOn,
             };
         }
 
@@ -23,9 +25,9 @@ namespace XPenC.WebApp.ViewModels
                 Id = source.Id,
                 Client = source.Client,
                 CreatedOn = source.CreatedOn,
-                ModifiedOn = source.ModifiedOn ?? source.CreatedOn,
-                MealTotal = source.Items.Where(i => i.ExpenseType == "M").Sum(i => i.Value ?? 0),
-                Total = source.Items.Sum(i => i.Value ?? 0),
+                ModifiedOn = source.ModifiedOn,
+                MealTotal = source.MealTotal,
+                Total = source.Total,
                 Items = source.Items.Select(ToExpenseReportItemDetails).ToList(),
             };
         }
@@ -36,7 +38,7 @@ namespace XPenC.WebApp.ViewModels
             {
                 ExpenseReportId = source.Id,
                 ItemNumber = 0,
-                ExpenseType = source.NewItem.ExpenseType,
+                ExpenseType = (ExpenseType)Enum.Parse(typeof(ExpenseType), source.NewItem.ExpenseType),
                 Date = source.NewItem.Date,
                 Value = source.NewItem.Value,
                 Description = source.NewItem.Description,
@@ -48,10 +50,11 @@ namespace XPenC.WebApp.ViewModels
             return new ExpenseReportItemDetails
             {
                 Number = source.ItemNumber,
-                ExpenseType = TranslateExpenseType(source.ExpenseType),
+                ExpenseType = source.ExpenseType.ToString(),
                 Date = source.Date,
                 Description = source.Description,
                 Value = source.Value ?? 0,
+                IsAboveMaximum = source.IsAboveMaximum,
             };
         }
 
@@ -63,21 +66,6 @@ namespace XPenC.WebApp.ViewModels
                 Client = source.Client,
                 Items = (source.Items?.Select(ToExpenseReportItemDetails) ?? Enumerable.Empty<ExpenseReportItemDetails>()).ToList(),
             };
-        }
-
-        public static string TranslateExpenseType(string expenseType)
-        {
-            switch (expenseType)
-            {
-                case "O": return "Office";
-                case "M": return "Meal";
-                case "L": return "Lodging (Hotel)";
-                case "L*": return "Lodging (Other)";
-                case "TL": return "Transportation (Land)";
-                case "TA": return "Transportation (Air)";
-                case "Ot": return "Other";
-                default: return "Unknown";
-            }
         }
 
         public static ExpenseReportUpdateInput RestoreInputItems(ExpenseReport source, ExpenseReportUpdateInput dest)

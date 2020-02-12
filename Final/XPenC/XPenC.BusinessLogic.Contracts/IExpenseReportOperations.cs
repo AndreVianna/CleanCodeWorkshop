@@ -13,8 +13,6 @@ namespace XPenC.BusinessLogic.Contracts
         void Update(ExpenseReport source);
         void Delete(int id);
 
-        void UpdateLastModificationDate(ExpenseReport source);
-
         void AddItem(ExpenseReport source, ExpenseReportItem newItemEntity);
         void RemoveItem(ExpenseReport source, int itemNumber);
     }

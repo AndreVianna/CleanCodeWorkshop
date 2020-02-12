@@ -10,7 +10,7 @@ namespace XPenC.BusinessLogic.Contracts.Models
 
         public DateTime? Date { get; set; }
 
-        public string ExpenseType { get; set; }
+        public ExpenseType ExpenseType { get; set; }
 
         public string Description { get; set; }
 

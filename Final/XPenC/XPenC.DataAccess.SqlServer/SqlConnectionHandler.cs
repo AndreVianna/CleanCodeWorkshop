@@ -93,13 +93,11 @@ namespace XPenC.DataAccess.SqlServer
             _transaction.Commit();
         }
 
-        private T ReadOne<T>(SqlCommand command, Func<SqlDataReader, T> convertRow, T defaultValue = default)
+        private static T ReadOne<T>(SqlCommand command, Func<SqlDataReader, T> convertRow, T defaultValue = default)
         {
             using (var row = command.ExecuteReader())
             {
-                if (row.Read())
-                    return convertRow(row);
-                return defaultValue;
+                return row.Read() ? convertRow(row) : defaultValue;
             }
         }
 
@@ -116,7 +114,7 @@ namespace XPenC.DataAccess.SqlServer
             return result;
         }
 
-        private bool TryUpdate<T>(SqlCommand command, T target, Action<T, SqlDataReader> updateTargetFromRow)
+        private static bool TryUpdate<T>(SqlCommand command, T target, Action<T, SqlDataReader> updateTargetFromRow)
         {
             bool hasUpdates;
             using (var row = command.ExecuteReader())
@@ -130,7 +128,7 @@ namespace XPenC.DataAccess.SqlServer
             return hasUpdates;
         }
 
-        private int ExecuteWithResult(SqlCommand command)
+        private static int ExecuteWithResult(SqlCommand command)
         {
             using (var r = command.ExecuteReader())
             {

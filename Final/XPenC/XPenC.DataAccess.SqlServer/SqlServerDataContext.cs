@@ -10,8 +10,8 @@ namespace XPenC.DataAccess.SqlServer
         public SqlServerDataContext(IConfiguration configuration, string connectionStringName)
         {
             _sqlConnection = new SqlConnectionHandler(configuration, connectionStringName);
-            ExpenseReportItems = new ExpenseReportItemTable(_sqlConnection);
-            ExpenseReports = new ExpenseReportSet(_sqlConnection, ExpenseReportItems);
+            var expenseReportItems = new ExpenseReportItemTable(_sqlConnection);
+            ExpenseReports = new ExpenseReportSet(_sqlConnection, expenseReportItems);
         }
 
         private bool _isDisposed;
@@ -23,8 +23,6 @@ namespace XPenC.DataAccess.SqlServer
         }
 
         public IExpenseReportSet ExpenseReports { get; }
-
-        public IExpenseReportItemTable ExpenseReportItems { get; }
 
         public void CommitChanges()
         {

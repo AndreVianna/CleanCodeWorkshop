@@ -15,13 +15,6 @@ namespace XPenC.DataAccess.SqlServer
             _sqlConnectionHandler = sqlConnectionHandler;
         }
 
-        public ExpenseReportItemEntity CreateRecordWithDefaults()
-        {
-            var now = DateTime.Now;
-            return new ExpenseReportItemEntity();
-        }
-
-
         public void Delete(int expenseReportId, int itemNumber)
         {
             var commandText = "DELETE FROM ExpenseReportItems " +

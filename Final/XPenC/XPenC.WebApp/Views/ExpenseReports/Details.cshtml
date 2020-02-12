@@ -56,7 +56,7 @@
         </div>
         @foreach (var item in Model.Items)
         {
-            <div class="row@(item.Value > 50 && item.ExpenseType == "Meal" ? " red" : "")">
+            <div class="row@(item.IsAboveMaximum ? " red" : "")">
                 <div class="col-1">@item.Number</div>
                 <div class="col-2">@($"{item.Date:d}")</div>
                 <div class="col-3">@item.ExpenseType</div>
