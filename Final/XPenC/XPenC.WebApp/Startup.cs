@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,7 @@ using XPenC.DataAccess.SqlServer;
 
 namespace XPenC.WebApp
 {
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         private readonly IConfiguration _configuration;
@@ -23,7 +25,8 @@ namespace XPenC.WebApp
         {
             services.AddControllersWithViews();
 
-            services.AddScoped<IDataContext>(provider => new SqlServerDataContext(_configuration, "DataContext"));
+            services.AddScoped<ISqlDataProvider>(provider => new SqlDataProvider(_configuration, "DataContext"));
+            services.AddScoped<IDataContext, SqlServerDataContext>();
             services.AddScoped<IExpenseReportOperations, ExpenseReportOperations>();
         }
 

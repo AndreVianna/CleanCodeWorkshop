@@ -1,31 +1,17 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
 using XPenC.DataAccess.Contracts.Schema;
 using XPenC.DataAccess.Contracts.Sets;
+using static XPenC.DataAccess.SqlServer.ConversionHelper;
 
 namespace XPenC.DataAccess.SqlServer.Sets
 {
     public class ExpenseReportItemSet : IExpenseReportItemSet
     {
-        private readonly SqlConnectionHandler _sqlConnectionHandler;
+        private readonly ISqlDataProvider _sqlDataProvider;
 
-        public ExpenseReportItemSet(SqlConnectionHandler sqlConnectionHandler)
+        public ExpenseReportItemSet(ISqlDataProvider sqlDataProvider)
         {
-            _sqlConnectionHandler = sqlConnectionHandler;
-        }
-
-        public void DeleteFrom(int expenseReportId, int itemNumber)
-        {
-            const string commandText = "DELETE FROM ExpenseReportItems " +
-                                       "WHERE ExpenseReportId = @id " +
-                                       "AND ItemNumber = @number";
-            var parameters = new Dictionary<string, object>
-            {
-                ["id"] = expenseReportId,
-                ["number"] = itemNumber,
-            };
-
-            _sqlConnectionHandler.Execute(commandText, parameters);
+            _sqlDataProvider = sqlDataProvider;
         }
 
         public IEnumerable<ExpenseReportItemEntity> GetAllFor(int expenseReportId)
@@ -35,7 +21,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
                                        "WHERE ExpenseReportId=@expenseReportId;";
             var parameters = new Dictionary<string, object> { ["expenseReportId"] = expenseReportId };
             
-            return _sqlConnectionHandler.ReadMany(commandText, parameters, ConversionHelper.ToExpenseReportItemEntity);
+            return _sqlDataProvider.ReadMany(commandText, parameters, ToExpenseReportItemEntity);
         }
 
         public void AddTo(int expenseReportId, ExpenseReportItemEntity source)
@@ -55,10 +41,24 @@ namespace XPenC.DataAccess.SqlServer.Sets
                 ["description"] = source.Description,
             };
 
-            _sqlConnectionHandler.Execute(commandText, parameters);
+            _sqlDataProvider.Execute(commandText, parameters);
 
             source.ExpenseReportId = expenseReportId;
             source.ItemNumber = nextNumber;
+        }
+
+        public void DeleteFrom(int expenseReportId, int itemNumber)
+        {
+            const string commandText = "DELETE FROM ExpenseReportItems " +
+                                       "WHERE ExpenseReportId = @id " +
+                                       "AND ItemNumber = @number";
+            var parameters = new Dictionary<string, object>
+            {
+                ["id"] = expenseReportId,
+                ["number"] = itemNumber,
+            };
+
+            _sqlDataProvider.Execute(commandText, parameters);
         }
 
         private int GetNextNumber(int id)
@@ -72,12 +72,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
                 ["id"] = id,
             };
 
-            return _sqlConnectionHandler.ReadOne(commandText, parameters, ReadItemNumber) + 1;
-        }
-
-        private static int ReadItemNumber(SqlDataReader reader)
-        {
-            return reader.GetInt32(reader.GetOrdinal("ItemNumber"));
+            return _sqlDataProvider.ReadOne(commandText, parameters, ToItemNumber) + 1;
         }
     }
 }

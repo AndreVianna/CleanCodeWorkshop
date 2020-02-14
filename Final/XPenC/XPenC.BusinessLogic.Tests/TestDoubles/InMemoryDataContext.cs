@@ -2,7 +2,7 @@ using XPenC.DataAccess.Contracts.Sets;
 
 namespace XPenC.BusinessLogic.Tests.TestDoubles
 {
-    public class InMemoryDataContext : DummyDataContext
+    internal class InMemoryDataContext : DummyDataContext
     {
         public InMemoryDataContext()
         {

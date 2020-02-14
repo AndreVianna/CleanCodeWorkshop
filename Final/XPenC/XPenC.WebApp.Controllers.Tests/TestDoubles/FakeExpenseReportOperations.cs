@@ -4,7 +4,7 @@ using XPenC.BusinessLogic.Contracts.Models;
 
 namespace XPenC.WebApp.Controllers.Tests.TestDoubles
 {
-    public class FakeExpenseReportOperations : DummyExpenseReportOperations
+    internal  class FakeExpenseReportOperations : DummyExpenseReportOperations
     {
         public static ExpenseReport ExistingReport1 { get; } = new ExpenseReport
         {
@@ -36,11 +36,11 @@ namespace XPenC.WebApp.Controllers.Tests.TestDoubles
 
         public override ExpenseReport Find(int id)
         {
-            if (id == ExistingReport1.Id)
-                return ExistingReport1;
-            if (id == ExistingReport2.Id)
-                return ExistingReport2;
-            return null;
+            return id == ExistingReport1.Id 
+                ? ExistingReport1
+                : id == ExistingReport2.Id 
+                    ? ExistingReport2
+                    : null;
         }
 
         public override ExpenseReport CreateWithDefaults()

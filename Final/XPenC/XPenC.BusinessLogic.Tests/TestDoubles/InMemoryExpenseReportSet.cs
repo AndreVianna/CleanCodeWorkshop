@@ -6,7 +6,7 @@ using XPenC.DataAccess.Contracts.Sets;
 
 namespace XPenC.BusinessLogic.Tests.TestDoubles
 {
-    public class InMemoryExpenseReportSet : IExpenseReportSet
+    internal class InMemoryExpenseReportSet : IExpenseReportSet
     {
         private readonly IDataContext _dataContext;
         private readonly List<ExpenseReportEntity> _data = new List<ExpenseReportEntity>();

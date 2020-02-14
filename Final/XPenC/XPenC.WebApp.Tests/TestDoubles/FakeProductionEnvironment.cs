@@ -1,4 +1,4 @@
-namespace XPenC.WebApp.Controllers.Tests.TestDoubles
+namespace XPenC.WebApp.Tests.TestDoubles
 {
     internal class FakeProductionEnvironment : DummyWebHostEnvironment
     {

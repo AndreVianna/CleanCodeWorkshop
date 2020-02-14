@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace XPenC.DataAccess.SqlServer
 {
-    public sealed class SqlConnectionHandler
+    [ExcludeFromCodeCoverage]
+    public sealed class SqlDataProvider : ISqlDataProvider
     {
-        private readonly SqlTransaction _transaction;
-        private readonly SqlConnection _connection;
+        private readonly IDbTransaction _transaction;
+        private readonly IDbConnection _connection;
 
-        public SqlConnectionHandler(IConfiguration configuration, string connectionStringName)
+        public SqlDataProvider(IConfiguration configuration, string connectionStringName)
         {
             var cs = configuration[$"ConnectionStrings:{connectionStringName}"];
             _connection = new SqlConnection(cs);
@@ -33,7 +35,7 @@ namespace XPenC.DataAccess.SqlServer
         }
 
 
-        public T ReadOne<T>(string commandText, IDictionary<string, object> parameters, Func<SqlDataReader, T> convertResultRow, T defaultValue = default)
+        public T ReadOne<T>(string commandText, IDictionary<string, object> parameters, Func<IDataRecord, T> convertResultRow, T defaultValue = default)
         {
             using (var command = CreateCommand(commandText, parameters))
             {
@@ -41,12 +43,12 @@ namespace XPenC.DataAccess.SqlServer
             }
         }
 
-        public IEnumerable<T> ReadMany<T>(string commandText, Func<SqlDataReader, T> convertResultRow)
+        public IEnumerable<T> ReadMany<T>(string commandText, Func<IDataRecord, T> convertResultRow)
         {
             return ReadMany(commandText, null, convertResultRow);
         }
 
-        public IEnumerable<T> ReadMany<T>(string commandText, IDictionary<string, object> parameters, Func<SqlDataReader, T> convertResultRow)
+        public IEnumerable<T> ReadMany<T>(string commandText, IDictionary<string, object> parameters, Func<IDataRecord, T> convertResultRow)
         {
             using (var command = CreateCommand(commandText, parameters))
             {
@@ -54,7 +56,7 @@ namespace XPenC.DataAccess.SqlServer
             }
         }
 
-        public bool TryReadManyInto<T>(T target, string commandText, IDictionary<string, object> parameters, Action<T, SqlDataReader> updateTargetFromRow)
+        public bool TryReadManyInto<T>(T target, string commandText, IDictionary<string, object> parameters, Action<T, IDataRecord> updateTargetFromRow)
         {
             using (var command = CreateCommand(commandText, parameters))
             {
@@ -78,8 +80,13 @@ namespace XPenC.DataAccess.SqlServer
             }
         }
 
+        public void CommitChanges()
+        {
+            _transaction.Commit();
+        }
+
         [SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Only used by pre-defined queries.")]
-        private SqlCommand CreateCommand(string commandText, IDictionary<string, object> parameters)
+        private IDbCommand CreateCommand(string commandText, IDictionary<string, object> parameters)
         {
             var command = _transaction.Connection.CreateCommand();
             command.CommandText = commandText;
@@ -91,17 +98,13 @@ namespace XPenC.DataAccess.SqlServer
 
             foreach (var parameter in parameters)
             {
-                command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
+                
+                command.Parameters.Add(new SqlParameter(parameter.Key, parameter.Value ?? DBNull.Value));
             }
             return command;
         }
 
-        public void CommitChanges()
-        {
-            _transaction.Commit();
-        }
-
-        private static T ReadOne<T>(SqlCommand command, Func<SqlDataReader, T> convertRow, T defaultValue = default)
+        private static T ReadOne<T>(IDbCommand command, Func<IDataRecord, T> convertRow, T defaultValue = default)
         {
             using (var row = command.ExecuteReader())
             {
@@ -114,7 +117,7 @@ namespace XPenC.DataAccess.SqlServer
             }
         }
 
-        private static IEnumerable<T> ReadMany<T>(SqlCommand command, Func<SqlDataReader, T> convertRow)
+        private static IEnumerable<T> ReadMany<T>(IDbCommand command, Func<IDataRecord, T> convertRow)
         {
             var result = new List<T>();
             using (var row = command.ExecuteReader())
@@ -127,21 +130,21 @@ namespace XPenC.DataAccess.SqlServer
             return result;
         }
 
-        private static bool TryReadManyInto<T>(SqlCommand command, T target, Action<T, SqlDataReader> updateTargetFromRow)
+        private static bool TryReadManyInto<T>(IDbCommand command, T target, Action<T, IDataRecord> updateTargetFromRow)
         {
-            bool hasUpdates;
+            var hasUpdates = false;
             using (var row = command.ExecuteReader())
             {
-                hasUpdates = row.HasRows;
                 while (row.Read())
                 {
                     updateTargetFromRow(target, row);
+                    hasUpdates = true;
                 }
             }
             return hasUpdates;
         }
 
-        private static int ExecuteWithResult(SqlCommand command)
+        private static int ExecuteWithResult(IDbCommand command)
         {
             using (var r = command.ExecuteReader())
             {

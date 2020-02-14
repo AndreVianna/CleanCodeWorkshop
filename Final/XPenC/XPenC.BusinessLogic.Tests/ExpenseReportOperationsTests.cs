@@ -20,6 +20,12 @@ namespace XPenC.BusinessLogic.Tests
         }
 
         [Fact]
+        public void ExpenseReportOperations_MaximumMealValue_ShouldPass()
+        {
+            Assert.Equal(50m, ExpenseReportOperations.MaximumMealValue);
+        }
+
+        [Fact]
         public void ExpenseReportOperations_CreateWithDefaults_ShouldPass()
         {
             var subject = _expenseReportOperations.CreateWithDefaults();

@@ -5,10 +5,10 @@
     <strong>Request ID:</strong> <code>@ViewData["RequestId"]</code>
 </p>
 
-@if (!(bool)ViewData["ShowException"])
+@if ((bool)ViewData["ShowException"])
 {
     <p>
-        <strong>Message:</strong> <code style="color: red">@ViewData["ExceptionType"]</code>
+        <strong>Exception:</strong> <code style="color: red">@ViewData["ExceptionType"]</code>
     </p>
     <p>
         <strong>Message:</strong> <code style="color: red">@ViewData["ExceptionMessage"]</code>

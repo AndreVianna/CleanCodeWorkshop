@@ -39,7 +39,6 @@ namespace XPenC.WebApp.Controllers.Tests.Filters
             var context = CreateExceptionContext();
             var activity = new Activity("HomeController_OnException_ForDevelopment_WithActivityId_ShouldPass");
             activity.Start();
-            var expectedRequestId = activity.Id;
             
             filter.OnException(context);
 

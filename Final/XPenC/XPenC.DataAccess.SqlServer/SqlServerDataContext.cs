@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using XPenC.DataAccess.Contracts;
+﻿using XPenC.DataAccess.Contracts;
 using XPenC.DataAccess.Contracts.Sets;
 using XPenC.DataAccess.SqlServer.Sets;
 
@@ -7,25 +6,13 @@ namespace XPenC.DataAccess.SqlServer
 {
     public sealed class SqlServerDataContext : IDataContext
     {
-        private readonly SqlConnectionHandler _sqlConnection;
+        private readonly ISqlDataProvider _sqlDataProvider;
 
-        public SqlServerDataContext(IConfiguration configuration, string connectionStringName)
+        public SqlServerDataContext(ISqlDataProvider sqlDataProvider)
         {
-            _sqlConnection = new SqlConnectionHandler(configuration, connectionStringName);
-            ExpenseReportItems = new ExpenseReportItemSet(_sqlConnection);
-            ExpenseReports = new ExpenseReportSet(_sqlConnection, ExpenseReportItems);
-        }
-
-        private bool _isDisposed;
-        public void Dispose()
-        {
-            if (_isDisposed)
-            {
-                return;
-            }
-
-            _sqlConnection?.Dispose();
-            _isDisposed = true;
+            _sqlDataProvider = sqlDataProvider;
+            ExpenseReportItems = new ExpenseReportItemSet(_sqlDataProvider);
+            ExpenseReports = new ExpenseReportSet(_sqlDataProvider, ExpenseReportItems);
         }
 
         public IExpenseReportSet ExpenseReports { get; }
@@ -34,7 +21,7 @@ namespace XPenC.DataAccess.SqlServer
 
         public void CommitChanges()
         {
-            _sqlConnection.CommitChanges();
+            _sqlDataProvider.CommitChanges();
         }
     }
 }

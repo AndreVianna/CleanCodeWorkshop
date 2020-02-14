@@ -11,14 +11,15 @@ namespace XPenC.BusinessLogic
     public class ExpenseReportOperations : IExpenseReportOperations
     {
         private readonly IDataContext _dataContext;
-        private static decimal _maximumMealValue = 50m;
 
         public ExpenseReportOperations(IDataContext dataContext)
         {
             _dataContext = dataContext;
         }
 
-        public static bool IsExpenseAboveMaximum(ExpenseReportItem item) => item.ExpenseType == ExpenseType.Meal && item.Value > _maximumMealValue;
+        public static decimal MaximumMealValue { get; } = 50m;
+
+        public static bool IsExpenseAboveMaximum(ExpenseReportItem item) => item.ExpenseType == ExpenseType.Meal && item.Value > MaximumMealValue;
         public static decimal CalculateReportTotal(IEnumerable<ExpenseReportItem> items) => items.Sum(i => i.Value ?? 0);
         public static decimal CalculateReportMealTotal(IEnumerable<ExpenseReportItem> items) => items.Where(i => i.ExpenseType == ExpenseType.Meal).Sum(i => i.Value ?? 0);
 

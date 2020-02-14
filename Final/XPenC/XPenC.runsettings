@@ -15,6 +15,7 @@
               <Exclude>
                 <ModulePath>.*xunit.*\.dll$</ModulePath>
                 <ModulePath>.*\.Tests\.dll$</ModulePath>
+                <ModulePath>.*\.Views\.dll$</ModulePath>
               </Exclude>
             </ModulePaths>
 

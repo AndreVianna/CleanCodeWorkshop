@@ -4,7 +4,7 @@ using XPenC.BusinessLogic.Contracts.Models;
 
 namespace XPenC.WebApp.Controllers.Tests.TestDoubles
 {
-    public class DummyExpenseReportOperations : IExpenseReportOperations
+    internal class DummyExpenseReportOperations : IExpenseReportOperations
     {
         public virtual void Add(ExpenseReport newExpenseReport) => throw new System.NotImplementedException();
         public virtual void AddItem(ExpenseReport source, ExpenseReportItem newItem) => throw new System.NotImplementedException();

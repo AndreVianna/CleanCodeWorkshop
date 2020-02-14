@@ -9,12 +9,12 @@ namespace XPenC.DataAccess.SqlServer.Sets
 {
     public class ExpenseReportSet : IExpenseReportSet
     {
-        private readonly SqlConnectionHandler _sqlConnectionHandler;
+        private readonly ISqlDataProvider _sqlDataProvider;
         private readonly IExpenseReportItemSet _itemSet;
 
-        public ExpenseReportSet(SqlConnectionHandler sqlConnectionHandler, IExpenseReportItemSet itemSet)
+        public ExpenseReportSet(ISqlDataProvider sqlDataProvider, IExpenseReportItemSet itemSet)
         {
-            _sqlConnectionHandler = sqlConnectionHandler;
+            _sqlDataProvider = sqlDataProvider;
             _itemSet = itemSet;
         }
 
@@ -42,7 +42,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
                 ["mealTotal"] = source.MealTotal,
                 ["total"] = source.Total,
             };
-            source.Id = _sqlConnectionHandler.ExecuteWithResult(commandText, parameters);
+            source.Id = _sqlDataProvider.ExecuteWithResult(commandText, parameters);
 
             foreach (var item in source.Items)
             {
@@ -56,7 +56,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
                                        "FROM ExpenseReports " +
                                        "ORDER BY ModifiedOn DESC;";
 
-            return _sqlConnectionHandler.ReadMany(commandText, ToExpenseReportEntity).ToList();
+            return _sqlDataProvider.ReadMany(commandText, ToExpenseReportEntity).ToList();
         }
 
         public ExpenseReportEntity Find(int id)
@@ -68,7 +68,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
                                        "WHERE r.Id=@id;";
             var parameters = new Dictionary<string, object> { ["id"] = id };
             
-            return !_sqlConnectionHandler.TryReadManyInto(result, commandText, parameters, ToExpenseReportWithItem)
+            return !_sqlDataProvider.TryReadManyInto(result, commandText, parameters, UpdateExpenseReport)
                 ? null
                 : result;
         }
@@ -89,7 +89,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
                 ["total"] = source.Total,
                 ["mealTotal"] = source.MealTotal,
             };
-            _sqlConnectionHandler.Execute(commandText, parameters);
+            _sqlDataProvider.Execute(commandText, parameters);
 
             var existingItems = _itemSet.GetAllFor(source.Id).ToList();
             var existingItemNumbers = existingItems.Select(i => i.ItemNumber).ToList();
@@ -110,7 +110,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
             {
                 ["id"] = id,
             };
-            _sqlConnectionHandler.Execute(commandText, parameters);
+            _sqlDataProvider.Execute(commandText, parameters);
         }
     }
 }

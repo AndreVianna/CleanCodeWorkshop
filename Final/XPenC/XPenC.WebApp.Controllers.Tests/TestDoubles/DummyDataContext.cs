@@ -3,7 +3,7 @@ using XPenC.DataAccess.Contracts.Sets;
 
 namespace XPenC.WebApp.Controllers.Tests.TestDoubles
 {
-    public class DummyDataContext : IDataContext
+    internal class DummyDataContext : IDataContext
     {
         public IExpenseReportSet ExpenseReports => throw new System.NotImplementedException();
 

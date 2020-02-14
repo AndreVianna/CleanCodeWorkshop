@@ -1,23 +1,19 @@
 ﻿using System;
-using Microsoft.Data.SqlClient;
+using System.Data;
 using XPenC.DataAccess.Contracts.Schema;
 
 namespace XPenC.DataAccess.SqlServer
 {
     internal static class ConversionHelper
     {
-        public static ExpenseReportEntity ToExpenseReportEntity(SqlDataReader row)
+        public static ExpenseReportEntity ToExpenseReportEntity(IDataRecord row)
         {
-            return new ExpenseReportEntity
-            {
-                Id = row.GetInt32(row.GetOrdinal("Id")),
-                Client = row.IsDBNull(row.GetOrdinal("Client")) ? null : row.GetString(row.GetOrdinal("Client")),
-                CreatedOn = row.GetDateTime(row.GetOrdinal("CreatedOn")),
-                ModifiedOn = row.IsDBNull(row.GetOrdinal("ModifiedOn")) ? (DateTime?)null : row.GetDateTime(row.GetOrdinal("ModifiedOn")),
-            };
+            var value = new ExpenseReportEntity();
+            UpdateExpenseReport(value, row);
+            return value;
         }
 
-        public static void ToExpenseReportWithItem(ExpenseReportEntity record, SqlDataReader row)
+        public static void UpdateExpenseReport(ExpenseReportEntity record, IDataRecord row)
         {
             record.Id = row.GetInt32(row.GetOrdinal("Id"));
             record.Client = row.IsDBNull(row.GetOrdinal("Client")) ? null : row.GetString(row.GetOrdinal("Client"));
@@ -25,14 +21,14 @@ namespace XPenC.DataAccess.SqlServer
             record.ModifiedOn = row.IsDBNull(row.GetOrdinal("ModifiedOn")) ? (DateTime?)null : row.GetDateTime(row.GetOrdinal("ModifiedOn"));
             record.MealTotal = row.GetDecimal(row.GetOrdinal("MealTotal"));
             record.Total = row.GetDecimal(row.GetOrdinal("Total"));
-            if (row.IsDBNull(row.GetOrdinal("ExpenseReportId")))
+            if (row.FieldCount == 6 || row.IsDBNull(row.GetOrdinal("ExpenseReportId")))
             {
                 return;
             }
             record.Items.Add(ToExpenseReportItemEntity(row));
         }
 
-        public static ExpenseReportItemEntity ToExpenseReportItemEntity(SqlDataReader row)
+        public static ExpenseReportItemEntity ToExpenseReportItemEntity(IDataRecord row)
         {
             return new ExpenseReportItemEntity
             {
@@ -43,6 +39,11 @@ namespace XPenC.DataAccess.SqlServer
                 Value = row.IsDBNull(row.GetOrdinal("Value")) ? 0 : row.GetDecimal(row.GetOrdinal("Value")),
                 Description = row.IsDBNull(row.GetOrdinal("Description")) ? null : row.GetString(row.GetOrdinal("Description")),
             };
+        }
+
+        public static int ToItemNumber(IDataRecord reader)
+        {
+            return reader.GetInt32(reader.GetOrdinal("ItemNumber"));
         }
     }
 }

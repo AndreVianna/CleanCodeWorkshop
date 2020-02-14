@@ -1,9 +1,8 @@
-﻿using System;
-using XPenC.DataAccess.Contracts.Sets;
+﻿using XPenC.DataAccess.Contracts.Sets;
 
 namespace XPenC.DataAccess.Contracts
 {
-    public interface IDataContext : IDisposable
+    public interface IDataContext
     {
         IExpenseReportSet ExpenseReports { get; }
         IExpenseReportItemSet ExpenseReportItems { get; }
