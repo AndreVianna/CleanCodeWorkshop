@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using XPenC.DataAccess.Contracts;
 using XPenC.DataAccess.Contracts.Schema;
+using XPenC.DataAccess.Contracts.Sets;
+using static XPenC.DataAccess.SqlServer.ConversionHelper;
 
-namespace XPenC.DataAccess.SqlServer
+namespace XPenC.DataAccess.SqlServer.Sets
 {
     public class ExpenseReportSet : IExpenseReportSet
     {
         private readonly SqlConnectionHandler _sqlConnectionHandler;
-        private readonly IExpenseReportItemTable _itemTable;
+        private readonly IExpenseReportItemSet _itemSet;
 
-        public ExpenseReportSet(SqlConnectionHandler sqlConnectionHandler, IExpenseReportItemTable itemTable)
+        public ExpenseReportSet(SqlConnectionHandler sqlConnectionHandler, IExpenseReportItemSet itemSet)
         {
             _sqlConnectionHandler = sqlConnectionHandler;
-            _itemTable = itemTable;
+            _itemSet = itemSet;
         }
 
-        public ExpenseReportEntity CreateRecordWithDefaults()
+        private static ExpenseReportEntity CreateRecordWithDefaults()
         {
             var now = DateTime.Now;
             return new ExpenseReportEntity
@@ -29,11 +30,11 @@ namespace XPenC.DataAccess.SqlServer
 
         public void Add(ExpenseReportEntity source)
         {
-            var commandText = "INSERT INTO ExpenseReports " +
-                              "(CreatedOn, ModifiedOn, MealTotal, Total) " +
-                              "VALUES " +
-                              "(@created, @modified, @mealTotal, @total);" +
-                              "SELECT SCOPE_IDENTITY();";
+            const string commandText = "INSERT INTO ExpenseReports " +
+                                       "(CreatedOn, ModifiedOn, MealTotal, Total) " +
+                                       "VALUES " +
+                                       "(@created, @modified, @mealTotal, @total);" +
+                                       "SELECT SCOPE_IDENTITY();";
             var parameters = new Dictionary<string, object>
             {
                 ["created"] = source.CreatedOn,
@@ -45,41 +46,41 @@ namespace XPenC.DataAccess.SqlServer
 
             foreach (var item in source.Items)
             {
-                _itemTable.Add(item);
+                _itemSet.AddTo(source.Id, item);
             }
         }
 
         public IEnumerable<ExpenseReportEntity> GetAll()
         {
-            var commandText = "SELECT * " +
-                              "FROM ExpenseReports " +
-                              "ORDER BY ModifiedOn DESC;";
-            
-            return _sqlConnectionHandler.ReadMany(commandText, ConversionHelper.ToExpenseReportEntity).ToList();
+            const string commandText = "SELECT * " +
+                                       "FROM ExpenseReports " +
+                                       "ORDER BY ModifiedOn DESC;";
+
+            return _sqlConnectionHandler.ReadMany(commandText, ToExpenseReportEntity).ToList();
         }
 
         public ExpenseReportEntity Find(int id)
         {
-            var result = new ExpenseReportEntity();
-            var commandText = "SELECT * " +
-                              "FROM ExpenseReports r " +
-                              "LEFT JOIN ExpenseReportItems i ON r.Id = i.ExpenseReportId " +
-                              "WHERE r.Id=@id;";
+            var result = CreateRecordWithDefaults();
+            const string commandText = "SELECT * " +
+                                       "FROM ExpenseReports r " +
+                                       "LEFT JOIN ExpenseReportItems i ON r.Id = i.ExpenseReportId " +
+                                       "WHERE r.Id=@id;";
             var parameters = new Dictionary<string, object> { ["id"] = id };
             
-            return !_sqlConnectionHandler.TryUpdate(result, commandText, parameters, ConversionHelper.UpdateExpenseReport)
+            return !_sqlConnectionHandler.TryReadManyInto(result, commandText, parameters, ToExpenseReportWithItem)
                 ? null
                 : result;
         }
 
         public void Update(ExpenseReportEntity source)
         {
-            var commandText = "UPDATE ExpenseReports SET " +
-                              "Client = @client, " +
-                              "ModifiedOn = @modifiedOn, " +
-                              "Total = @total, " +
-                              "MealTotal = @mealTotal " +
-                              "WHERE Id = @id";
+            const string commandText = "UPDATE ExpenseReports SET " +
+                                       "Client = @client, " +
+                                       "ModifiedOn = @modifiedOn, " +
+                                       "Total = @total, " +
+                                       "MealTotal = @mealTotal " +
+                                       "WHERE Id = @id";
             var parameters = new Dictionary<string, object>
             {
                 ["id"] = source.Id,
@@ -90,22 +91,21 @@ namespace XPenC.DataAccess.SqlServer
             };
             _sqlConnectionHandler.Execute(commandText, parameters);
 
-            var existingItems = _itemTable.GetAllFor(source.Id).ToList();
+            var existingItems = _itemSet.GetAllFor(source.Id).ToList();
             var existingItemNumbers = existingItems.Select(i => i.ItemNumber).ToList();
 
             var sourceItems = source.Items.ToList();
-            var inputItemNumbers = source.Items.Select(i => i.ItemNumber).ToArray();
+            var inputItemNumbers = sourceItems.Select(i => i.ItemNumber);
+            var itemsNumbersToRemove = existingItemNumbers.Except(inputItemNumbers).ToList();
+            itemsNumbersToRemove.ForEach(i => _itemSet.DeleteFrom(source.Id, i));
 
-            var itemsToRemove = existingItemNumbers.Except(inputItemNumbers).ToList();
-            var itemsToAdd = inputItemNumbers.Except(existingItemNumbers).ToList();
-
-            itemsToRemove.ForEach(i => _itemTable.Delete(source.Id, i));
-            itemsToAdd.ForEach(i => _itemTable.Add(sourceItems.Find(r => r.ItemNumber == i)));
+            var itemsToAdd = sourceItems.Where(r => r.ItemNumber == 0).ToList();
+            itemsToAdd.ForEach(i => _itemSet.AddTo(source.Id, i));
         }
 
         public void Delete(int id)
         {
-            var commandText = "DELETE FROM ExpenseReports WHERE Id=@id;";
+            const string commandText = "DELETE FROM ExpenseReports WHERE Id=@id;";
             var parameters = new Dictionary<string, object>
             {
                 ["id"] = id,

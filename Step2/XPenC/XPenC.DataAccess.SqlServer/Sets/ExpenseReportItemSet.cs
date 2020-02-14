@@ -1,32 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
-using XPenC.DataAccess.Contracts;
 using XPenC.DataAccess.Contracts.Schema;
+using XPenC.DataAccess.Contracts.Sets;
 
-namespace XPenC.DataAccess.SqlServer
+namespace XPenC.DataAccess.SqlServer.Sets
 {
-    public class ExpenseReportItemTable : IExpenseReportItemTable
+    public class ExpenseReportItemSet : IExpenseReportItemSet
     {
         private readonly SqlConnectionHandler _sqlConnectionHandler;
 
-        public ExpenseReportItemTable(SqlConnectionHandler sqlConnectionHandler)
+        public ExpenseReportItemSet(SqlConnectionHandler sqlConnectionHandler)
         {
             _sqlConnectionHandler = sqlConnectionHandler;
         }
 
-        public ExpenseReportItemEntity CreateRecordWithDefaults()
+        public void DeleteFrom(int expenseReportId, int itemNumber)
         {
-            var now = DateTime.Now;
-            return new ExpenseReportItemEntity();
-        }
-
-
-        public void Delete(int expenseReportId, int itemNumber)
-        {
-            var commandText = "DELETE FROM ExpenseReportItems " +
-                              "WHERE ExpenseReportId = @id " +
-                              "AND ItemNumber = @number";
+            const string commandText = "DELETE FROM ExpenseReportItems " +
+                                       "WHERE ExpenseReportId = @id " +
+                                       "AND ItemNumber = @number";
             var parameters = new Dictionary<string, object>
             {
                 ["id"] = expenseReportId,
@@ -38,24 +30,24 @@ namespace XPenC.DataAccess.SqlServer
 
         public IEnumerable<ExpenseReportItemEntity> GetAllFor(int expenseReportId)
         {
-            var commandText = "SELECT * " +
-                              "FROM ExpenseReportItems " +
-                              "WHERE ExpenseReportId=@expenseReportId;";
+            const string commandText = "SELECT * " +
+                                       "FROM ExpenseReportItems " +
+                                       "WHERE ExpenseReportId=@expenseReportId;";
             var parameters = new Dictionary<string, object> { ["expenseReportId"] = expenseReportId };
             
             return _sqlConnectionHandler.ReadMany(commandText, parameters, ConversionHelper.ToExpenseReportItemEntity);
         }
 
-        public void Add(ExpenseReportItemEntity source)
+        public void AddTo(int expenseReportId, ExpenseReportItemEntity source)
         {
-            var nextNumber = GetNextNumber(source.ExpenseReportId);
-            var commandText = "INSERT INTO ExpenseReportItems " +
-                              "(ExpenseReportId, ItemNumber, Date, ExpenseType, Value, Description) " +
-                              "VALUES " +
-                              "(@id, @number, @date, @expenseType, @value, @description)";
+            var nextNumber = GetNextNumber(expenseReportId);
+            const string commandText = "INSERT INTO ExpenseReportItems " +
+                                       "(ExpenseReportId, ItemNumber, Date, ExpenseType, Value, Description) " +
+                                       "VALUES " +
+                                       "(@id, @number, @date, @expenseType, @value, @description)";
             var parameters = new Dictionary<string, object>
             {
-                ["id"] = source.ExpenseReportId,
+                ["id"] = expenseReportId,
                 ["number"] = nextNumber,
                 ["date"] = source.Date,
                 ["expenseType"] = source.ExpenseType,
@@ -64,21 +56,28 @@ namespace XPenC.DataAccess.SqlServer
             };
 
             _sqlConnectionHandler.Execute(commandText, parameters);
+            
+            source.ExpenseReportId = expenseReportId;
+            source.ItemNumber = nextNumber;
         }
 
         private int GetNextNumber(int id)
         {
-            var commandText = "SELECT TOP 1 ItemNumber " +
-                              "FROM ExpenseReportItems " +
-                              "WHERE ExpenseReportId = @id " +
-                              "ORDER BY 1 DESC";
+            const string commandText = "SELECT TOP 1 ItemNumber " +
+                                       "FROM ExpenseReportItems " +
+                                       "WHERE ExpenseReportId = @id " +
+                                       "ORDER BY 1 DESC";
             var parameters = new Dictionary<string, object>
             {
                 ["id"] = id,
             };
-            Func<SqlDataReader, int> readItemNumber = r => r.GetInt32(r.GetOrdinal("ItemNumber"));
 
-            return _sqlConnectionHandler.ReadOne(commandText, parameters, readItemNumber) + 1;
+            return _sqlConnectionHandler.ReadOne(commandText, parameters, ReadItemNumber) + 1;
+        }
+
+        private static int ReadItemNumber(SqlDataReader reader)
+        {
+            return reader.GetInt32(reader.GetOrdinal("ItemNumber"));
         }
     }
 }

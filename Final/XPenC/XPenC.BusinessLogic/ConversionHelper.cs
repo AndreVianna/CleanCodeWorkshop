@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using XPenC.BusinessLogic.Contracts;
 using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.DataAccess.Contracts.Schema;
 
@@ -9,62 +8,78 @@ namespace XPenC.BusinessLogic
     {
         public static ExpenseReport ToExpenseReport(ExpenseReportEntity source)
         {
-            if (source == null) return null;
-            var items = (source.Items?.Select(ToExpenseReportItem)?? Enumerable.Empty<ExpenseReportItem>()).ToList();
-            var value = new ExpenseReport
+            if (source == null)
             {
-                Id = source.Id,
-                Client = source.Client,
-                CreatedOn = source.CreatedOn,
-                ModifiedOn = source.ModifiedOn ?? source.CreatedOn,
-                Items = items,
-                Total = ExpenseReportOperations.CalculateReportTotal(items),
-                MealTotal = ExpenseReportOperations.CalculateReportMealTotal(items),
-            };
+                return null;
+            }
+
+            var value = new ExpenseReport();
+            UpdateExpenseReport(value, source);
             return value;
+        }
+
+        public static void UpdateExpenseReport(ExpenseReport dest, ExpenseReportEntity source)
+        {
+            dest.Id = source.Id;
+            dest.Client = source.Client;
+            dest.CreatedOn = source.CreatedOn;
+            dest.ModifiedOn = source.ModifiedOn ?? source.CreatedOn;
+            dest.Items = source.Items.Select(ToExpenseReportItem).ToList();
+            dest.Total = source.Total;
+            dest.MealTotal = source.MealTotal;
         }
 
         public static ExpenseReportEntity ToExpenseReportEntity(ExpenseReport source)
         {
-            if (source == null) return null;
-            return new ExpenseReportEntity
-            {
-                Id = source.Id,
-                Client = source.Client,
-                CreatedOn = source.CreatedOn,
-                ModifiedOn = source.ModifiedOn,
-                Items = (source.Items?.Select(ToExpenseReportItemEntity) ?? Enumerable.Empty<ExpenseReportItemEntity>()).ToList(),
-                Total = ExpenseReportOperations.CalculateReportTotal(source.Items),
-                MealTotal = ExpenseReportOperations.CalculateReportMealTotal(source.Items),
-            };
+            var value = new ExpenseReportEntity();
+            UpdateExpenseReportEntity(value, source);
+            return value;
+        }
+
+        private static void UpdateExpenseReportEntity(ExpenseReportEntity dest, ExpenseReport source)
+        {
+            dest.Id = source.Id;
+            dest.Client = source.Client;
+            dest.CreatedOn = source.CreatedOn;
+            dest.ModifiedOn = source.ModifiedOn;
+            dest.Items = source.Items.Select(ToExpenseReportItemEntity).ToList();
+            dest.Total = ExpenseReportOperations.CalculateReportTotal(source.Items);
+            dest.MealTotal = ExpenseReportOperations.CalculateReportMealTotal(source.Items);
         }
 
         private static ExpenseReportItem ToExpenseReportItem(ExpenseReportItemEntity source)
         {
-            var result = new ExpenseReportItem
-            {
-                ExpenseReportId = source.ExpenseReportId,
-                ItemNumber = source.ItemNumber,
-                ExpenseType = TranslateExpenseType(source.ExpenseType),
-                Date = source.Date,
-                Value = source.Value,
-                Description = source.Description,
-            };
-            result.IsAboveMaximum = ExpenseReportOperations.IsExpenseAboveMaximum(result);
-            return result;
+            var value = new ExpenseReportItem();
+            UpdateExpenseReportItem(value, source);
+            return value;
         }
 
-        private static ExpenseReportItemEntity ToExpenseReportItemEntity(ExpenseReportItem source)
+        public static void UpdateExpenseReportItem(ExpenseReportItem dest, ExpenseReportItemEntity source)
         {
-            return new ExpenseReportItemEntity
-            {
-                ExpenseReportId = source.ExpenseReportId,
-                ItemNumber = source.ItemNumber,
-                ExpenseType = TranslateExpenseType(source.ExpenseType),
-                Date = source.Date,
-                Value = source.Value,
-                Description = source.Description,
-            };
+            dest.ExpenseReportId = source.ExpenseReportId;
+            dest.ItemNumber = source.ItemNumber;
+            dest.ExpenseType = TranslateExpenseType(source.ExpenseType);
+            dest.Date = source.Date;
+            dest.Value = source.Value;
+            dest.Description = source.Description;
+            dest.IsAboveMaximum = ExpenseReportOperations.IsExpenseAboveMaximum(dest);
+        }
+
+        public static ExpenseReportItemEntity ToExpenseReportItemEntity(ExpenseReportItem source)
+        {
+            var value = new ExpenseReportItemEntity();
+            UpdateExpenseReportItemEntity(value, source);
+            return value;
+        }
+
+        private static void UpdateExpenseReportItemEntity(ExpenseReportItemEntity dest, ExpenseReportItem source)
+        {
+            dest.ExpenseReportId = source.ExpenseReportId;
+            dest.ItemNumber = source.ItemNumber;
+            dest.ExpenseType = TranslateExpenseType(source.ExpenseType);
+            dest.Date = source.Date;
+            dest.Value = source.Value;
+            dest.Description = source.Description;
         }
 
         private static ExpenseType TranslateExpenseType(string expenseType)

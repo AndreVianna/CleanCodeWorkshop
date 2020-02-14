@@ -1,6 +1,6 @@
 using System;
 
-namespace XPenC.WebApp.ViewModels
+namespace XPenC.WebApp.Controllers.ViewModels
 {
     public class ExpenseReportListItem
     {

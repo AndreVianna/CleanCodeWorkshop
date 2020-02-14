@@ -7,7 +7,7 @@ namespace XPenC.BusinessLogic.Contracts
     {
         ExpenseReport CreateWithDefaults();
 
-        List<ExpenseReport> GetList();
+        IEnumerable<ExpenseReport> GetList();
         void Add(ExpenseReport newExpenseReport);
         ExpenseReport Find(int id);
         void Update(ExpenseReport source);

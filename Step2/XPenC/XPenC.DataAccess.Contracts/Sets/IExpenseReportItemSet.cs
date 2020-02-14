@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using XPenC.DataAccess.Contracts.Schema;
 
-namespace XPenC.DataAccess.Contracts
+namespace XPenC.DataAccess.Contracts.Sets
 {
-    public interface IExpenseReportItemTable
+    public interface IExpenseReportItemSet
     {
         IEnumerable<ExpenseReportItemEntity> GetAllFor(int expenseReportId);
-        void Add(ExpenseReportItemEntity source);
-        void Delete(int expenseReportId, int itemNumber);
+        void AddTo(int expenseReportId, ExpenseReportItemEntity source);
+        void DeleteFrom(int expenseReportId, int itemNumber);
     }
 }

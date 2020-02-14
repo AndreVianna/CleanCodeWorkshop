@@ -35,14 +35,14 @@ namespace XPenC.BusinessLogic
 
         public void Add(ExpenseReport source)
         {
-            var entity = ToExpenseReportEntity(source);
-            _dataContext.ExpenseReports.Add(entity);
-            source.Id = entity.Id;
+            var newEntity = ToExpenseReportEntity(source);
+            _dataContext.ExpenseReports.Add(newEntity);
+            UpdateExpenseReport(source, newEntity);
         }
 
-        public List<ExpenseReport> GetList()
+        public IEnumerable<ExpenseReport> GetList()
         {
-            return _dataContext.ExpenseReports.GetAll().Select(ToExpenseReport).ToList();
+            return _dataContext.ExpenseReports.GetAll().Select(ToExpenseReport);
         }
 
         public ExpenseReport Find(int id)
@@ -52,21 +52,17 @@ namespace XPenC.BusinessLogic
 
         public void RemoveItem(ExpenseReport source, int itemNumber)
         {
+            _dataContext.ExpenseReportItems.DeleteFrom(source.Id, itemNumber);
             var itemToRemove = source.Items.ToList().Find(i => i.ItemNumber == itemNumber);
             source.Items.Remove(itemToRemove);
         }
 
         public void AddItem(ExpenseReport source, ExpenseReportItem newItem)
         {
-            if (source.Items == null)
-                source.Items = new List<ExpenseReportItem>();
-            source.Items.Add(new ExpenseReportItem
-            {
-                ExpenseReportId = source.Id,
-                Date = newItem.Date,
-                ExpenseType = newItem.ExpenseType,
-                Value = newItem.Value,
-            });
+            var newItemEntity = ToExpenseReportItemEntity(newItem);
+            _dataContext.ExpenseReportItems.AddTo(source.Id, newItemEntity);
+            UpdateExpenseReportItem(newItem, newItemEntity);
+            source.Items.Add(newItem);
         }
 
         public void Update(ExpenseReport source)

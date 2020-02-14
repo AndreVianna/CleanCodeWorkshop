@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace XPenC.WebApp.ViewModels
+namespace XPenC.WebApp.Controllers.ViewModels
 {
     public class ExpenseReportDetails
     {

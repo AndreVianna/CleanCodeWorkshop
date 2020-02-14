@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using XPenC.WebApp.ViewModels;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace XPenC.WebApp.Controllers
+namespace XPenC.WebApp.Controllers.Controllers
 {
     public class HomeController : Controller
     {
@@ -14,16 +12,6 @@ namespace XPenC.WebApp.Controllers
         public IActionResult Privacy()
         {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error(string message)
-        {
-            return View(new ErrorViewModel
-            {
-                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
-                Message = message,
-            });
         }
     }
 }

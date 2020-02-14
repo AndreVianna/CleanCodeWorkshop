@@ -1,5 +1,4 @@
-﻿@using System.Collections
-@model XPenC.WebApp.ViewModels.ExpenseReportUpdateInput
+﻿@model XPenC.WebApp.Controllers.ViewModels.ExpenseReportUpdate
 
 <h1>Update Expense Report @Model.Id</h1>
 <hr />
@@ -25,40 +24,40 @@
                         <label class="d-none d-md-block col-md-2 col-form-label">Value</label>
                         <label class="d-none d-md-block offset-md-1 col-md-1 col-form-label">&nbsp;</label>
                     </div>
-                    @for (var i = 0; i < Model.Items.Count; i++)
+                    @for (var i = 0; i < Model.DisplayItems.Count; i++)
                     {
                         <div class="row">
                             <div class="col-2 col-md-1">
                                 <input value="@(i + 1)" readonly class="form-control-plaintext" />
                             </div>
                             <div class="col-5 col-md-3">
-                                <input value="@($"{Model.Items[i].Date:d}")" readonly class="form-control-plaintext" />
+                                <input value="@($"{Model.DisplayItems[i].Date:d}")" readonly class="form-control-plaintext" />
                             </div>
                             <div class="col-5 col-md-4">
-                                <input value="@Model.Items[i].ExpenseType" readonly class="form-control-plaintext" />
+                                <input value="@Model.DisplayItems[i].ExpenseType" readonly class="form-control-plaintext" />
                             </div>
                             <label class="d-block d-md-none col-2 col-form-label">Value</label>
                             <div class="col-5 col-md-2">
-                                <input value="@($"{Model.Items[i].Value:C}")" readonly class="form-control-plaintext" />
+                                <input value="@($"{Model.DisplayItems[i].Value:C}")" readonly class="form-control-plaintext" />
                             </div>
                             <div class="d-none d-md-block col-1">
-                                <button type="submit" name="action" value="@($"Remove{Model.Items[i].Number}")" class="btn btn-primary">Remove</button>
+                                <button type="submit" name="action" value="@($"Remove{Model.DisplayItems[i].Number}")" class="btn btn-primary">Remove</button>
                             </div>
                         </div>
                         <div class="row">
                             <label class="col-12 offset-md-1 col-md-11 col-form-label">Description</label>
                             <div class="col-12 offset-md-1 col-md-9">
-                                <input value="@Model.Items[i].Description" readonly class="form-control-plaintext" />
+                                <input value="@Model.DisplayItems[i].Description" readonly class="form-control-plaintext" />
                             </div>
                             <div class="d-block d-md-none col-10 col-md-2">
-                                <button type="submit" name="action" value="@($"Remove{Model.Items[i].Number}")" class="btn btn-primary">Remove</button>
+                                <button type="submit" name="action" value="@($"Remove{Model.DisplayItems[i].Number}")" class="btn btn-primary">Remove</button>
                             </div>
                         </div>
                         <div class="row"><div class="col"><hr /></div></div>
                     }
                     <div class="row">
                         <div class="col-2 col-md-1">
-                            <input asp-for="NewItem.Number" readonly class="form-control-plaintext" value="@(Model.Items.Count + 1)" />
+                            <input readonly class="form-control-plaintext" value="@(Model.DisplayItems.Count + 1)" />
                         </div>
                         <div class="col-5 col-md-3">
                             <input asp-for="NewItem.Date" type="date" class="form-control" />

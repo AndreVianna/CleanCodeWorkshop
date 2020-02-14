@@ -1,15 +1,9 @@
 using System;
 
-namespace XPenC.WebApp.ViewModels
+namespace XPenC.WebApp.Controllers.ViewModels
 {
     public class ExpenseReportItemDetails
     {
-        public ExpenseReportItemDetails()
-        {
-            Date = DateTime.Now;
-            Value = 0;
-        }
-
         public int Number { get; set; }
 
         public DateTime? Date { get; set; }

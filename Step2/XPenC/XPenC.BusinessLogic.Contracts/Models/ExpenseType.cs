@@ -1,4 +1,4 @@
-﻿namespace XPenC.BusinessLogic.Contracts
+﻿namespace XPenC.BusinessLogic.Contracts.Models
 {
     public enum ExpenseType
     {

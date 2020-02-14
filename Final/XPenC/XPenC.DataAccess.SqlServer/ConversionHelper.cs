@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using XPenC.DataAccess.Contracts.Schema;
 
@@ -18,7 +17,7 @@ namespace XPenC.DataAccess.SqlServer
             };
         }
 
-        public static void UpdateExpenseReport(ExpenseReportEntity record, SqlDataReader row)
+        public static void ToExpenseReportWithItem(ExpenseReportEntity record, SqlDataReader row)
         {
             record.Id = row.GetInt32(row.GetOrdinal("Id"));
             record.Client = row.IsDBNull(row.GetOrdinal("Client")) ? null : row.GetString(row.GetOrdinal("Client"));
@@ -26,11 +25,11 @@ namespace XPenC.DataAccess.SqlServer
             record.ModifiedOn = row.IsDBNull(row.GetOrdinal("ModifiedOn")) ? (DateTime?)null : row.GetDateTime(row.GetOrdinal("ModifiedOn"));
             record.MealTotal = row.GetDecimal(row.GetOrdinal("MealTotal"));
             record.Total = row.GetDecimal(row.GetOrdinal("Total"));
-            if (!row.IsDBNull(row.GetOrdinal("ExpenseReportId")))
+            if (row.IsDBNull(row.GetOrdinal("ExpenseReportId")))
             {
-                if (record.Items == null) record.Items = new List<ExpenseReportItemEntity>();
-                record.Items.Add(ToExpenseReportItemEntity(row));
+                return;
             }
+            record.Items.Add(ToExpenseReportItemEntity(row));
         }
 
         public static ExpenseReportItemEntity ToExpenseReportItemEntity(SqlDataReader row)

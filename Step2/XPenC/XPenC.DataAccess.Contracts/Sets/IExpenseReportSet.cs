@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using XPenC.DataAccess.Contracts.Schema;
 
-namespace XPenC.DataAccess.Contracts
+namespace XPenC.DataAccess.Contracts.Sets
 {
     public interface IExpenseReportSet
     {
-        ExpenseReportEntity CreateRecordWithDefaults();
-
         IEnumerable<ExpenseReportEntity> GetAll();
         ExpenseReportEntity Find(int id);
 

@@ -36,12 +36,16 @@ namespace XPenC.WebApp.Controllers
         public IActionResult Details(int? id)
         {
             if (id == null)
+            {
                 return NotFound();
+            }
 
             var result = GetExistingReport(id.Value);
 
             if (result == null)
+            {
                 return NotFound();
+            }
 
             return View(result);
         }
@@ -59,7 +63,7 @@ namespace XPenC.WebApp.Controllers
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", "Home", new { message = ex.Message });
+                return RedirectToAction("Error", "Home", new { message = $"{ex.GetType().Name}: {ex.Message}" });
             }
         }
 
@@ -67,12 +71,16 @@ namespace XPenC.WebApp.Controllers
         public IActionResult Update(int? id)
         {
             if (id == null)
+            {
                 return NotFound();
+            }
 
             var result = ConvertToExpenseReportUpdateInput(GetExistingReport(id.Value));
 
             if (result == null)
+            {
                 return NotFound();
+            }
 
             PrepareExpenseTypeDropdownList();
             return View(result);
@@ -86,15 +94,21 @@ namespace XPenC.WebApp.Controllers
             try
             {
                 if (id == null)
+                {
                     return NotFound();
+                }
 
                 if (input == null || input.Id != id)
+                {
                     return BadRequest("The update request data is not valid.");
+                }
 
                 var originalValue = GetExistingReport(id.Value);
 
                 if (originalValue == null)
+                {
                     return NotFound();
+                }
 
                 ValidateUpdateOperation(action, input);
                 if (!ModelState.IsValid)
@@ -109,13 +123,15 @@ namespace XPenC.WebApp.Controllers
                 _connectionHandler.CommitChanges();
 
                 if (action == "Finish")
+                {
                     return RedirectToAction(nameof(Index));
+                }
 
                 return RedirectToAction(nameof(Update), new {id});
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", "Home", new { message = ex.Message });
+                return RedirectToAction("Error", "Home", new { message = $"{ex.GetType().Name}: {ex.Message}" });
             }
         }
 
@@ -123,12 +139,16 @@ namespace XPenC.WebApp.Controllers
         public IActionResult Delete(int? id)
         {
             if (id == null)
+            {
                 return NotFound();
+            }
 
             var result = GetExistingReport(id.Value);
 
             if (result == null)
+            {
                 return NotFound();
+            }
 
             return View(result);
         }
@@ -143,12 +163,13 @@ namespace XPenC.WebApp.Controllers
                 ExecuteDeleteReport(id);
 
                 _connectionHandler.CommitChanges();
+
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Error", "Home", new { message = ex.Message });
+                return RedirectToAction("Error", "Home", new { message = $"{ex.GetType().Name}: {ex.Message}" });
             }
-            return RedirectToAction(nameof(Index));
         }
 
         private List<ExpenseReportListItem> GetReportList()
@@ -438,7 +459,11 @@ namespace XPenC.WebApp.Controllers
 
         protected virtual void Dispose(bool isDisposing)
         {
-            if (_isDisposed) return;
+            if (_isDisposed)
+            {
+                return;
+            }
+
             if (isDisposing)
             {
                 _transaction?.Dispose();
@@ -452,6 +477,7 @@ namespace XPenC.WebApp.Controllers
             Dispose(true);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Only used by pre-defined queries.")]
         private SqlCommand CreateCommand(string commandText, IDictionary<string, object> parameters)
         {
             var command = _transaction.Connection.CreateCommand();
@@ -474,7 +500,10 @@ namespace XPenC.WebApp.Controllers
                 using (var row = command.ExecuteReader())
                 {
                     if (row.Read())
+                    {
                         return convertResult(row);
+                    }
+
                     return defaultValue;
                 }
             }
@@ -505,7 +534,9 @@ namespace XPenC.WebApp.Controllers
                 using (var row = command.ExecuteReader())
                 {
                     if (!row.HasRows)
+                    {
                         return null;
+                    }
 
                     while (row.Read())
                     {

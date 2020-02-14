@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
@@ -21,7 +22,11 @@ namespace XPenC.DataAccess.SqlServer
         private bool _isDisposed;
         public void Dispose()
         {
-            if (_isDisposed) return;
+            if (_isDisposed)
+            {
+                return;
+            }
+
             _transaction?.Dispose();
             _connection?.Dispose();
             _isDisposed = true;
@@ -49,11 +54,11 @@ namespace XPenC.DataAccess.SqlServer
             }
         }
 
-        public bool TryUpdate<T>(T target, string commandText, IDictionary<string, object> parameters, Action<T, SqlDataReader> updateTargetFromRow)
+        public bool TryReadManyInto<T>(T target, string commandText, IDictionary<string, object> parameters, Action<T, SqlDataReader> updateTargetFromRow)
         {
             using (var command = CreateCommand(commandText, parameters))
             {
-                return TryUpdate(command, target, updateTargetFromRow);
+                return TryReadManyInto(command, target, updateTargetFromRow);
             }
         }
 
@@ -73,17 +78,20 @@ namespace XPenC.DataAccess.SqlServer
             }
         }
 
+        [SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Only used by pre-defined queries.")]
         private SqlCommand CreateCommand(string commandText, IDictionary<string, object> parameters)
         {
             var command = _transaction.Connection.CreateCommand();
             command.CommandText = commandText;
             command.Transaction = _transaction;
-            if (parameters != null && parameters.Count > 0)
+            if (parameters == null || parameters.Count <= 0)
             {
-                foreach (var parameter in parameters)
-                {
-                    command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
-                }
+                return command;
+            }
+
+            foreach (var parameter in parameters)
+            {
+                command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
             }
             return command;
         }
@@ -97,11 +105,16 @@ namespace XPenC.DataAccess.SqlServer
         {
             using (var row = command.ExecuteReader())
             {
-                return row.Read() ? convertRow(row) : defaultValue;
+                if (row.Read())
+                {
+                    return convertRow(row);
+                }
+
+                return defaultValue;
             }
         }
 
-        private IEnumerable<T> ReadMany<T>(SqlCommand command, Func<SqlDataReader, T> convertRow)
+        private static IEnumerable<T> ReadMany<T>(SqlCommand command, Func<SqlDataReader, T> convertRow)
         {
             var result = new List<T>();
             using (var row = command.ExecuteReader())
@@ -114,7 +127,7 @@ namespace XPenC.DataAccess.SqlServer
             return result;
         }
 
-        private static bool TryUpdate<T>(SqlCommand command, T target, Action<T, SqlDataReader> updateTargetFromRow)
+        private static bool TryReadManyInto<T>(SqlCommand command, T target, Action<T, SqlDataReader> updateTargetFromRow)
         {
             bool hasUpdates;
             using (var row = command.ExecuteReader())
