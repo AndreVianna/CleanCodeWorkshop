@@ -7,8 +7,7 @@ namespace XPenC.WebApp.Models
     {
         public ExpenseReportUpdate()
         {
-            DisplayItems = new List<ExpenseReportItemDetails>();
-            NewItem = new ExpenseReportItemUpdate();
+            Items = new List<ExpenseReportItemDetails>();
         }
 
         public int Id { get; set; }
@@ -17,8 +16,6 @@ namespace XPenC.WebApp.Models
         [Display(Name = "Client")]
         public string Client { get; set; }
 
-        public IList<ExpenseReportItemDetails> DisplayItems { get; set; }
-
-        public ExpenseReportItemUpdate NewItem { get; set; }
+        public IList<ExpenseReportItemDetails> Items { get; set; }
     }
 }

@@ -5,19 +5,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace XPenC.WebApp.Controllers
 {
+    [Route("")]
+    [Route("Home")]
     public class HomeController : Controller
     {
+        [HttpGet("")]
+        [HttpGet("Index")]
         public IActionResult Index()
         {
             return View();
         }
 
+        [HttpGet("Privacy")]
         public IActionResult Privacy()
         {
             return View();
         }
 
-        [HttpPost]
+        [HttpPost("SetLanguage")]
         public IActionResult SetLanguage(string culture, string returnUrl)
         {
             Response.Cookies.Append(

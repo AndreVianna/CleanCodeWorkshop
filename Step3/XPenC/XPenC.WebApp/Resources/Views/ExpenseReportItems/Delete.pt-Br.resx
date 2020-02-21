@@ -120,11 +120,17 @@
   <data name="#" xml:space="preserve">
     <value>#</value>
   </data>
-  <data name="Add New Item" xml:space="preserve">
-    <value>Addicionar Novo Item</value>
+  <data name="Add" xml:space="preserve">
+    <value>Addicionar</value>
+  </data>
+  <data name="Are you sure you want to delete this item?" xml:space="preserve">
+    <value>Tem certeza que deseja excluir este item?</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancelar</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirmar</value>
   </data>
   <data name="Finish" xml:space="preserve">
     <value>Terminar</value>

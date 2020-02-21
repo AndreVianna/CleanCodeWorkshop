@@ -120,8 +120,8 @@
   <data name="#" xml:space="preserve">
     <value>#</value>
   </data>
-  <data name="Add New Item" xml:space="preserve">
-    <value>Addicionar Novo Item</value>
+  <data name="Add" xml:space="preserve">
+    <value>Addicionar</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancelar</value>
@@ -131,6 +131,9 @@
   </data>
   <data name="Items" xml:space="preserve">
     <value>Itens</value>
+  </data>
+  <data name="New Item" xml:space="preserve">
+    <value>Novo Item</value>
   </data>
   <data name="Please select one..." xml:space="preserve">
     <value>Por favor selecione um...</value>

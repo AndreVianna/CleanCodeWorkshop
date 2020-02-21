@@ -1,5 +1,4 @@
 ﻿@using System.Globalization
-@using System.Linq
 @using Microsoft.AspNetCore.Mvc.Localization
 @using XPenC.WebApp.Models
 @using XPenC.WebApp
@@ -7,21 +6,18 @@
 @inject IViewLocalizer Strings
 @inject IHtmlLocalizer<SharedResources> SharedStrings
 
-@model XPenC.WebApp.Models.ExpenseReportUpdate
+@model XPenC.WebApp.Models.ExpenseReportDetails
 
 <h1>@Strings["Update Expense Report"]&nbsp;@Model.Id</h1>
 <hr />
 <div class="row">
     <div class="col">
-        <form asp-action="Update">
-            <input asp-for="Id" type="hidden" />
+        <form asp-action="Delete">
             <div class="text-danger">@ViewData["ErrorMessage"]</div>
             <div class="form-group row">
                 <label asp-for="Client" class="col-12 col-md-1 col-form-label"></label>
                 <div class="col-12 col-md-6">
-                    <input asp-for="Client" class="form-control"
-                           data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Client)]"  />
-                    <span asp-validation-for="Client" class="text-danger"></span>
+                    <input asp-for="Client" readonly="" class="form-control-plaintext" />
                 </div>
             </div>
             <div class="form-group row">
@@ -32,10 +28,17 @@
                         <label class="col-5 col-md-3 col-form-label">@Html.DisplayNameFor(model => model.Items.FirstOrDefault().Date)</label>
                         <label class="col-5 col-md-4 col-form-label">@Html.DisplayNameFor(model => model.Items.FirstOrDefault().ExpenseType)</label>
                         <label class="d-none d-md-block col-md-2 col-form-label">@Html.DisplayNameFor(model => model.Items.FirstOrDefault().Value)</label>
-                        <label class="d-none d-md-block offset-md-1 col-md-1 col-form-label">&nbsp;</label>
                     </div>
                     @for (var i = 0; i < Model.Items.Count; i++)
                     {
+                        if (Model.Items[i].Number == (int)ViewData["Number"])
+                        {
+                            <div class="form-group row">
+                                <div class="col">
+                                    <h3>@Strings["Are you sure you want to delete this item?"]</h3>
+                                </div>
+                            </div>
+                        }
                         <div class="row">
                             <div class="col-2 col-md-1">
                                 <input value="@(i + 1)" readonly class="form-control-plaintext" />
@@ -50,33 +53,26 @@
                             <div class="col-5 col-md-2">
                                 <input value="@Html.DisplayFor(model => model.Items[i].Value)" readonly class="form-control-plaintext" />
                             </div>
-                            <div class="d-none d-md-block col-1">
-                                <a class="btn btn-primary" asp-action="Delete" asp-controller="ExpenseReportItems" asp-route-id="@Model.Id" asp-route-number="@Model.Items[i].Number">@Strings["Remove"]</a>
-                            </div>
                         </div>
                         <div class="row">
                             <label class="col-12 offset-md-1 col-md-11 col-form-label">@Html.DisplayNameFor(model => model.Items.FirstOrDefault().Description)</label>
                             <div class="col-12 offset-md-1 col-md-9">
                                 <input value="@Html.DisplayFor(model => model.Items[i].Description)" readonly class="form-control-plaintext" />
                             </div>
-                            <div class="d-block d-md-none col-10 col-md-2">
-                                <a class="btn btn-primary" asp-action="Delete" asp-controller="ExpenseReportItems" asp-route-id="@Model.Id" asp-route-number="@Model.Items[i].Number">@Strings["Remove"]</a>
-                            </div>
                         </div>
+                        if (Model.Items[i].Number == (int)ViewData["Number"])
+                        {
+                            <div class="form-group row">
+                                <div class="col">
+                                    <input type="hidden" asp-for="Id" />
+                                    <input type="hidden" name="Number" value="@ViewData["Number"]" />
+                                    <button type="submit" value="Confirm" class="btn btn-danger">@Strings["Confirm"]</button>
+                                    <a asp-action="Update" asp-controller="ExpenseReports" asp-route-id="@Model.Id" class="btn btn-secondary">@Strings["Cancel"]</a>
+                                </div>
+                            </div>
+                        }
                         <div class="row"><div class="col"><hr /></div></div>
                     }
-                    <div class="form-group row">
-                        <div class="col">
-                            <a class="btn btn-success" asp-action="Create" asp-controller="ExpenseReportItems" asp-route-id="@Model.Id">@Strings["Add New Item"]</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="offset-1 col-11">
-                    <button type="submit" name="action" value="@ViewData["SaveAction"]" class="btn btn-primary">@Strings["Save"]</button>
-                    <button type="submit" name="action" value="@ViewData["FinishAction"]" class="btn btn-primary">@Strings["Finish"]</button>
-                    <a class="btn btn-secondary" asp-action="Index">@Strings["Cancel"]</a>
                 </div>
             </div>
         </form>

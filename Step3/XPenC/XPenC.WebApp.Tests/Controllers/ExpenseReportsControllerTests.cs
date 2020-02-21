@@ -1,7 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using XPenC.BusinessLogic.Exceptions;
+using XPenC.BusinessLogic.Validation;
 using XPenC.WebApp.Controllers;
 using XPenC.WebApp.Models;
 using XPenC.WebApp.Tests.TestDoubles;
@@ -14,12 +15,12 @@ namespace XPenC.WebApp.Tests.Controllers
     public class ExpenseReportsControllerTests
     {
         private readonly ExpenseReportsController _controller;
+        private readonly FakeExpenseReportOperations _expenseReportOperations = new FakeExpenseReportOperations();
 
         public ExpenseReportsControllerTests()
         {
             var dataContext = new StubDataContext();
-            var expenseReportOperations = new FakeExpenseReportOperations();
-            _controller = new ExpenseReportsController(dataContext, expenseReportOperations);
+            _controller = new ExpenseReportsController(dataContext, _expenseReportOperations, new FakeStringLocalizer<ExpenseReportsController>());
         }
 
         [Fact]
@@ -88,15 +89,81 @@ namespace XPenC.WebApp.Tests.Controllers
             var result = _controller.Create();
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Update", viewResult.ActionName);
+            Assert.Equal("Create", viewResult.ActionName);
         }
 
         [Fact]
-        public void ExpenseReportsController_Update_Get_WithNullId_ShouldPass()
+        public void ExpenseReportsController_Create_Post_WithNullAction_ShouldPass()
         {
-            var result = _controller.Update(null);
+            var result = _controller.Create(null, null);
 
-            Assert.IsType<BadRequestResult>(result);
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public void ExpenseReportsController_Create_Post_WithEmptyAction_ShouldPass()
+        {
+            var result = _controller.Create(" ", null);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public void ExpenseReportsController_Create_Post_WithInvalidAction_ShouldPass()
+        {
+            var result = _controller.Create("Invalid", null);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public void ExpenseReportsController_Create_Post_WithNullInput_ShouldPass()
+        {
+            var result = _controller.Create( "Save", null);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public void ExpenseReportsController_Create_Post_WithModelError_ShouldPass()
+        {
+            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
+            _controller.ModelState.AddModelError("", "Some error");
+            var result = _controller.Create("Save", input);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Null(viewResult.ViewName);
+        }
+
+        [Fact]
+        public void ExpenseReportsController_Create_Post_WithValidationError_ShouldPass()
+        {
+            var input = new ExpenseReportUpdate { Id = 1 };
+            _expenseReportOperations.ExpectedAddBehavior = () => throw new ValidationException("Add", new[] { new ValidationError("Client", "The 'Client' field is required.") });
+            var result = _controller.Create("Save", input);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.Null(viewResult.ViewName);
+        }
+
+        [Fact]
+        public void ExpenseReportsController_Create_Post_ForSave_ShouldPass()
+        {
+            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
+            var result = _controller.Create("Save", input);
+
+            var viewResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Create", viewResult.ActionName);
+        }
+
+        [Fact]
+        public void ExpenseReportsController_Create_Post_ForFinish_ShouldPass()
+        {
+            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
+            var result = _controller.Create( "Finish", input);
+
+            var viewResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", viewResult.ActionName);
         }
 
         [Fact]
@@ -117,26 +184,14 @@ namespace XPenC.WebApp.Tests.Controllers
             var model = Assert.IsType<ExpenseReportUpdate>(viewResult.Model);
             Assert.Equal(ExistingReport1.Id, model.Id);
             Assert.Equal(ExistingReport1.Client, model.Client);
-            Assert.Equal(ExistingReport1.Items.Count, model.DisplayItems.Count);
+            Assert.Equal(ExistingReport1.Items.Count, model.Items.Count);
             var existingItems = ExistingReport1.Items.ToList();
-            Assert.Equal(existingItems[0].ItemNumber, model.DisplayItems[0].Number);
-            Assert.Equal(existingItems[0].Description, model.DisplayItems[0].Description);
-            Assert.Equal(existingItems[0].Date, model.DisplayItems[0].Date);
-            Assert.Equal(existingItems[0].Value, model.DisplayItems[0].Value);
-            Assert.Equal(existingItems[0].IsAboveMaximum, model.DisplayItems[0].IsAboveMaximum);
-            Assert.Equal(existingItems[0].ExpenseType.ToString(), model.DisplayItems[0].ExpenseType.ToString());
-            Assert.Null(model.NewItem.Description);
-            Assert.NotNull(model.NewItem.Date);
-            Assert.Equal(0, model.NewItem.Value);
-            Assert.Null(model.NewItem.ExpenseType);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_WithNullId_ShouldPass()
-        {
-            var result = _controller.Update(null, null, null);
-
-            Assert.IsType<BadRequestResult>(result);
+            Assert.Equal(existingItems[0].ItemNumber, model.Items[0].Number);
+            Assert.Equal(existingItems[0].Description, model.Items[0].Description);
+            Assert.Equal(existingItems[0].Date, model.Items[0].Date);
+            Assert.Equal(existingItems[0].Value, model.Items[0].Value);
+            Assert.Equal(existingItems[0].IsAboveMaximum, model.Items[0].IsAboveMaximum);
+            Assert.Equal(existingItems[0].ExpenseType.ToString(), model.Items[0].ExpenseType.ToString());
         }
 
         [Fact]
@@ -190,9 +245,10 @@ namespace XPenC.WebApp.Tests.Controllers
         }
 
         [Fact]
-        public void ExpenseReportsController_Update_Post_WithEmptyClient_ShouldPass()
+        public void ExpenseReportsController_Update_Post_WithModelError_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 1 };
+            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
+            _controller.ModelState.AddModelError("", "Some error");
             var result = _controller.Update(1, "Save", input);
 
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -200,155 +256,14 @@ namespace XPenC.WebApp.Tests.Controllers
         }
 
         [Fact]
-        public void ExpenseReportsController_Update_Post_ForAdd_WithNullNewItemDate_ShouldPass()
+        public void ExpenseReportsController_Update_Post_WithValidationError_ShouldPass()
         {
-            var newItem = new ExpenseReportItemUpdate { Date = null };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
+            var input = new ExpenseReportUpdate { Id = 1 };
+            _expenseReportOperations.ExpectedUpdateBehavior = () => throw new ValidationException("Update", new [] { new ValidationError("Client", "The 'Client' field is required.") });
+            var result = _controller.Update(1, "Save", input);
 
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Null(viewResult.ViewName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForAdd_WithNewItemDateInTheFuture_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddHours(1)};
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Null(viewResult.ViewName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForAdd_WithNullExpenseType_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = null };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Null(viewResult.ViewName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForAdd_WithNullValue_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Meal, Value = null };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Null(viewResult.ViewName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForAdd_WithNegativeValue_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Meal, Value = -1 };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<ViewResult>(result);
-            Assert.Null(viewResult.ViewName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForAddOffice_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Office, Value = 10, Description = "Some Description" };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Update", viewResult.ActionName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForAddMeal_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Meal, Value = 10, Description = "Some Description" };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Update", viewResult.ActionName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForAddHotelLodging_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.HotelLodging, Value = 10, Description = "Some Description" };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Update", viewResult.ActionName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForAddOtherLodging_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.OtherLodging, Value = 10, Description = "Some Description" };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Update", viewResult.ActionName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForAddLandTransportation_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.LandTransportation, Value = 10, Description = "Some Description" };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Update", viewResult.ActionName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForAddAirTransportation_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.AirTransportation, Value = 10, Description = "Some Description" };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Update", viewResult.ActionName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForOther_ShouldPass()
-        {
-            var newItem = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Other, Value = 10, Description = "Some Description" };
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client", NewItem = newItem };
-            var result = _controller.Update(1, "Add", input);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Update", viewResult.ActionName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForRemove_ShouldPass()
-        {
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
-            var result = _controller.Update(1, "Remove1", input);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Update", viewResult.ActionName);
-        }
-
-        [Fact]
-        public void ExpenseReportsController_Update_Post_ForRemove_WithInvalidItemNumber_ShouldPass()
-        {
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
-            var result = _controller.Update(1, "Remove32", input);
-
-            var viewResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Update", viewResult.ActionName);
         }
 
         [Fact]
@@ -369,15 +284,6 @@ namespace XPenC.WebApp.Tests.Controllers
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Index", viewResult.ActionName);
-        }
-
-
-        [Fact]
-        public void ExpenseReportsController_Delete_WithNullId_ShouldPass()
-        {
-            var result = _controller.Delete(null);
-
-            Assert.IsType<BadRequestResult>(result);
         }
 
         [Fact]

@@ -117,14 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="#" xml:space="preserve">
-    <value>#</value>
-  </data>
-  <data name="Add New Item" xml:space="preserve">
-    <value>Addicionar Novo Item</value>
-  </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancelar</value>
+  </data>
+  <data name="Create Expense Report" xml:space="preserve">
+    <value>Criar Relatório de Despesas</value>
   </data>
   <data name="Finish" xml:space="preserve">
     <value>Terminar</value>
@@ -132,16 +129,10 @@
   <data name="Items" xml:space="preserve">
     <value>Itens</value>
   </data>
-  <data name="Please select one..." xml:space="preserve">
-    <value>Por favor selecione um...</value>
-  </data>
-  <data name="Remove" xml:space="preserve">
-    <value>Remover</value>
-  </data>
   <data name="Save" xml:space="preserve">
     <value>Salvar</value>
   </data>
-  <data name="Update Expense Report" xml:space="preserve">
-    <value>Alterar Relatório de Despesas</value>
+  <data name="Save the current report to be able to add items." xml:space="preserve">
+    <value>Salve este relatório para poder adicionar itens.</value>
   </data>
 </root>

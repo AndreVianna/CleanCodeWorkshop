@@ -53,8 +53,10 @@ namespace XPenC.WebApp.Tests.TestDoubles
             return new ExpenseReport();
         }
 
+        public Action ExpectedAddBehavior { get; set; }
         public override void Add(ExpenseReport newExpenseReport)
         {
+            ExpectedAddBehavior?.Invoke();
         }
 
         public override void AddItem(ExpenseReport source, ExpenseReportItem newItem)
@@ -65,8 +67,10 @@ namespace XPenC.WebApp.Tests.TestDoubles
         {
         }
 
+        public Action ExpectedUpdateBehavior { get; set; }
         public override void Update(ExpenseReport source)
         {
+            ExpectedUpdateBehavior?.Invoke();
         }
 
         public override void Delete(int id)

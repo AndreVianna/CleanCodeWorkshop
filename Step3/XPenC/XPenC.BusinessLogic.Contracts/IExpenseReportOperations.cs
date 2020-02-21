@@ -12,8 +12,5 @@ namespace XPenC.BusinessLogic.Contracts
         ExpenseReport Find(int id);
         void Update(ExpenseReport source);
         void Delete(int id);
-
-        void AddItem(ExpenseReport source, ExpenseReportItem newItem);
-        void RemoveItem(ExpenseReport source, int itemNumber);
     }
 }

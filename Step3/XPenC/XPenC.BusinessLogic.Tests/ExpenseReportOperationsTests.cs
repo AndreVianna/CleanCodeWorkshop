@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using XPenC.BusinessLogic.Contracts.Models;
+using XPenC.BusinessLogic.Exceptions;
 using XPenC.BusinessLogic.Tests.TestDoubles;
 using XPenC.DataAccess.Contracts.Schema;
 using Xunit;
@@ -36,14 +37,27 @@ namespace XPenC.BusinessLogic.Tests
             Assert.Equal(0, subject.MealTotal);
             Assert.Equal(0, subject.Total);
             Assert.Null(subject.Client);
-            Assert.InRange(subject.CreatedOn, now.AddMilliseconds(-50), now);
-            Assert.InRange(subject.ModifiedOn, now.AddMilliseconds(-50), now);
+            Assert.Equal(now, subject.CreatedOn, TimeSpan.FromMilliseconds(50));
+            Assert.Equal(now, subject.ModifiedOn, TimeSpan.FromMilliseconds(50));
         }
+
+        [Fact]
+        public void ExpenseReportOperations_Add_WithEmptyClient_ShouldPass()
+        {
+            var item = new ExpenseReport();
+
+            var exception = Assert.Throws<ValidationException>(() => _expenseReportOperations.Add(item));
+            Assert.Equal("Add", exception.Operation);
+            Assert.Equal(1, exception.Errors.Count);
+            Assert.Equal("Client", exception.Errors.First().Source);
+            Assert.Equal("The 'Client' field is required.", exception.Errors.First().Message);
+        }
+
 
         [Fact]
         public void ExpenseReportOperations_Add_ShouldPass()
         {
-            var item = new ExpenseReport();
+            var item = new ExpenseReport { Client = "Client 3" };
 
             _expenseReportOperations.Add(item);
 
@@ -54,13 +68,24 @@ namespace XPenC.BusinessLogic.Tests
         [Fact]
         public void ExpenseReportOperations_Find_ShouldPass()
         {
-            _inMemoryDataContext.ExpenseReports.Add(new ExpenseReportEntity { Id = 1 });
-            _inMemoryDataContext.ExpenseReports.Add(new ExpenseReportEntity { Id = 2 });
+            var createdDate = DateTime.Now.AddDays(-1);
+            _inMemoryDataContext.ExpenseReports.Add(new ExpenseReportEntity
+            {
+                Id = 1,
+                Client = "Value",
+                CreatedOn = createdDate,
+                ModifiedOn = createdDate.AddMinutes(1),
+                Items = new List<ExpenseReportItemEntity>
+                {
+                    new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = "O", Date = createdDate.Date.AddDays(-2), Value = 10 },
+                    new ExpenseReportItemEntity{ ExpenseReportId = 1, ItemNumber = 2, ExpenseType = "M", Date = createdDate.Date.AddDays(-3), Value = 20 }
+                }
+            });
 
-            var subject = _expenseReportOperations.Find(2);
+            var subject = _expenseReportOperations.Find(1);
 
             Assert.NotNull(subject);
-            Assert.Equal(2, subject.Id);
+            Assert.Equal(1, subject.Id);
         }
 
         [Fact]
@@ -72,6 +97,86 @@ namespace XPenC.BusinessLogic.Tests
             var subject = _expenseReportOperations.Find(3);
 
             Assert.Null(subject);
+        }
+
+        [Fact]
+        public void ExpenseReportOperations_Find_WithItemWithNullDateInStorage_ShouldThrow()
+        {
+            var createdDate = DateTime.Now.AddDays(-1);
+            _inMemoryDataContext.ExpenseReports.Add(new ExpenseReportEntity
+            {
+                Id = 1,
+                Client = "Value",
+                CreatedOn = createdDate,
+                ModifiedOn = createdDate.AddMinutes(1),
+                Items = new List<ExpenseReportItemEntity>
+                {
+                    new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = "O", Date = null, Value = 10 },
+                }
+            });
+
+            var exception = Assert.Throws<DataProviderException>(() => _expenseReportOperations.Find(1));
+            Assert.Equal("Invalid record date.", exception.Message);
+        }
+
+        [Fact]
+        public void ExpenseReportOperations_Find_WithItemWithNullValueInStorage_ShouldThrow()
+        {
+            var createdDate = DateTime.Now.AddDays(-1);
+            _inMemoryDataContext.ExpenseReports.Add(new ExpenseReportEntity
+            {
+                Id = 1,
+                Client = "Value",
+                CreatedOn = createdDate,
+                ModifiedOn = createdDate.AddMinutes(1),
+                Items = new List<ExpenseReportItemEntity>
+                {
+                    new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = "O", Date = createdDate.Date.AddDays(-2), Value = null },
+                }
+            });
+
+            var exception = Assert.Throws<DataProviderException>(() => _expenseReportOperations.Find(1));
+            Assert.Equal("Invalid record value.", exception.Message);
+        }
+
+        [Fact]
+        public void ExpenseReportOperations_Find_WithItemWithNullExpenseTypeInStorage_ShouldThrow()
+        {
+            var createdDate = DateTime.Now.AddDays(-1);
+            _inMemoryDataContext.ExpenseReports.Add(new ExpenseReportEntity
+            {
+                Id = 1,
+                Client = "Value",
+                CreatedOn = createdDate,
+                ModifiedOn = createdDate.AddMinutes(1),
+                Items = new List<ExpenseReportItemEntity>
+                {
+                    new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = null, Date = createdDate.Date.AddDays(-2), Value = 10 },
+                }
+            });
+
+            var exception = Assert.Throws<DataProviderException>(() => _expenseReportOperations.Find(1));
+            Assert.Equal("Invalid record expense type.", exception.Message);
+        }
+
+        [Fact]
+        public void ExpenseReportOperations_Find_WithInvalidExpenseTypeFromStorage_ShouldPass()
+        {
+            var createdDate = DateTime.Now.AddDays(-1);
+            _inMemoryDataContext.ExpenseReports.Add(new ExpenseReportEntity
+            {
+                Id = 1,
+                Client = "Value",
+                CreatedOn = createdDate,
+                ModifiedOn = createdDate.AddMinutes(1),
+                Items = new List<ExpenseReportItemEntity>
+                {
+                    new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = "Invalid", Date = createdDate.Date.AddDays(-2), Value = 10 },
+                }
+            });
+
+            var exception = Assert.Throws<DataProviderException>(() => _expenseReportOperations.Find(1));
+            Assert.Equal("Invalid record expense type.", exception.Message);
         }
 
         [Fact]
@@ -104,6 +209,7 @@ namespace XPenC.BusinessLogic.Tests
         {
             var newReport = new ExpenseReport
             {
+                Client = "Client 3",
                 Items = new List<ExpenseReportItem>
                 {
                     new ExpenseReportItem { ExpenseType = ExpenseType.Meal, Value = 10 },
@@ -132,168 +238,6 @@ namespace XPenC.BusinessLogic.Tests
         }
 
         [Fact]
-        public void ExpenseReportOperations_AddDefaultItem_ShouldPass()
-        {
-            TestAddExpenseReportTypeItem(new ExpenseReportItem());
-        }
-
-        [Fact]
-        public void ExpenseReportOperations_AddMealItem_ShouldPass()
-        {
-            TestAddExpenseReportTypeItem(new ExpenseReportItem { ExpenseType = ExpenseType.Meal });
-        }
-
-        [Fact]
-        public void ExpenseReportOperations_AddAirTransportationItem_ShouldPass()
-        {
-            TestAddExpenseReportTypeItem(new ExpenseReportItem { ExpenseType = ExpenseType.AirTransportation });
-        }
-
-        [Fact]
-        public void ExpenseReportOperations_AddHotelLodgingItem_ShouldPass()
-        {
-            TestAddExpenseReportTypeItem(new ExpenseReportItem { ExpenseType = ExpenseType.HotelLodging });
-        }
-
-        [Fact]
-        public void ExpenseReportOperations_AddLandTransportationItem_ShouldPass()
-        {
-            TestAddExpenseReportTypeItem(new ExpenseReportItem { ExpenseType = ExpenseType.LandTransportation });
-        }
-
-        [Fact]
-        public void ExpenseReportOperations_AddOfficeItem_ShouldPass()
-        {
-            TestAddExpenseReportTypeItem(new ExpenseReportItem { ExpenseType = ExpenseType.Office });
-        }
-
-        [Fact]
-        public void ExpenseReportOperations_AddOtherLodgingItem_ShouldPass()
-        {
-            TestAddExpenseReportTypeItem(new ExpenseReportItem { ExpenseType = ExpenseType.OtherLodging });
-        }
-
-        [Fact]
-        public void ExpenseReportOperations_AddOtherItem_ShouldPass()
-        {
-            TestAddExpenseReportTypeItem(new ExpenseReportItem { ExpenseType = ExpenseType.Other });
-        }
-
-        private void TestAddExpenseReportTypeItem(ExpenseReportItem newItem)
-        {
-            _inMemoryDataContext.ExpenseReports.Add(new ExpenseReportEntity {Id = 1});
-            var subject = _expenseReportOperations.Find(1);
-            var itemsBefore = subject.Items.ToArray();
-
-            _expenseReportOperations.AddItem(subject, newItem);
-
-            var updatedReport = _inMemoryDataContext.ExpenseReports.Find(1);
-            var itemsAfter = updatedReport.Items.ToList();
-            Assert.Empty(itemsBefore);
-            Assert.Single(itemsAfter);
-            var insertedItem = itemsAfter[0];
-            Assert.Equal(updatedReport.Id, insertedItem.ExpenseReportId);
-            Assert.Equal(1, insertedItem.ItemNumber);
-        }
-
-        [Fact]
-        public void ExpenseReportOperations_RemoveItem_ShouldPass()
-        {
-            var expenseReportWithItems = new ExpenseReportEntity
-            {
-                Id = 1,
-                Items = new List<ExpenseReportItemEntity>
-                {
-                    new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = "O"},
-                    new ExpenseReportItemEntity{ ExpenseReportId = 1, ItemNumber = 2, ExpenseType = "M" }
-                }
-            };
-            _inMemoryDataContext.ExpenseReports.Add(expenseReportWithItems);
-            var subject = _expenseReportOperations.Find(1);
-            var itemsBefore = subject.Items.ToArray();
-
-            _expenseReportOperations.RemoveItem(subject, 1);
-
-            var updatedReport = _expenseReportOperations.Find(1);
-            var itemsAfter = updatedReport.Items.ToList();
-            Assert.Equal(2, itemsBefore.Length);
-            Assert.Single(itemsAfter);
-            Assert.Null(itemsAfter.Find(i => i.ItemNumber == 1));
-            Assert.NotNull(itemsAfter.Find(i => i.ItemNumber == 2));
-        }
-
-        [Fact]
-        public void ExpenseReportOperations_RemoveNotExistingItem_ShouldPass()
-        {
-            var expenseReportWithItems = new ExpenseReportEntity
-            {
-                Id = 1,
-                Items = new List<ExpenseReportItemEntity>
-                {
-                    new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = "O"},
-                    new ExpenseReportItemEntity{ ExpenseReportId = 1, ItemNumber = 2, ExpenseType = "M" }
-                }
-            };
-            _inMemoryDataContext.ExpenseReports.Add(expenseReportWithItems);
-            var subject = _expenseReportOperations.Find(1);
-            var itemsBefore = subject.Items.ToArray();
-
-            _expenseReportOperations.RemoveItem(subject, 3);
-
-            var updatedReport = _expenseReportOperations.Find(1);
-            var itemsAfter = updatedReport.Items.ToList();
-            Assert.Equal(itemsBefore.Length, itemsAfter.Count);
-            Assert.NotNull(itemsAfter.Find(i => i.ItemNumber == 1));
-            Assert.NotNull(itemsAfter.Find(i => i.ItemNumber == 2));
-        }
-
-        [Fact]
-        public void ExpenseReportOperations_AddItem_IntoReportWithItems_ShouldPass()
-        {
-            var expenseReportWithItems = new ExpenseReportEntity
-            {
-                Id = 1,
-                Items = new List<ExpenseReportItemEntity>
-                {
-                    new ExpenseReportItemEntity{ ExpenseReportId = 1, ItemNumber = 2, ExpenseType = "M" }
-                }
-            };
-            _inMemoryDataContext.ExpenseReports.Add(expenseReportWithItems);
-            var originalReport = _expenseReportOperations.Find(1);
-            var itemsBefore = originalReport.Items.ToArray();
-
-            _expenseReportOperations.AddItem(originalReport, new ExpenseReportItem());
-
-            var updatedReport = _expenseReportOperations.Find(1);
-            var itemsAfter = updatedReport.Items.ToList();
-            Assert.Single(itemsBefore);
-            Assert.Equal(2, itemsAfter.Count);
-            var insertedItem = itemsAfter[1];
-            Assert.Equal(updatedReport.Id, insertedItem.ExpenseReportId);
-            Assert.Equal(3, insertedItem.ItemNumber);
-        }
-
-
-        [Fact]
-        public void ExpenseReportOperations_Update_WithInvalidExpenseTypeFromStorage_ShouldPass()
-        {
-            var createdDate = DateTime.Now.AddDays(-1);
-            var originalReport = new ExpenseReportEntity
-            {
-                Id = 1,
-                Client = "Old Value",
-                CreatedOn = createdDate,
-                ModifiedOn = createdDate.AddMinutes(1),
-                Items = new List<ExpenseReportItemEntity>
-                {
-                    new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = "Invalid"},
-                }
-            };
-            _inMemoryDataContext.ExpenseReports.Add(originalReport);
-            Assert.Throws<InvalidOperationException>(() => _expenseReportOperations.Find(1));
-        }
-
-        [Fact]
         public void ExpenseReportOperations_Update_ShouldPass()
         {
             var createdDate = DateTime.Now.AddDays(-1);
@@ -305,8 +249,8 @@ namespace XPenC.BusinessLogic.Tests
                 ModifiedOn = createdDate.AddMinutes(1),
                 Items = new List<ExpenseReportItemEntity>
                 {
-                    new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = "O"},
-                    new ExpenseReportItemEntity{ ExpenseReportId = 1, ItemNumber = 2, ExpenseType = "M" }
+                    new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = "O", Date = createdDate.Date.AddDays(-2), Value = 10 },
+                    new ExpenseReportItemEntity{ ExpenseReportId = 1, ItemNumber = 2, ExpenseType = "M", Date = createdDate.Date.AddDays(-3), Value = 20 }
                 }
             };
             _inMemoryDataContext.ExpenseReports.Add(originalReport);
@@ -327,7 +271,7 @@ namespace XPenC.BusinessLogic.Tests
             Assert.Null(itemsAfter.Find(i => i.ItemNumber == 1));
             Assert.NotNull(itemsAfter.Find(i => i.ItemNumber == 2));
             Assert.NotNull(itemsAfter.Find(i => i.ItemNumber == 3));
-            Assert.InRange(subject.ModifiedOn, now.AddMilliseconds(-50), now);
+            Assert.Equal(now, subject.ModifiedOn, TimeSpan.FromMilliseconds(50));
             Assert.Equal(createdDate, subject.CreatedOn);
         }
 

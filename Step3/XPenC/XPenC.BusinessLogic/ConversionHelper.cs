@@ -1,6 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using XPenC.BusinessLogic.Contracts.Models;
+using XPenC.BusinessLogic.Exceptions;
 using XPenC.DataAccess.Contracts.Schema;
 
 namespace XPenC.BusinessLogic
@@ -37,7 +37,7 @@ namespace XPenC.BusinessLogic
             return value;
         }
 
-        private static void UpdateExpenseReportEntity(ExpenseReportEntity dest, ExpenseReport source)
+        public static void UpdateExpenseReportEntity(ExpenseReportEntity dest, ExpenseReport source)
         {
             dest.Id = source.Id;
             dest.Client = source.Client;
@@ -60,8 +60,8 @@ namespace XPenC.BusinessLogic
             dest.ExpenseReportId = source.ExpenseReportId;
             dest.ItemNumber = source.ItemNumber;
             dest.ExpenseType = TranslateExpenseType(source.ExpenseType);
-            dest.Date = source.Date;
-            dest.Value = source.Value;
+            dest.Date = source.Date ?? throw new DataProviderException("Invalid record date.");
+            dest.Value = source.Value ?? throw new DataProviderException("Invalid record value.");
             dest.Description = source.Description;
             dest.IsAboveMaximum = ExpenseReportOperations.IsExpenseAboveMaximum(dest);
         }
@@ -94,7 +94,7 @@ namespace XPenC.BusinessLogic
                 case "TL": return ExpenseType.LandTransportation;
                 case "TA": return ExpenseType.AirTransportation;
                 case "Ot": return ExpenseType.Other;
-                default: throw new InvalidOperationException("Invalid ExpenseType.");
+                default: throw new DataProviderException("Invalid record expense type.");
             }
         }
 

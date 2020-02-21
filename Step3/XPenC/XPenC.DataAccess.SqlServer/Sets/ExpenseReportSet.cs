@@ -31,14 +31,15 @@ namespace XPenC.DataAccess.SqlServer.Sets
         public void Add(ExpenseReportEntity source)
         {
             const string commandText = "INSERT INTO ExpenseReports " +
-                                       "(CreatedOn, ModifiedOn, MealTotal, Total) " +
+                                       "(CreatedOn, ModifiedOn, Client, MealTotal, Total) " +
                                        "VALUES " +
-                                       "(@created, @modified, @mealTotal, @total);" +
+                                       "(@created, @modified, @client, @mealTotal, @total);" +
                                        "SELECT SCOPE_IDENTITY();";
             var parameters = new Dictionary<string, object>
             {
                 ["created"] = source.CreatedOn,
                 ["modified"] = (object)source.ModifiedOn ?? DBNull.Value,
+                ["client"] = (object)source.Client ?? DBNull.Value,
                 ["mealTotal"] = source.MealTotal,
                 ["total"] = source.Total,
             };

@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-using System.Text.RegularExpressions;
 using XPenC.BusinessLogic.Contracts.Models;
-using XPenC.WebApp.Controllers;
 using BusinessExpenseType = XPenC.BusinessLogic.Contracts.Models.ExpenseType;
 using ViewExpenseType = XPenC.WebApp.Models.ExpenseType;
 
@@ -59,21 +57,39 @@ namespace XPenC.WebApp.Models
             dest.IsAboveMaximum = source.IsAboveMaximum;
         }
 
-        public static ExpenseReportItem ToExpenseReportItem(ExpenseReportUpdate source)
+        public static void UpdateExpenseReport(ExpenseReport dest, ExpenseReportUpdate source)
+        {
+            dest.Client = source.Client;
+        }
+
+        public static ExpenseReportItem ToExpenseReportItem(ExpenseReportItemUpdate source)
         {
             var result = new ExpenseReportItem();
             UpdateExpenseReportItem(result, source);
             return result;
         }
 
-        private static void UpdateExpenseReportItem(ExpenseReportItem dest, ExpenseReportUpdate source)
+        private static void UpdateExpenseReportItem(ExpenseReportItem dest, ExpenseReportItemUpdate source)
+        {
+            dest.ExpenseReportId = source.ExpenseReportId;
+            dest.ItemNumber = 0;
+            dest.ExpenseType = GetExpenseType(source.ExpenseType);
+            dest.Date = source.Date;
+            dest.Value = source.Value;
+            dest.Description = source.Description;
+        }
+
+        public static ExpenseReportItemUpdate ToExpenseReportItemUpdate(ExpenseReport source)
+        {
+            var result = new ExpenseReportItemUpdate();
+            UpdateExpenseReportItemUpdate(result, source);
+            return result;
+        }
+
+        public static void UpdateExpenseReportItemUpdate(ExpenseReportItemUpdate dest, ExpenseReport source)
         {
             dest.ExpenseReportId = source.Id;
-            dest.ItemNumber = 0;
-            dest.ExpenseType = GetExpenseType(source.NewItem.ExpenseType);
-            dest.Date = source.NewItem.Date;
-            dest.Value = source.NewItem.Value;
-            dest.Description = source.NewItem.Description;
+            dest.ExpenseReport = ToExpenseReportDetails(source);
         }
 
         public static ExpenseReportUpdate ToExpenseReportUpdate(ExpenseReport source)
@@ -87,22 +103,7 @@ namespace XPenC.WebApp.Models
         {
             dest.Id = source.Id;
             dest.Client = source.Client;
-            dest.DisplayItems = source.Items.Select(ToExpenseReportItemDetails).ToList();
-        }
-
-        public static bool IsRemoveAction(string action)
-        {
-            return Regex.IsMatch(action, GetRemoveActionPattern());
-        }
-
-        public static int GetItemNumberFromAction(string action)
-        {
-            return int.Parse(Regex.Match(action, GetRemoveActionPattern()).Groups[1].Value);
-        }
-
-        private static string GetRemoveActionPattern()
-        {
-            return $@"^{ExpenseReportsController.RemoveActionName}(\d*)$";
+            dest.Items = source.Items.Select(ToExpenseReportItemDetails).ToList();
         }
 
         private static ViewExpenseType GetViewExpenseType(BusinessExpenseType expenseType)

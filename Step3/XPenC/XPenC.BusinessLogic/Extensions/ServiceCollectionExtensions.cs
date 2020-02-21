@@ -8,6 +8,7 @@ namespace XPenC.BusinessLogic.Extensions
         public static IServiceCollection AddBusinessServices(this IServiceCollection services)
         {
             services.AddScoped<IExpenseReportOperations, ExpenseReportOperations>();
+            services.AddScoped<IExpenseReportItemOperations, ExpenseReportItemOperations>();
             return services;
         }
     }
