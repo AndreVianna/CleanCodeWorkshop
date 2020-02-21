@@ -1,0 +1,125 @@
+﻿@using System.Globalization
+@using System.Linq
+@using Microsoft.AspNetCore.Mvc.Localization
+@using XPenC.WebApp.Models
+@using XPenC.WebApp
+
+@inject IViewLocalizer Strings
+@inject IHtmlLocalizer<SharedResources> SharedStrings
+
+@model XPenC.WebApp.Models.ExpenseReportUpdate
+
+    <h1>@Strings["Update Expense Report"]&nbsp;@Model.Id</h1>
+<hr />
+<div class="row">
+    <div class="col">
+        <form asp-action="Update">
+            <input asp-for="Id" type="hidden" />
+            <div class="text-danger">@ViewData["ErrorMessage"]</div>
+            <div class="form-group row">
+                <label asp-for="Client" class="col-12 col-md-1 col-form-label"></label>
+                <div class="col-12 col-md-6">
+                    <input asp-for="Client" class="form-control"
+                           data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Client)]"  />
+                    <span asp-validation-for="Client" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-12 col-md-1 col-form-label">@Strings["Items"]</label>
+                <div class="col-12 col-md-11">
+                    <div class="row">
+                        <label class="col-2 col-md-1 col-form-label">@Strings["#"]</label>
+                        <label class="col-5 col-md-3 col-form-label">@Html.DisplayNameFor(model => model.DisplayItems.FirstOrDefault().Date)</label>
+                        <label class="col-5 col-md-4 col-form-label">@Html.DisplayNameFor(model => model.DisplayItems.FirstOrDefault().ExpenseType)</label>
+                        <label class="d-none d-md-block col-md-2 col-form-label">@Html.DisplayNameFor(model => model.DisplayItems.FirstOrDefault().Value)</label>
+                        <label class="d-none d-md-block offset-md-1 col-md-1 col-form-label">&nbsp;</label>
+                    </div>
+                    @for (var i = 0; i < Model.DisplayItems.Count; i++)
+                    {
+                        <div class="row">
+                            <div class="col-2 col-md-1">
+                                <input value="@(i + 1)" readonly class="form-control-plaintext" />
+                            </div>
+                            <div class="col-5 col-md-3">
+                                <input value="@Html.DisplayFor(model => model.DisplayItems[i].Date)" readonly class="form-control-plaintext" />
+                            </div>
+                            <div class="col-5 col-md-4">
+                                <input value="@Html.DisplayFor(model => model.DisplayItems[i].ExpenseType)" readonly class="form-control-plaintext" />
+                            </div>
+                            <label class="d-block d-md-none col-2 col-form-label">Value</label>
+                            <div class="col-5 col-md-2">
+                                <input value="@Html.DisplayFor(model => model.DisplayItems[i].Value)" readonly class="form-control-plaintext" />
+                            </div>
+                            <div class="d-none d-md-block col-1">
+                                <button type="submit" name="action" value="@($"{ViewData["RemoveAction"]}{Model.DisplayItems[i].Number}")" class="btn btn-primary">@Strings["Remove"]</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-12 offset-md-1 col-md-11 col-form-label">@Html.DisplayNameFor(model => model.DisplayItems.FirstOrDefault().Description)</label>
+                            <div class="col-12 offset-md-1 col-md-9">
+                                <input value="@Html.DisplayFor(model => model.DisplayItems[i].Description)" readonly class="form-control-plaintext" />
+                            </div>
+                            <div class="d-block d-md-none col-10 col-md-2">
+                                <button type="submit" name="action" value="@($"{ViewData["RemoveAction"]}{Model.DisplayItems[i].Number}")" class="btn btn-primary">@Strings["Remove"]</button>
+                            </div>
+                        </div>
+                        <div class="row"><div class="col"><hr /></div></div>
+                    }
+                    <div class="row">
+                        <div class="col-2 col-md-1">
+                            <input readonly class="form-control-plaintext" value="@(Model.DisplayItems.Count + 1)" />
+                        </div>
+                        <div class="col-5 col-md-3">
+                            <input asp-for="NewItem.Date" type="date" class="form-control"
+                                   data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.NewItem.Date)]"  />
+                            <span asp-validation-for="NewItem.Date" class="text-danger"></span>
+                        </div>
+                        <div class="col-5 col-md-4">
+                            <select asp-for="NewItem.ExpenseType" asp-items="Html.GetEnumSelectList<ExpenseType>()" class="form-control"
+                                    data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.NewItem.ExpenseType)]" >
+                                <option value="">@Strings["Please select one..."]</option>
+                            </select>
+                            <span asp-validation-for="NewItem.ExpenseType" class="text-danger"></span>
+                        </div>
+                        <label asp-for="NewItem.Value" class="d-block d-md-none col-2 col-form-label"></label>
+                        <div class="col-5 col-md-2">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">@NumberFormatInfo.CurrentInfo.CurrencySymbol</div>
+                                </div>
+                                <input asp-for="NewItem.Value" class="form-control"
+                                       data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.NewItem.Value)]"
+                                       data-val-number="@SharedStrings["The field '{0}' must be a number.", Html.DisplayNameFor(m => m.NewItem.Value)]" />
+                            </div>
+                            <span asp-validation-for="NewItem.Value" class="text-danger"></span>
+                        </div>
+                        <div class="d-none d-md-block col-1">
+                            <button type="submit" name="action" value="@ViewData["AddAction"]" class="btn btn-primary">@Strings["Add"]</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label asp-for="NewItem.Description" class="col-12 offset-md-1 col-md-12 col-form-label"></label>
+                        <div class="col-12 offset-md-1 col-md-9">
+                            <input asp-for="NewItem.Description" class="form-control" />
+                            <span asp-validation-for="NewItem.Description" class="text-danger"></span>
+                        </div>
+                        <div class="d-block d-md-none col-10 col-md-2">
+                            <button type="submit" name="action" value="@ViewData["AddAction"]" class="btn btn-primary">@Strings["Add"]</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="offset-1 col-11">
+                    <button type="submit" name="action" value="@ViewData["SaveAction"]" class="btn btn-primary">@Strings["Save"]</button>
+                    <button type="submit" name="action" value="@ViewData["FinishAction"]" class="btn btn-primary">@Strings["Finish"]</button>
+                    <a class="btn btn-primary" asp-action="Index">@Strings["Cancel"]</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
