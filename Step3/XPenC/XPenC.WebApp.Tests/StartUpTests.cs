@@ -11,13 +11,12 @@ namespace XPenC.WebApp.Tests
     public class StartUpTests
     {
         private readonly FakeServiceCollection _serviceCollection;
-        private readonly Startup _startUp;
 
         public StartUpTests()
         {
             _serviceCollection = new FakeServiceCollection();
-            _startUp = new Startup(new DummyConfiguration());
-            _startUp.ConfigureServices(_serviceCollection);
+            var startUp = new Startup(new DummyConfiguration());
+            startUp.ConfigureServices(_serviceCollection);
         }
 
         [Fact]
