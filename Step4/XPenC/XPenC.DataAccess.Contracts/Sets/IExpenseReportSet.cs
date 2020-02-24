@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
-using XPenC.DataAccess.Contracts.Schema;
+using XPenC.BusinessLogic.Contracts.Models;
 
 namespace XPenC.DataAccess.Contracts.Sets
 {
     public interface IExpenseReportSet
     {
-        IEnumerable<ExpenseReportEntity> GetAll();
-        ExpenseReportEntity Find(int id);
+        IEnumerable<ExpenseReport> GetAll();
+        ExpenseReport Find(int id);
 
-        void Add(ExpenseReportEntity source);
-        void Update(ExpenseReportEntity source);
+        void Add(ExpenseReport source);
+        void Update(ExpenseReport source);
         void Delete(int id);
     }
 }

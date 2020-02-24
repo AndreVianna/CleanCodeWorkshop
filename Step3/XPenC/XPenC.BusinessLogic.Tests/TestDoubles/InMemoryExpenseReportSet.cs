@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.DataAccess.Contracts;
-using XPenC.DataAccess.Contracts.Schema;
 using XPenC.DataAccess.Contracts.Sets;
 
 namespace XPenC.BusinessLogic.Tests.TestDoubles
@@ -9,14 +9,14 @@ namespace XPenC.BusinessLogic.Tests.TestDoubles
     internal class InMemoryExpenseReportSet : IExpenseReportSet
     {
         private readonly IDataContext _dataContext;
-        private readonly List<ExpenseReportEntity> _data = new List<ExpenseReportEntity>();
+        private readonly List<ExpenseReport> _data = new List<ExpenseReport>();
 
         public InMemoryExpenseReportSet(IDataContext dataContext)
         {
             _dataContext = dataContext;
         }
 
-        public void Add(ExpenseReportEntity source)
+        public void Add(ExpenseReport source)
         {
             source.Id = _data.Count + 1;
             _data.Add(source);
@@ -28,22 +28,23 @@ namespace XPenC.BusinessLogic.Tests.TestDoubles
 
         public void Delete(int id)
         {
-            var report = Find(id);
+            var report = _data.Find(i => i.Id == id);
             if (report == null)
             {
                 return;
             }
 
             _data.Remove(report);
-            foreach (var item in report.Items)
+            var reportItems = _dataContext.ExpenseReportItems.GetAllFor(report.Id).ToList();
+            foreach (var item in reportItems)
             {
                 _dataContext.ExpenseReportItems.DeleteFrom(report.Id, item.ItemNumber);
             }
         }
 
-        public ExpenseReportEntity Find(int id)
+        public ExpenseReport Find(int id)
         {
-            var record = _data.Find(i => i.Id == id);
+            var record = _data.FirstOrDefault(i => i.Id == id);
             if (record == null)
             {
                 return null;
@@ -53,12 +54,12 @@ namespace XPenC.BusinessLogic.Tests.TestDoubles
             return record;
         }
 
-        private void GetItems(ExpenseReportEntity record)
+        private void GetItems(ExpenseReport record)
         {
             record.Items = _dataContext.ExpenseReportItems.GetAllFor(record.Id).ToList();
         }
 
-        public IEnumerable<ExpenseReportEntity> GetAll()
+        public IEnumerable<ExpenseReport> GetAll()
         {
             var list = _data;
             foreach (var item in list)
@@ -68,7 +69,7 @@ namespace XPenC.BusinessLogic.Tests.TestDoubles
             return list;
         }
 
-        public void Update(ExpenseReportEntity source)
+        public void Update(ExpenseReport source)
         {
             Delete(source.Id);
             Add(source);

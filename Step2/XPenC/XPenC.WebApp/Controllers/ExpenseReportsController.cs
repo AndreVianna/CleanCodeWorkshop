@@ -1,45 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Localization;
 using XPenC.BusinessLogic.Contracts;
-using XPenC.BusinessLogic.Contracts.Models;
+using XPenC.BusinessLogic.Contracts.Exceptions;
 using XPenC.DataAccess.Contracts;
 using XPenC.WebApp.Filters;
-using XPenC.WebApp.ViewModels;
-using static XPenC.WebApp.ViewModels.ConversionHelper;
+using XPenC.WebApp.Models;
+using static XPenC.WebApp.Models.ConversionHelper;
+using ExpenseType = XPenC.BusinessLogic.Contracts.Models.ExpenseType;
+using ViewExpenseType = XPenC.WebApp.Models.ExpenseType;
 
 namespace XPenC.WebApp.Controllers
 {
+    [Route("ExpenseReports")]
     [TypeFilter(typeof(GeneralExceptionFilter))]
     public class ExpenseReportsController : Controller
     {
         private readonly IDataContext _dataContext;
         private readonly IExpenseReportOperations _expenseReportOperations;
+        private readonly IStringLocalizer<ExpenseReportsController> _strings;
 
-        public static string AddActionName => "Add";
-        public static string RemoveActionName => "Remove";
-        public static string FinishActionName => "Finish";
-        public static string SaveActionName => "Save";
+        private const string FINISH_ACTION_NAME = "Finish";
+        private const string SAVE_ACTION_NAME = "Save";
 
-        public ExpenseReportsController(IDataContext dataContext, IExpenseReportOperations expenseReportOperations)
+        public ExpenseReportsController(IDataContext dataContext, IExpenseReportOperations expenseReportOperations, IStringLocalizer<ExpenseReportsController> strings)
         {
             _dataContext = dataContext;
             _expenseReportOperations = expenseReportOperations;
+            _strings = strings;
         }
 
-        // GET: ExpenseReports
+        [HttpGet("")]
         public IActionResult Index()
         {
             var expenseReportList = _expenseReportOperations.GetList();
-
+            
             var result = expenseReportList.Select(ToExpenseReportListItem).ToArray();
-
+            
             return View(result);
         }
 
-        // GET: ExpenseReports/Details/5
+        [HttpGet("Details/{id}")]
         public IActionResult Details(int? id)
         {
             if (id == null)
@@ -58,47 +59,71 @@ namespace XPenC.WebApp.Controllers
             return View(result);
         }
 
-        // GET: ExpenseReports/Create
+        [HttpGet("Create")]
         public IActionResult Create()
         {
             var expenseReport = _expenseReportOperations.CreateWithDefaults();
 
-            _expenseReportOperations.Add(expenseReport);
-
-            _dataContext.CommitChanges();
-
-            return RedirectToAction(nameof(Update), new { expenseReport.Id });
+            return View(ToExpenseReportUpdate(expenseReport));
         }
 
-        // GET: ExpenseReports/Update/5
-        public IActionResult Update(int? id)
+        [HttpPost("Create")]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(string action, ExpenseReportUpdate input)
         {
-            if (id == null)
+            if (input == null)
             {
-                return BadRequest();
+                return BadRequest("The create request data is not valid.");
             }
 
-            var existingReport = _expenseReportOperations.Find(id.Value);
+            if (!ModelState.IsValid)
+            {
+                return View(input);
+            }
+
+            try
+            {
+                var newExpenseReport = _expenseReportOperations.CreateWithDefaults();
+
+                UpdateExpenseReport(newExpenseReport, input);
+
+                _expenseReportOperations.Add(newExpenseReport);
+
+                _dataContext.CommitChanges();
+
+                return action == FINISH_ACTION_NAME
+                    ? RedirectToAction(nameof(Index))
+                    : RedirectToAction(nameof(Update), new { newExpenseReport.Id });
+            }
+            catch (ValidationException ex)
+            {
+                foreach (var validationError in ex.Errors)
+                {
+                    ModelState.AddModelError(validationError.Source, _strings[validationError.Message]);
+                }
+                PrepareUpdateViewViewData();
+                return View(input);
+            }
+        }
+
+        [HttpGet("Update/{id}")]
+        public IActionResult Update(int id)
+        {
+            var existingReport = _expenseReportOperations.Find(id);
             if (existingReport == null)
             {
                 return NotFound();
             }
 
             var result = ToExpenseReportUpdate(existingReport);
-            PrepareExpenseTypeDropdownList();
+            PrepareUpdateViewViewData();
             return View(result);
         }
 
-        // POST: ExpenseReports/Update/5?action=Add
-        [HttpPost]
+        [HttpPost("Update/{id}")]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(int? id, string action, ExpenseReportUpdate input)
+        public IActionResult Update(int id, string action, ExpenseReportUpdate input)
         {
-            if (id == null)
-            {
-                return BadRequest();
-            }
-
             if (!IsValidAction(action))
             {
                 return BadRequest("The action is not valid.");
@@ -109,46 +134,51 @@ namespace XPenC.WebApp.Controllers
                 return BadRequest("The update request data is not valid.");
             }
 
-            var existingReport = _expenseReportOperations.Find(id.Value);
+            var existingReport = _expenseReportOperations.Find(id);
             if (existingReport == null)
             {
                 return NotFound();
             }
 
-            ValidateUpdateOperation(action, input);
             if (!ModelState.IsValid)
             {
-                UpdateExpenseReportUpdate(input, existingReport);
-                PrepareExpenseTypeDropdownList();
                 return View(input);
             }
 
-            ExecuteUpdateAction(action, existingReport, input);
-
-            _dataContext.CommitChanges();
-
-            if (action == "Finish")
+            try
             {
-                return RedirectToAction(nameof(Index));
-            }
+                UpdateExpenseReport(existingReport, input);
 
-            return RedirectToAction(nameof(Update), new { id });
+                _expenseReportOperations.Update(existingReport);
+
+                _dataContext.CommitChanges();
+
+                return action == FINISH_ACTION_NAME
+                    ? RedirectToAction(nameof(Index))
+                    : RedirectToAction(nameof(Update), new {id});
+            }
+            catch (ValidationException ex)
+            {
+                foreach (var validationError in ex.Errors)
+                {
+                    ModelState.AddModelError(validationError.Source, _strings[validationError.Message]);
+                }
+                UpdateExpenseReportUpdate(input, existingReport);
+                PrepareUpdateViewViewData();
+                return View(input);
+            }
         }
 
         private static bool IsValidAction(string action)
         {
-            return !string.IsNullOrWhiteSpace(action) && (action == AddActionName || action == FinishActionName || action == SaveActionName || IsRemoveAction(action));
+            return !string.IsNullOrWhiteSpace(action) && (action == FINISH_ACTION_NAME || action == SAVE_ACTION_NAME);
         }
 
         // GET: ExpenseReports/Delete/5
-        public IActionResult Delete(int? id)
+        [HttpGet("Delete/{id}")]
+        public IActionResult Delete(int id)
         {
-            if (id == null)
-            {
-                return BadRequest();
-            }
-
-            var existingReport = _expenseReportOperations.Find(id.Value);
+            var existingReport = _expenseReportOperations.Find(id);
             if (existingReport == null)
             {
                 return NotFound();
@@ -166,99 +196,28 @@ namespace XPenC.WebApp.Controllers
             _expenseReportOperations.Delete(id);
 
             _dataContext.CommitChanges();
-
+            
             return RedirectToAction(nameof(Index));
         }
 
-        private void ExecuteUpdateAction(string action, ExpenseReport originalValue, ExpenseReportUpdate input)
-        {
-            if (IsRemoveAction(action))
-            {
-                _expenseReportOperations.RemoveItem(originalValue, GetItemNumberFromAction(action));
-            }
-            else if (action == "Add")
-            {
-                _expenseReportOperations.AddItem(originalValue, ToExpenseReportItem(input));
-            }
-            originalValue.Client = input.Client;
-            _expenseReportOperations.Update(originalValue);
-        }
-
-        private void ValidateUpdateOperation(string action, ExpenseReportUpdate input)
-        {
-            if (string.IsNullOrWhiteSpace(input.Client))
-            {
-                ModelState.AddModelError("Client", "The client field is required.");
-            }
-
-            if (action != "Add")
-            {
-                return;
-            }
-
-            if (input.NewItem.Date is null)
-            {
-                ModelState.AddModelError("NewItem.Date", "The new expense date is required.");
-            }
-
-            if (input.NewItem.Date > DateTime.Now)
-            {
-                ModelState.AddModelError("NewItem.Value", "The new expense date must not be in the future.");
-            }
-
-            if (string.IsNullOrWhiteSpace(input.NewItem.ExpenseType))
-            {
-                ModelState.AddModelError("NewItem.ExpenseType", "The new expense type is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(input.NewItem.ExpenseType))
-            {
-                ModelState.AddModelError("NewItem.ExpenseType", "The new expense type is required.");
-            }
-
-            if (!Enum.TryParse<ExpenseType>(input.NewItem.ExpenseType, out _))
-            {
-                ModelState.AddModelError("NewItem.ExpenseType", $"'{input.NewItem.ExpenseType}' is not a valid expense type.");
-            }
-
-            if (input.NewItem.Value is null)
-            {
-                ModelState.AddModelError("NewItem.Value", "The new expense value is required.");
-            }
-
-            if (input.NewItem.Value < 0)
-            {
-                ModelState.AddModelError("NewItem.Value", "The new expense value must be greater than zero.");
-            }
-        }
-
-        public static string GetExpenseTypeDisplayName(ExpenseType expenseType)
+        public static ViewExpenseType GetExpenseTypeDisplayName(ExpenseType expenseType)
         {
             return expenseType switch
             {
-                ExpenseType.Office => "Office",
-                ExpenseType.Meal => "Meal",
-                ExpenseType.HotelLodging => "Lodging (Hotel)",
-                ExpenseType.OtherLodging => "Lodging (Other)",
-                ExpenseType.LandTransportation => "Transportation (Land)",
-                ExpenseType.AirTransportation => "Transportation (Air)",
-                ExpenseType.Other => "Other",
-                _ => ""
+                ExpenseType.Office => ViewExpenseType.Office,
+                ExpenseType.Meal => ViewExpenseType.Meal,
+                ExpenseType.HotelLodging => ViewExpenseType.HotelLodging,
+                ExpenseType.OtherLodging => ViewExpenseType.OtherLodging,
+                ExpenseType.LandTransportation => ViewExpenseType.LandTransportation,
+                ExpenseType.AirTransportation => ViewExpenseType.AirTransportation,
+                _ => ViewExpenseType.Other,
             };
         }
 
-        private void PrepareExpenseTypeDropdownList()
+        private void PrepareUpdateViewViewData()
         {
-            ViewData["ExpenseTypes"] = new List<SelectListItem>
-            {
-                new SelectListItem(GetExpenseTypeDisplayName(ExpenseType.Office), ExpenseType.Office.ToString()),
-                new SelectListItem(GetExpenseTypeDisplayName(ExpenseType.Meal), ExpenseType.Meal.ToString()),
-                new SelectListItem(GetExpenseTypeDisplayName(ExpenseType.HotelLodging), ExpenseType.HotelLodging.ToString()),
-                new SelectListItem(GetExpenseTypeDisplayName(ExpenseType.OtherLodging), ExpenseType.OtherLodging.ToString()),
-                new SelectListItem(GetExpenseTypeDisplayName(ExpenseType.LandTransportation), ExpenseType.LandTransportation.ToString()),
-                new SelectListItem(GetExpenseTypeDisplayName(ExpenseType.AirTransportation), ExpenseType.AirTransportation.ToString()),
-                new SelectListItem(GetExpenseTypeDisplayName(ExpenseType.Other), ExpenseType.Other.ToString()),
-            };
+            ViewData["SaveAction"] = SAVE_ACTION_NAME;
+            ViewData["FinishAction"] = FINISH_ACTION_NAME;
         }
     }
 }

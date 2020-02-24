@@ -1,5 +1,6 @@
 using System.Linq;
-using XPenC.DataAccess.Contracts.Schema;
+using XPenC.BusinessLogic.Contracts.Models;
+using XPenC.DataAccess.Contracts.Exceptions;
 using XPenC.DataAccess.Contracts.Sets;
 using XPenC.DataAccess.SqlServer.Sets;
 using XPenC.DataAccess.SqlServer.Tests.TestDoubles;
@@ -19,15 +20,23 @@ namespace XPenC.DataAccess.SqlServer.Tests.Sets
         [Fact]
         public void ExpenseReportItemSet_GetAllFor_ShouldPass()
         {
-            var result = _expenseReportItemSet.GetAllFor(1);
+            var result = _expenseReportItemSet.GetAllFor(1).ToArray();
 
-            Assert.Equal(2, result.Count());
+            Assert.Equal(7, result.Length);
+        }
+
+        [Fact]
+        public void ExpenseReportItemSet_GetAllFor_WithInvalidData_ShouldThrow()
+        {
+            var expenseReportItemSet = new ExpenseReportItemSet(new MockSqlDataProviderWithInvalidValues());
+
+            Assert.Throws<DataProviderException>(() => expenseReportItemSet.GetAllFor(1));
         }
 
         [Fact]
         public void ExpenseReportItemSet_AddTo_ShouldPass()
         {
-            _expenseReportItemSet.AddTo(1, new ExpenseReportItemEntity());
+            _expenseReportItemSet.AddTo(1, new ExpenseReportItem());
         }
 
         [Fact]

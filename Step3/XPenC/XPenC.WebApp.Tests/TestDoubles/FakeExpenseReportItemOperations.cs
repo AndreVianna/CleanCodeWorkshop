@@ -6,7 +6,7 @@ namespace XPenC.WebApp.Tests.TestDoubles
     internal class FakeExpenseReportItemOperations : DummyExpenseReportItemOperations
     {
         public Action ExpectedAddBehavior { get; set; }
-        public override void Add(int expenseReportId, ExpenseReportItem newExpenseReportItem)
+        public override void Add(ExpenseReportItem newExpenseReportItem)
         {
             ExpectedAddBehavior?.Invoke();
         }

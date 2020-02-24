@@ -27,11 +27,10 @@ namespace XPenC.WebApp.Filters
                 ViewName = "Error",
                 ViewData = new ViewDataDictionary(_modelMetadataProvider, context.ModelState)
                 {
+                    ["RequestId"] = requestId,
                     ["ShowException"] = _hostingEnvironment.IsDevelopment(),
                     ["ExceptionType"] = context.Exception.GetType().Name,
                     ["ExceptionMessage"] = context.Exception.Message,
-                    ["HasRequestId"] = !string.IsNullOrWhiteSpace(requestId),
-                    ["RequestId"] = requestId,
                 }
             };
         }

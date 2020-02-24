@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Hosting;
+using XPenC.WebApp.Models;
 
 namespace XPenC.WebApp.Filters
 {
@@ -22,15 +23,18 @@ namespace XPenC.WebApp.Filters
         public void OnException(ExceptionContext context)
         {
             var requestId = Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
+            var model = new ErrorData
+            {
+                RequestId = requestId,
+                ShowException = _hostingEnvironment.IsDevelopment(),
+                Exception = context.Exception,
+            };
             context.Result = new ViewResult
             {
                 ViewName = "Error",
                 ViewData = new ViewDataDictionary(_modelMetadataProvider, context.ModelState)
                 {
-                    ["RequestId"] = requestId,
-                    ["ShowException"] = _hostingEnvironment.IsDevelopment(),
-                    ["ExceptionType"] = context.Exception.GetType().Name,
-                    ["ExceptionMessage"] = context.Exception.Message,
+                    Model = model,
                 }
             };
         }

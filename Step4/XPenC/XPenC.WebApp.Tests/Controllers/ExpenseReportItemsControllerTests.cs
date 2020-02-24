@@ -1,9 +1,8 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
-using XPenC.BusinessLogic.Exceptions;
-using XPenC.BusinessLogic.Validation;
+using XPenC.BusinessLogic.Contracts.Exceptions;
 using XPenC.WebApp.Controllers;
-using XPenC.WebApp.Models;
+using XPenC.WebApp.Models.ExpenseReports;
 using XPenC.WebApp.Tests.TestDoubles;
 using Xunit;
 
@@ -64,7 +63,12 @@ namespace XPenC.WebApp.Tests.Controllers
         public void ExpenseReportItemsController_Create_Post_WithValidationError_ShouldPass()
         {
             var input = new ExpenseReportItemUpdate { Date = DateTime.Now.AddHours(1) };
-            _expenseReportItemOperations.ExpectedAddBehavior = () => throw new ValidationException("Add", new [] { new ValidationError("Date", "The expense item date must not be in the future.") });
+            var expectedError = new ValidationError
+            {
+                Source = "Date", 
+                Message = "The expense item date must not be in the future.",
+            };
+            _expenseReportItemOperations.ExpectedAddBehavior = () => throw new ValidationException("Add", new [] { expectedError });
             var result = _controller.Create(1, input);
 
             var viewResult = Assert.IsType<ViewResult>(result);

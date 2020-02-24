@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Routing;
 using XPenC.WebApp.Filters;
+using XPenC.WebApp.Models;
 using XPenC.WebApp.Tests.TestDoubles;
 using Xunit;
 
@@ -26,10 +27,10 @@ namespace XPenC.WebApp.Tests.Filters
 
             var viewResult = Assert.IsType<ViewResult>(context.Result);
             Assert.Equal("Error", viewResult.ViewName);
-            Assert.True((bool)viewResult.ViewData["ShowException"]);
-            Assert.Equal("Exception", (string)viewResult.ViewData["ExceptionType"]);
-            Assert.Equal("Some message", (string)viewResult.ViewData["ExceptionMessage"]);
-            Assert.NotNull((string)viewResult.ViewData["RequestId"]);
+            var model = Assert.IsType<ErrorData>(viewResult.Model);
+            Assert.NotNull(model.RequestId);
+            Assert.True(model.ShowException);
+            Assert.NotNull(model.Exception);
         }
 
         [Fact]
@@ -45,10 +46,10 @@ namespace XPenC.WebApp.Tests.Filters
             activity.Stop();
             var viewResult = Assert.IsType<ViewResult>(context.Result);
             Assert.Equal("Error", viewResult.ViewName);
-            Assert.True((bool)viewResult.ViewData["ShowException"]);
-            Assert.Equal("Exception", (string)viewResult.ViewData["ExceptionType"]);
-            Assert.Equal("Some message", (string)viewResult.ViewData["ExceptionMessage"]);
-            Assert.NotNull((string)viewResult.ViewData["RequestId"]);
+            var model = Assert.IsType<ErrorData>(viewResult.Model);
+            Assert.NotNull(model.RequestId);
+            Assert.True(model.ShowException);
+            Assert.NotNull(model.Exception);
         }
 
         [Fact]
@@ -61,10 +62,10 @@ namespace XPenC.WebApp.Tests.Filters
 
             var viewResult = Assert.IsType<ViewResult>(context.Result);
             Assert.Equal("Error", viewResult.ViewName);
-            Assert.False((bool)viewResult.ViewData["ShowException"]);
-            Assert.Equal("Exception", (string)viewResult.ViewData["ExceptionType"]);
-            Assert.Equal("Some message", (string)viewResult.ViewData["ExceptionMessage"]);
-            Assert.NotNull((string)viewResult.ViewData["RequestId"]);
+            var model = Assert.IsType<ErrorData>(viewResult.Model);
+            Assert.NotNull(model.RequestId);
+            Assert.False(model.ShowException);
+            Assert.NotNull(model.Exception);
         }
 
         private static ExceptionContext CreateExceptionContext()

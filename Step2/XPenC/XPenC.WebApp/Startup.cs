@@ -1,15 +1,19 @@
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using XPenC.BusinessLogic;
-using XPenC.BusinessLogic.Contracts;
-using XPenC.DataAccess.Contracts;
-using XPenC.DataAccess.SqlServer;
+using Microsoft.Extensions.Options;
+using XPenC.BusinessLogic.Extensions;
+using XPenC.DataAccess.SqlServer.Extensions;
+using XPenC.WebApp.Configuration;
 
 namespace XPenC.WebApp
 {
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         private readonly IConfiguration _configuration;
@@ -19,20 +23,32 @@ namespace XPenC.WebApp
             _configuration = configuration;
         }
 
+        //The first supported culture is considered the default one.
+        private readonly IList<CultureInfo> _supportedCultures = new List<CultureInfo>
+        {
+            new CultureInfo("en-US"),
+            new CultureInfo("pt-Br"),
+        };
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddLocalizedMvc(_supportedCultures);
 
-            services.AddScoped<IDataContext>(provider => new SqlServerDataContext(_configuration, "DataContext"));
-            services.AddScoped<IExpenseReportOperations, ExpenseReportOperations>();
+            services.AddSqlServerDataContext(_configuration, "DataContext");
+
+            services.AddBusinessServices();
         }
 
         // ReSharper disable once UnusedMember.Global - This method gets called by the runtime.
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var locOptions = app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(locOptions.Value);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseBrowserLink();
             }
             else
             {
@@ -48,9 +64,7 @@ namespace XPenC.WebApp
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapDefaultControllerRoute();
             });
         }
     }

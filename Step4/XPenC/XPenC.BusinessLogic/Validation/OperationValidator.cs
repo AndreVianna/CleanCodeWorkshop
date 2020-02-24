@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using XPenC.BusinessLogic.Exceptions;
+using XPenC.BusinessLogic.Contracts.Exceptions;
 
 namespace XPenC.BusinessLogic.Validation
 {
@@ -14,10 +14,13 @@ namespace XPenC.BusinessLogic.Validation
             _operation = operation;
         }
 
-
         public void AddError(string source, string message)
         {
-            _errors.Add(new ValidationError(source, message));
+            _errors.Add(new ValidationError
+            {
+                Source = source,
+                Message = message,
+            });
         }
 
         public void Validate()

@@ -17,5 +17,7 @@ namespace XPenC.BusinessLogic.Contracts.Models
         public decimal Value { get; set; }
 
         public bool IsAboveMaximum { get; set; }
+
+        //public ExpenseReport ExpenseReport { get; set; }
     }
 }

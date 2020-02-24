@@ -9,6 +9,5 @@
         LandTransportation,
         AirTransportation,
         Other,
-        Unknown,
     }
 }

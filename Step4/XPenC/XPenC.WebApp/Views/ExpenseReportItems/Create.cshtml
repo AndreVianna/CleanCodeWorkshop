@@ -1,12 +1,12 @@
 ﻿@using System.Globalization
 @using Microsoft.AspNetCore.Mvc.Localization
-@using XPenC.WebApp.Models
 @using XPenC.WebApp
+@using XPenC.WebApp.Models.ExpenseReports
 
 @inject IViewLocalizer Strings
 @inject IHtmlLocalizer<SharedResources> SharedStrings
 
-@model XPenC.WebApp.Models.ExpenseReportItemUpdate
+@model XPenC.WebApp.Models.ExpenseReports.ExpenseReportItemUpdate
 
 <h1>@Strings["Update Expense Report"]&nbsp;@Model.ExpenseReportId</h1>
 <hr />

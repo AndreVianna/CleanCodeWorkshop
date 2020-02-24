@@ -1,43 +1,55 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using XPenC.DataAccess.Contracts.Schema;
+using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.DataAccess.Contracts.Sets;
+using static XPenC.DataAccess.EntityFrameworkCore.ConversionHelper;
 
 namespace XPenC.DataAccess.EntityFrameworkCore.Sets
 {
     public class ExpenseReportItemSet : IExpenseReportItemSet
     {
-        private readonly XPenCDbContext _dataContext;
+        private readonly XPenCDbContext _dbContext;
+        private readonly ICollection<Action> _afterSaveChanges;
 
-        public ExpenseReportItemSet(XPenCDbContext dataContext)
+        public ExpenseReportItemSet(XPenCDbContext dbContext, ICollection<Action> afterSaveChanges)
         {
-            _dataContext = dataContext;
+            _dbContext = dbContext;
+            _afterSaveChanges = afterSaveChanges;
         }
 
-        public IEnumerable<ExpenseReportItemEntity> GetAllFor(int expenseReportId)
+        public IEnumerable<ExpenseReportItem> GetAllFor(int expenseReportId)
         {
-            return _dataContext.ExpenseReportItems.AsNoTracking().Where(i => i.ExpenseReportId == expenseReportId).ToArray();
+            var result = _dbContext.ExpenseReportItems
+                .AsNoTracking()
+                .Where(i => i.ExpenseReportId == expenseReportId)
+                .AsEnumerable()
+                .Select(ToExpenseReportItem)
+                .ToArray();
+            return result;
         }
 
-        public void AddTo(int expenseReportId, ExpenseReportItemEntity source)
+        public void AddTo(int expenseReportId, ExpenseReportItem source)
         {
-            source.ItemNumber = GetNextNumber(expenseReportId);
-            _dataContext.ExpenseReportItems.Add(source);
+            var entity = ToExpenseReportItemEntity(source);
+            entity.ItemNumber = GetNextNumber(expenseReportId);
+            _dbContext.ExpenseReportItems.Add(entity);
+            _afterSaveChanges.Add(() => UpdateExpenseReportItem(source, entity));
         }
 
         public void DeleteFrom(int expenseReportId, int itemNumber)
         {
-            var entity = _dataContext.ExpenseReportItems.Find(expenseReportId, itemNumber);
+            var entity = _dbContext.ExpenseReportItems.Find(expenseReportId, itemNumber);
             if (entity != null)
             {
-                _dataContext.ExpenseReportItems.Remove(entity);
+                _dbContext.ExpenseReportItems.Remove(entity);
             }
         }
 
         private int GetNextNumber(int id)
         {
-            var lastNumber = _dataContext.ExpenseReportItems.AsNoTracking().Where(i => i.ExpenseReportId == id).OrderByDescending(i => i.ItemNumber).Select(i => i.ItemNumber).FirstOrDefault();
+            var lastNumber = _dbContext.ExpenseReportItems.AsNoTracking().Where(i => i.ExpenseReportId == id).OrderByDescending(i => i.ItemNumber).Select(i => i.ItemNumber).FirstOrDefault();
             return lastNumber + 1;
         }
     }

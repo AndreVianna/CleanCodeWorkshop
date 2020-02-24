@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
-using XPenC.DataAccess.Contracts.Schema;
+using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.DataAccess.Contracts.Sets;
 
 namespace XPenC.BusinessLogic.Tests.TestDoubles
 {
     internal class InMemoryExpenseReportItemSet : IExpenseReportItemSet
     {
-        private readonly List<ExpenseReportItemEntity> _data = new List<ExpenseReportItemEntity>();
+        private readonly List<ExpenseReportItem> _data = new List<ExpenseReportItem>();
 
-        public void AddTo(int expenseReportId, ExpenseReportItemEntity source)
+        public void AddTo(int expenseReportId, ExpenseReportItem source)
         {
             source.ExpenseReportId = expenseReportId;
             if (source.ItemNumber == 0)
@@ -21,7 +21,7 @@ namespace XPenC.BusinessLogic.Tests.TestDoubles
 
         public void DeleteFrom(int expenseReportId, int itemNumber)
         {
-            var item = Find(expenseReportId, itemNumber);
+            var item = _data.Find(i => i.ExpenseReportId == expenseReportId && i.ItemNumber == itemNumber);
             if (item == null)
             {
                 return;
@@ -30,12 +30,7 @@ namespace XPenC.BusinessLogic.Tests.TestDoubles
             _data.Remove(item);
         }
 
-        private ExpenseReportItemEntity Find(int expenseReportId, int itemNumber)
-        {
-            return _data.Find(i => i.ExpenseReportId == expenseReportId && i.ItemNumber == itemNumber);
-        }
-
-        public IEnumerable<ExpenseReportItemEntity> GetAllFor(int expenseReportId)
+        public IEnumerable<ExpenseReportItem> GetAllFor(int expenseReportId)
         {
             return _data.Where(i => i.ExpenseReportId == expenseReportId);
         }

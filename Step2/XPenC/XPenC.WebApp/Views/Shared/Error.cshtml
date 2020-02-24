@@ -1,19 +1,20 @@
-﻿<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
 
-@if (!(bool)ViewData["HasRequestId"])
+@inject IViewLocalizer Strings
+
+<h1 class="text-danger">@Strings["Error."]</h1>
+<h2 class="text-danger">@Strings["An error occurred while processing your request."]</h2>
+
+<p>
+    <strong>@Strings["Request ID"]:</strong> <code>@ViewData["RequestId"]</code>
+</p>
+
+@if ((bool)ViewData["ShowException"])
 {
     <p>
-        <strong>Request ID:</strong> <code>@ViewData["RequestId"]</code>
-    </p>
-}
-
-@if (!(bool)ViewData["ShowException"])
-{
-    <p>
-        <strong>Message:</strong> <code style="color: red">@ViewData["ExceptionType"]</code>
+        <strong>@Strings["Exception"]:</strong> <code style="color: red">@ViewData["ExceptionType"]</code>
     </p>
     <p>
-        <strong>Message:</strong> <code style="color: red">@ViewData["ExceptionMessage"]</code>
+        <strong>@Strings["Message"]:</strong> <code style="color: red">@ViewData["ExceptionMessage"]</code>
     </p>
 }

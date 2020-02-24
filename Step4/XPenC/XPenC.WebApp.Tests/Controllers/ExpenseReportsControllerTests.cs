@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using XPenC.BusinessLogic.Exceptions;
-using XPenC.BusinessLogic.Validation;
+using XPenC.BusinessLogic.Contracts.Exceptions;
 using XPenC.WebApp.Controllers;
-using XPenC.WebApp.Models;
+using XPenC.WebApp.Models.ExpenseReports;
 using XPenC.WebApp.Tests.TestDoubles;
 using Xunit;
 using static XPenC.WebApp.Controllers.ExpenseReportsController;
@@ -139,7 +138,12 @@ namespace XPenC.WebApp.Tests.Controllers
         public void ExpenseReportsController_Create_Post_WithValidationError_ShouldPass()
         {
             var input = new ExpenseReportUpdate { Id = 1 };
-            _expenseReportOperations.ExpectedAddBehavior = () => throw new ValidationException("Add", new[] { new ValidationError("Client", "The 'Client' field is required.") });
+            var expectedError = new ValidationError
+            {
+                Source = "Client",
+                Message = "The 'Client' field is required.",
+            };
+            _expenseReportOperations.ExpectedAddBehavior = () => throw new ValidationException("Add", new[] { expectedError });
             var result = _controller.Create("Save", input);
 
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -259,7 +263,12 @@ namespace XPenC.WebApp.Tests.Controllers
         public void ExpenseReportsController_Update_Post_WithValidationError_ShouldPass()
         {
             var input = new ExpenseReportUpdate { Id = 1 };
-            _expenseReportOperations.ExpectedUpdateBehavior = () => throw new ValidationException("Update", new [] { new ValidationError("Client", "The 'Client' field is required.") });
+            var expectedError = new ValidationError
+            {
+                Source = "Client",
+                Message = "The 'Client' field is required.",
+            };
+            _expenseReportOperations.ExpectedUpdateBehavior = () => throw new ValidationException("Update", new [] { expectedError });
             var result = _controller.Update(1, "Save", input);
 
             var viewResult = Assert.IsType<ViewResult>(result);

@@ -5,7 +5,7 @@ using XPenC.BusinessLogic.Contracts;
 using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.BusinessLogic.Validation;
 using XPenC.DataAccess.Contracts;
-using static XPenC.BusinessLogic.ConversionHelper;
+using static XPenC.BusinessLogic.ExpenseReportItemOperations;
 
 namespace XPenC.BusinessLogic
 {
@@ -17,12 +17,6 @@ namespace XPenC.BusinessLogic
         {
             _dataContext = dataContext;
         }
-
-        public static decimal MaximumMealValue { get; } = 50m;
-
-        public static bool IsExpenseAboveMaximum(ExpenseReportItem item) => item.ExpenseType == ExpenseType.Meal && item.Value > MaximumMealValue;
-        public static decimal CalculateReportTotal(IEnumerable<ExpenseReportItem> items) => items.Sum(i => i.Value);
-        public static decimal CalculateReportMealTotal(IEnumerable<ExpenseReportItem> items) => items.Where(i => i.ExpenseType == ExpenseType.Meal).Sum(i => i.Value);
 
         public ExpenseReport CreateWithDefaults()
         {
@@ -37,26 +31,32 @@ namespace XPenC.BusinessLogic
         public void Add(ExpenseReport source)
         {
             ValidateOperation(nameof(Add), source);
-            var newEntity = ToExpenseReportEntity(source);
-            _dataContext.ExpenseReports.Add(newEntity);
-            UpdateExpenseReport(source, newEntity);
+            ProcessExpenseReportRulesForUpdate(source);
+            _dataContext.ExpenseReports.Add(source);
         }
 
         public IEnumerable<ExpenseReport> GetList()
         {
-            return _dataContext.ExpenseReports.GetAll().Select(ToExpenseReport);
+            var expenseReports = _dataContext.ExpenseReports.GetAll().ToArray();
+            foreach (var expenseReport in expenseReports)
+            {
+                ProcessExpenseReportDisplayRules(expenseReport);
+            }
+            return expenseReports;
         }
 
         public ExpenseReport Find(int id)
         {
-            return ToExpenseReport(_dataContext.ExpenseReports.Find(id));
+            var expenseReport = _dataContext.ExpenseReports.Find(id);
+            ProcessExpenseReportDisplayRules(expenseReport);
+            return expenseReport;
         }
 
         public void Update(ExpenseReport source)
         {
             ValidateOperation(nameof(Update), source);
-            source.ModifiedOn = DateTime.Now;
-            _dataContext.ExpenseReports.Update(ToExpenseReportEntity(source));
+            ProcessExpenseReportRulesForUpdate(source);
+            _dataContext.ExpenseReports.Update(source);
         }
 
         public void Delete(int id)
@@ -64,7 +64,7 @@ namespace XPenC.BusinessLogic
             _dataContext.ExpenseReports.Delete(id);
         }
 
-        private void ValidateOperation(string operation, ExpenseReport input)
+        private static void ValidateOperation(string operation, ExpenseReport input)
         {
             var validator = new OperationValidator(operation);
             ValidateExpenseReportClient(validator, input);
@@ -78,5 +78,31 @@ namespace XPenC.BusinessLogic
                 validator.AddError(nameof(ExpenseReport.Client), $"The '{nameof(ExpenseReport.Client)}' field is required.");
             }
         }
+
+        private static void ProcessExpenseReportDisplayRules(ExpenseReport expenseReport)
+        {
+            if (expenseReport == null)
+            {
+                return;
+            }
+            foreach (var item in expenseReport.Items)
+            {
+                ProcessExpenseReportItemRules(item);
+            }
+        }
+
+        private static void ProcessExpenseReportRulesForUpdate(ExpenseReport expenseReport)
+        {
+            expenseReport.ModifiedOn = DateTime.Now;
+            expenseReport.MealTotal = CalculateReportMealTotal(expenseReport.Items);
+            expenseReport.Total = CalculateReportTotal(expenseReport.Items);
+            foreach (var item in expenseReport.Items)
+            {
+                ProcessExpenseReportItemRules(item);
+            }
+        }
+
+        private static decimal CalculateReportTotal(IEnumerable<ExpenseReportItem> items) => items.Sum(i => i.Value);
+        private static decimal CalculateReportMealTotal(IEnumerable<ExpenseReportItem> items) => items.Where(i => i.ExpenseType == ExpenseType.Meal).Sum(i => i.Value);
     }
 }

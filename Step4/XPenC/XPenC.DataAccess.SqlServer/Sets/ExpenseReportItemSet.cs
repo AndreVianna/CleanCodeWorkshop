@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using XPenC.DataAccess.Contracts.Schema;
+﻿using System;
+using System.Collections.Generic;
+using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.DataAccess.Contracts.Sets;
 using static XPenC.DataAccess.SqlServer.ConversionHelper;
 
@@ -14,17 +15,17 @@ namespace XPenC.DataAccess.SqlServer.Sets
             _sqlDataProvider = sqlDataProvider;
         }
 
-        public IEnumerable<ExpenseReportItemEntity> GetAllFor(int expenseReportId)
+        public IEnumerable<ExpenseReportItem> GetAllFor(int expenseReportId)
         {
             const string commandText = "SELECT * " +
                                        "FROM ExpenseReportItems " +
                                        "WHERE ExpenseReportId=@expenseReportId;";
             var parameters = new Dictionary<string, object> { ["expenseReportId"] = expenseReportId };
             
-            return _sqlDataProvider.ReadMany(commandText, parameters, ToExpenseReportItemEntity);
+            return _sqlDataProvider.ReadMany(commandText, parameters, ToExpenseReportItem);
         }
 
-        public void AddTo(int expenseReportId, ExpenseReportItemEntity source)
+        public void AddTo(int expenseReportId, ExpenseReportItem source)
         {
             var nextNumber = GetNextNumber(expenseReportId);
             const string commandText = "INSERT INTO ExpenseReportItems " +
@@ -36,9 +37,9 @@ namespace XPenC.DataAccess.SqlServer.Sets
                 ["id"] = expenseReportId,
                 ["number"] = nextNumber,
                 ["date"] = source.Date,
-                ["expenseType"] = source.ExpenseType,
+                ["expenseType"] = TranslateExpenseType(source.ExpenseType),
                 ["value"] = source.Value,
-                ["description"] = source.Description,
+                ["description"] = (object)source.Description ?? DBNull.Value,
             };
 
             _sqlDataProvider.Execute(commandText, parameters);

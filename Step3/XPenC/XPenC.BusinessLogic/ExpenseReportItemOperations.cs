@@ -15,12 +15,10 @@ namespace XPenC.BusinessLogic
             _dataContext = dataContext;
         }
 
-        public void Add(int expenseReportId, ExpenseReportItem newItem)
+        public void Add(ExpenseReportItem newItem)
         {
             ValidateAddOperation(newItem);
-            var newItemEntity = ConversionHelper.ToExpenseReportItemEntity(newItem);
-            _dataContext.ExpenseReportItems.AddTo(expenseReportId, newItemEntity);
-            ConversionHelper.UpdateExpenseReportItem(newItem, newItemEntity);
+            _dataContext.ExpenseReportItems.AddTo(newItem.ExpenseReportId, newItem);
         }
 
         public void Delete(int expenseReportId, int itemNumber)
@@ -51,5 +49,13 @@ namespace XPenC.BusinessLogic
                 validator.AddError(nameof(ExpenseReportItem.Value), "The expense item value must be grater than zero.");
             }
         }
+
+        internal static void ProcessExpenseReportItemRules(ExpenseReportItem item)
+        {
+            item.IsAboveMaximum = IsExpenseAboveMaximum(item);
+        }
+        
+        private static decimal MaximumMealValue { get; } = 50m;
+        private static bool IsExpenseAboveMaximum(ExpenseReportItem item) => item.ExpenseType == ExpenseType.Meal && item.Value > MaximumMealValue;
     }
 }

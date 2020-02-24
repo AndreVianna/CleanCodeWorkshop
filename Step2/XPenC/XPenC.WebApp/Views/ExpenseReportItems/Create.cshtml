@@ -1,0 +1,117 @@
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using XPenC.WebApp.Models
+@using XPenC.WebApp
+
+@inject IViewLocalizer Strings
+@inject IHtmlLocalizer<SharedResources> SharedStrings
+
+@model XPenC.WebApp.Models.ExpenseReportItemUpdate
+
+<h1>@Strings["Update Expense Report"]&nbsp;@Model.ExpenseReportId</h1>
+<hr />
+<div class="row">
+    <div class="col">
+        <form asp-action="Create">
+            <input asp-for="ExpenseReportId" type="hidden" />
+            <div class="text-danger">@ViewData["ErrorMessage"]</div>
+            <div class="form-group row">
+                <label asp-for="ExpenseReport.Client" class="col-12 col-md-1 col-form-label"></label>
+                <div class="col-12 col-md-6">
+                    <input asp-for="ExpenseReport.Client" readonly class="form-control-plaintext" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-12 col-md-1 col-form-label">@Strings["Items"]</label>
+                <div class="col-12 col-md-11">
+                    <div class="row">
+                        <label class="col-2 col-md-1 col-form-label">@Strings["#"]</label>
+                        <label class="col-5 col-md-3 col-form-label">@Html.DisplayNameFor(model => model.ExpenseReport.Items.FirstOrDefault().Date)</label>
+                        <label class="col-5 col-md-4 col-form-label">@Html.DisplayNameFor(model => model.ExpenseReport.Items.FirstOrDefault().ExpenseType)</label>
+                        <label class="d-none d-md-block col-md-2 col-form-label">@Html.DisplayNameFor(model => model.ExpenseReport.Items.FirstOrDefault().Value)</label>
+                    </div>
+                    @for (var i = 0; i < Model.ExpenseReport.Items.Count; i++)
+                    {
+                        <div class="row">
+                            <div class="col-2 col-md-1">
+                                <input value="@(i + 1)" readonly class="form-control-plaintext" />
+                            </div>
+                            <div class="col-5 col-md-3">
+                                <input value="@Html.DisplayFor(model => model.ExpenseReport.Items[i].Date)" readonly class="form-control-plaintext" />
+                            </div>
+                            <div class="col-5 col-md-4">
+                                <input value="@Html.DisplayFor(model => model.ExpenseReport.Items[i].ExpenseType)" readonly class="form-control-plaintext" />
+                            </div>
+                            <label class="d-block d-md-none col-2 col-form-label">Value</label>
+                            <div class="col-5 col-md-2">
+                                <input value="@Html.DisplayFor(model => model.ExpenseReport.Items[i].Value)" readonly class="form-control-plaintext" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-12 offset-md-1 col-md-11 col-form-label">@Html.DisplayNameFor(model => model.ExpenseReport.Items.FirstOrDefault().Description)</label>
+                            <div class="col-12 offset-md-1 col-md-9">
+                                <input value="@Html.DisplayFor(model => model.ExpenseReport.Items[i].Description)" readonly class="form-control-plaintext" />
+                            </div>
+                        </div>
+                        <div class="row"><div class="col"><hr /></div></div>
+                    }
+                    <div class="form-group row">
+                        <div class="col">
+                            <h4>@Strings["New Item"]</h4>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col">
+                            <div class="row">
+                                <div class="col-2 col-md-1">
+                                    <input readonly class="form-control-plaintext" value="@(Model.ExpenseReport.Items.Count + 1)" />
+                                </div>
+                                <div class="col-5 col-md-3">
+                                    <input asp-for="Date" type="date" class="form-control"
+                                           data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Date)]" />
+                                    <span asp-validation-for="Date" class="text-danger"></span>
+                                </div>
+                                <div class="col-5 col-md-4">
+                                    <select asp-for="ExpenseType" asp-items="Html.GetEnumSelectList<ExpenseType>()" class="form-control"
+                                            data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.ExpenseType)]">
+                                        <option value="">@Strings["Please select one..."]</option>
+                                    </select>
+                                    <span asp-validation-for="ExpenseType" class="text-danger"></span>
+                                </div>
+                                <label asp-for="Value" class="d-block d-md-none col-2 col-form-label"></label>
+                                <div class="col-5 col-md-2">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">@NumberFormatInfo.CurrentInfo.CurrencySymbol</div>
+                                        </div>
+                                        <input asp-for="Value" class="form-control"
+                                               data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Value)]"
+                                               data-val-number="@SharedStrings["The field '{0}' must be a number.", Html.DisplayNameFor(m => m.Value)]" />
+                                    </div>
+                                    <span asp-validation-for="Value" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label asp-for="Description" class="col-12 offset-md-1 col-md-12 col-form-label"></label>
+                                <div class="col-12 offset-md-1 col-md-9">
+                                    <input asp-for="Description" class="form-control" />
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="offset-1 col-11">
+                            <button type="submit" name="action" value="@ViewData["SaveAction"]" class="btn btn-primary">@Strings["Save"]</button>
+                            <a class="btn btn-secondary" asp-action="Update" asp-controller="ExpenseReports" asp-route-id="@Model.ExpenseReportId">@Strings["Cancel"]</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using XPenC.DataAccess.Contracts.Schema;
+using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.DataAccess.Contracts.Sets;
+using XPenC.DataAccess.EntityFrameworkCore.Schema;
 using XPenC.DataAccess.EntityFrameworkCore.Sets;
 using Xunit;
 
@@ -13,25 +16,26 @@ namespace XPenC.DataAccess.EntityFrameworkCore.Tests.Sets
         public ExpenseReportItemSetTests()
         {
             var dbContext = new XPenCDbContext(InMemoryDbContextOptionsBuilder<XPenCDbContext>.Build());
-            dbContext.ExpenseReports.Add(new ExpenseReportEntity { Id = 1 });
-            dbContext.ExpenseReportItems.Add(new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1 });
-            dbContext.ExpenseReportItems.Add(new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 2 });
+            var report = new ExpenseReportEntity {Id = 1};
+            dbContext.ExpenseReports.Add(report);
+            dbContext.ExpenseReportItems.Add(new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 1, ExpenseType = "M", });
+            dbContext.ExpenseReportItems.Add(new ExpenseReportItemEntity { ExpenseReportId = 1, ItemNumber = 2, ExpenseType = "O", });
             dbContext.SaveChanges();
-            _expenseReportItemSet = new ExpenseReportItemSet(dbContext);
+            _expenseReportItemSet = new ExpenseReportItemSet(dbContext, new List<Action>());
         }
 
         [Fact]
         public void ExpenseReportItemSet_GetAllFor_ShouldPass()
         {
-            var result = _expenseReportItemSet.GetAllFor(1);
+            var result = _expenseReportItemSet.GetAllFor(1).ToArray();
 
-            Assert.Equal(2, result.Count());
+            Assert.Equal(2, result.Length);
         }
 
         [Fact]
         public void ExpenseReportItemSet_AddTo_ShouldPass()
         {
-            _expenseReportItemSet.AddTo(1, new ExpenseReportItemEntity());
+            _expenseReportItemSet.AddTo(1, new ExpenseReportItem());
         }
 
         [Fact]

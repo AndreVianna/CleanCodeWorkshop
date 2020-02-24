@@ -7,7 +7,7 @@ namespace XPenC.BusinessLogic.Contracts.Models
     {
         public ExpenseReport()
         {
-            Items = new List<ExpenseReportItem>();
+            Items = new HashSet<ExpenseReportItem>();
         }
 
         public int Id { get; set; }

@@ -2,13 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using XPenC.BusinessLogic.Contracts;
-using XPenC.BusinessLogic.Exceptions;
+using XPenC.BusinessLogic.Contracts.Exceptions;
 using XPenC.DataAccess.Contracts;
 using XPenC.WebApp.Filters;
-using XPenC.WebApp.Models;
-using static XPenC.WebApp.Models.ConversionHelper;
+using XPenC.WebApp.Models.ExpenseReports;
+using static XPenC.WebApp.Models.ExpenseReports.ConversionHelper;
 using ExpenseType = XPenC.BusinessLogic.Contracts.Models.ExpenseType;
-using ViewExpenseType = XPenC.WebApp.Models.ExpenseType;
+using ViewExpenseType = XPenC.WebApp.Models.ExpenseReports.ExpenseType;
 
 namespace XPenC.WebApp.Controllers
 {

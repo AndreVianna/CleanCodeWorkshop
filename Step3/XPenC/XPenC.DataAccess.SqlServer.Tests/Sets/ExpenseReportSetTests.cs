@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using XPenC.DataAccess.Contracts.Schema;
+using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.DataAccess.Contracts.Sets;
 using XPenC.DataAccess.SqlServer.Sets;
 using XPenC.DataAccess.SqlServer.Tests.TestDoubles;
@@ -21,9 +21,10 @@ namespace XPenC.DataAccess.SqlServer.Tests.Sets
         [Fact]
         public void ExpenseReportSet_GetAll_ShouldPass()
         {
-            var result = _expenseReportSet.GetAll();
+            var result = _expenseReportSet.GetAll().ToArray();
 
             Assert.Equal(2, result.Count());
+            Assert.Empty(result[0].Items);
         }
 
         [Fact]
@@ -32,6 +33,7 @@ namespace XPenC.DataAccess.SqlServer.Tests.Sets
             var result = _expenseReportSet.Find(1);
 
             Assert.NotNull(result);
+            Assert.NotEmpty(result.Items);
         }
 
         [Fact]
@@ -42,18 +44,25 @@ namespace XPenC.DataAccess.SqlServer.Tests.Sets
             Assert.Null(result);
         }
 
-        [Fact]
-        public void ExpenseReportSet_Add_ShouldPass()
+        [Theory]
+        [InlineData(ExpenseType.Office)]
+        [InlineData(ExpenseType.Meal)]
+        [InlineData(ExpenseType.HotelLodging)]
+        [InlineData(ExpenseType.OtherLodging)]
+        [InlineData(ExpenseType.LandTransportation)]
+        [InlineData(ExpenseType.AirTransportation)]
+        [InlineData(ExpenseType.Other)]
+        public void ExpenseReportSet_Add_ShouldPass(ExpenseType expenseType)
         {
-            var items = new List<ExpenseReportItemEntity> { new ExpenseReportItemEntity() };
-            _expenseReportSet.Add(new ExpenseReportEntity { Items = items });
+            var items = new List<ExpenseReportItem> { new ExpenseReportItem { ExpenseType = expenseType } };
+            _expenseReportSet.Add(new ExpenseReport { Items = items });
         }
 
         [Fact]
         public void ExpenseReportSet_Update_ShouldPass()
         {
-            var items = new List<ExpenseReportItemEntity> {new ExpenseReportItemEntity()};
-            _expenseReportSet.Update(new ExpenseReportEntity { Items = items });
+            var items = new List<ExpenseReportItem> {new ExpenseReportItem()};
+            _expenseReportSet.Update(new ExpenseReport { Items = items });
         }
 
         [Fact]

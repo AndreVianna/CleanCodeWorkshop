@@ -104,9 +104,6 @@ body {
     color: red;
 }
 
-.report .bottom {
-}
-
 @page {
     size: letter;
     margin: auto;

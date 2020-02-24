@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using XPenC.DataAccess.Contracts.Schema;
+using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.DataAccess.Contracts.Sets;
 using static XPenC.DataAccess.SqlServer.ConversionHelper;
 
@@ -18,7 +17,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
             _itemSet = itemSet;
         }
 
-        public void Add(ExpenseReportEntity source)
+        public void Add(ExpenseReport source)
         {
             const string commandText = "INSERT INTO ExpenseReports " +
                                        "(CreatedOn, ModifiedOn, Client, MealTotal, Total) " +
@@ -28,8 +27,8 @@ namespace XPenC.DataAccess.SqlServer.Sets
             var parameters = new Dictionary<string, object>
             {
                 ["created"] = source.CreatedOn,
-                ["modified"] = (object)source.ModifiedOn ?? DBNull.Value,
-                ["client"] = (object)source.Client ?? DBNull.Value,
+                ["modified"] = source.ModifiedOn,
+                ["client"] = source.Client,
                 ["mealTotal"] = source.MealTotal,
                 ["total"] = source.Total,
             };
@@ -41,18 +40,18 @@ namespace XPenC.DataAccess.SqlServer.Sets
             }
         }
 
-        public IEnumerable<ExpenseReportEntity> GetAll()
+        public IEnumerable<ExpenseReport> GetAll()
         {
             const string commandText = "SELECT * " +
                                        "FROM ExpenseReports " +
                                        "ORDER BY ModifiedOn DESC;";
 
-            return _sqlDataProvider.ReadMany(commandText, ToExpenseReportEntity).ToList();
+            return _sqlDataProvider.ReadMany(commandText, ToExpenseReport).ToList();
         }
 
-        public ExpenseReportEntity Find(int id)
+        public ExpenseReport Find(int id)
         {
-            var result = new ExpenseReportEntity();
+            var result = new ExpenseReport();
             const string commandText = "SELECT * " +
                                        "FROM ExpenseReports r " +
                                        "LEFT JOIN ExpenseReportItems i ON r.Id = i.ExpenseReportId " +
@@ -64,7 +63,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
                 : result;
         }
 
-        public void Update(ExpenseReportEntity source)
+        public void Update(ExpenseReport source)
         {
             const string commandText = "UPDATE ExpenseReports SET " +
                                        "Client = @client, " +
@@ -75,8 +74,8 @@ namespace XPenC.DataAccess.SqlServer.Sets
             var parameters = new Dictionary<string, object>
             {
                 ["id"] = source.Id,
-                ["client"] = (object)source.Client ?? DBNull.Value,
-                ["modifiedOn"] = (object)source.ModifiedOn ?? DBNull.Value,
+                ["client"] = source.Client,
+                ["modifiedOn"] = source.ModifiedOn,
                 ["total"] = source.Total,
                 ["mealTotal"] = source.MealTotal,
             };

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using XPenC.BusinessLogic.Contracts;
-using XPenC.BusinessLogic.Exceptions;
+using XPenC.BusinessLogic.Contracts.Exceptions;
 using XPenC.DataAccess.Contracts;
 using XPenC.WebApp.Filters;
 using XPenC.WebApp.Models;

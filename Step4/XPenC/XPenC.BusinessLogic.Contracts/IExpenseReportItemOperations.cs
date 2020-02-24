@@ -4,7 +4,7 @@ namespace XPenC.BusinessLogic.Contracts
 {
     public interface IExpenseReportItemOperations
     {
-        void Add(int expenseReportId, ExpenseReportItem newExpenseReportItem);
+        void Add(ExpenseReportItem newExpenseReportItem);
         void Delete(int expenseReportId, int itemNumber);
     }
 }

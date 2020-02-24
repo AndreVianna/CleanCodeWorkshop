@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using XPenC.DataAccess.Contracts.Schema;
+using XPenC.DataAccess.EntityFrameworkCore.Schema;
 
 namespace XPenC.DataAccess.EntityFrameworkCore
 {
@@ -10,33 +10,48 @@ namespace XPenC.DataAccess.EntityFrameworkCore
         {
         }
 
-        public DbSet<ExpenseReportEntity> ExpenseReports { get; set; }
-
         public DbSet<ExpenseReportItemEntity> ExpenseReportItems { get; set; }
+        public DbSet<ExpenseReportEntity> ExpenseReports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<ExpenseReportEntity>(e =>
+            modelBuilder.Entity<ExpenseReportItemEntity>(entity =>
             {
-                e.ToTable("ExpenseReports");
-                e.HasKey(i => i.Id);
-                e.Property(i => i.MealTotal).HasColumnType("decimal(8,4)");
-                e.Property(i => i.Total).HasColumnType("decimal(8,4)");
-                e.HasMany(i => i.Items)
-                    .WithOne()
-                    .HasPrincipalKey(i => i.Id)
-                    .HasForeignKey(i => i.ExpenseReportId)
-                    .HasConstraintName("FK_ExpenseReportItems_ExpenseReports")
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasKey(e => new { e.ExpenseReportId, e.ItemNumber });
+
+                entity.HasIndex(e => e.Date);
+
+                entity.HasIndex(e => e.ExpenseType);
+
+                entity.Property(e => e.Date).HasColumnType("date");
+
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.ExpenseType)
+                    .IsRequired()
+                    .HasMaxLength(2)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Value).HasColumnType("decimal(8, 4)");
+
+                entity.HasOne<ExpenseReportEntity>()
+                    .WithMany(p => p.Items)
+                    .HasForeignKey(d => d.ExpenseReportId);
             });
 
-            modelBuilder.Entity<ExpenseReportItemEntity>(e =>
+            modelBuilder.Entity<ExpenseReportEntity>(entity =>
             {
-                e.ToTable("ExpenseReportItems");
-                e.HasKey(i => new { i.ExpenseReportId, i.ItemNumber });
-                e.Property(i => i.Value).HasColumnType("decimal(8,4)");
+                entity.HasIndex(e => e.Client);
+
+                entity.HasIndex(e => e.ModifiedOn);
+
+                entity.Property(e => e.Client)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.MealTotal).HasColumnType("decimal(8, 4)");
+
+                entity.Property(e => e.Total).HasColumnType("decimal(8, 4)");
             });
         }
     }

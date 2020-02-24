@@ -17,6 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XPenC.BusinessLogic.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A90B0CA1-620D-4E1E-A65F-5A55302607DC}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		ExecuteCleanUp.cmd = ExecuteCleanUp.cmd
 		XPenC.runsettings = XPenC.runsettings
 	EndProjectSection
@@ -28,6 +29,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XPenC.DataAccess.EntityFrameworkCore", "XPenC.DataAccess.EntityFrameworkCore\XPenC.DataAccess.EntityFrameworkCore.csproj", "{4E10D60F-9551-4E38-B01D-42F59B0B35B4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XPenC.DataAccess.EntityFrameworkCore.Tests", "XPenC.DataAccess.EntityFrameworkCore.Tests\XPenC.DataAccess.EntityFrameworkCore.Tests.csproj", "{E4F970EA-48F2-48EC-AFFC-6640BCF782B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XPenC.BusinessLogic.Contracts.Tests", "XPenC.BusinessLogic.Contracts.Tests\XPenC.BusinessLogic.Contracts.Tests.csproj", "{34B6A071-2E14-4009-8FC6-F8BE758FC00C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XPenC.DataAccess.Contracts.Tests", "XPenC.DataAccess.Contracts.Tests\XPenC.DataAccess.Contracts.Tests.csproj", "{4F71882F-3CBC-4773-98C9-F19BFB24F84F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +80,14 @@ Global
 		{E4F970EA-48F2-48EC-AFFC-6640BCF782B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4F970EA-48F2-48EC-AFFC-6640BCF782B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4F970EA-48F2-48EC-AFFC-6640BCF782B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34B6A071-2E14-4009-8FC6-F8BE758FC00C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34B6A071-2E14-4009-8FC6-F8BE758FC00C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34B6A071-2E14-4009-8FC6-F8BE758FC00C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34B6A071-2E14-4009-8FC6-F8BE758FC00C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F71882F-3CBC-4773-98C9-F19BFB24F84F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F71882F-3CBC-4773-98C9-F19BFB24F84F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F71882F-3CBC-4773-98C9-F19BFB24F84F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F71882F-3CBC-4773-98C9-F19BFB24F84F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

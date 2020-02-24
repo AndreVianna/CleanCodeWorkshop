@@ -1,17 +1,51 @@
-﻿using System.Collections.Generic;
-using Microsoft.Data.SqlClient;
-using XPenC.DataAccess.Contracts.Schema;
+﻿using System;
+using System.Collections.Generic;
+using XPenC.BusinessLogic.Contracts.Models;
 using XPenC.DataAccess.Contracts.Sets;
+using static XPenC.DataAccess.SqlServer.ConversionHelper;
 
 namespace XPenC.DataAccess.SqlServer.Sets
 {
     public class ExpenseReportItemSet : IExpenseReportItemSet
     {
-        private readonly SqlConnectionHandler _sqlConnectionHandler;
+        private readonly ISqlDataProvider _sqlDataProvider;
 
-        public ExpenseReportItemSet(SqlConnectionHandler sqlConnectionHandler)
+        public ExpenseReportItemSet(ISqlDataProvider sqlDataProvider)
         {
-            _sqlConnectionHandler = sqlConnectionHandler;
+            _sqlDataProvider = sqlDataProvider;
+        }
+
+        public IEnumerable<ExpenseReportItem> GetAllFor(int expenseReportId)
+        {
+            const string commandText = "SELECT * " +
+                                       "FROM ExpenseReportItems " +
+                                       "WHERE ExpenseReportId=@expenseReportId;";
+            var parameters = new Dictionary<string, object> { ["expenseReportId"] = expenseReportId };
+            
+            return _sqlDataProvider.ReadMany(commandText, parameters, ToExpenseReportItem);
+        }
+
+        public void AddTo(int expenseReportId, ExpenseReportItem source)
+        {
+            var nextNumber = GetNextNumber(expenseReportId);
+            const string commandText = "INSERT INTO ExpenseReportItems " +
+                                       "(ExpenseReportId, ItemNumber, Date, ExpenseType, Value, Description) " +
+                                       "VALUES " +
+                                       "(@id, @number, @date, @expenseType, @value, @description)";
+            var parameters = new Dictionary<string, object>
+            {
+                ["id"] = expenseReportId,
+                ["number"] = nextNumber,
+                ["date"] = source.Date,
+                ["expenseType"] = TranslateExpenseType(source.ExpenseType),
+                ["value"] = source.Value,
+                ["description"] = (object)source.Description ?? DBNull.Value,
+            };
+
+            _sqlDataProvider.Execute(commandText, parameters);
+
+            source.ExpenseReportId = expenseReportId;
+            source.ItemNumber = nextNumber;
         }
 
         public void DeleteFrom(int expenseReportId, int itemNumber)
@@ -25,40 +59,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
                 ["number"] = itemNumber,
             };
 
-            _sqlConnectionHandler.Execute(commandText, parameters);
-        }
-
-        public IEnumerable<ExpenseReportItemEntity> GetAllFor(int expenseReportId)
-        {
-            const string commandText = "SELECT * " +
-                                       "FROM ExpenseReportItems " +
-                                       "WHERE ExpenseReportId=@expenseReportId;";
-            var parameters = new Dictionary<string, object> { ["expenseReportId"] = expenseReportId };
-            
-            return _sqlConnectionHandler.ReadMany(commandText, parameters, ConversionHelper.ToExpenseReportItemEntity);
-        }
-
-        public void AddTo(int expenseReportId, ExpenseReportItemEntity source)
-        {
-            var nextNumber = GetNextNumber(expenseReportId);
-            const string commandText = "INSERT INTO ExpenseReportItems " +
-                                       "(ExpenseReportId, ItemNumber, Date, ExpenseType, Value, Description) " +
-                                       "VALUES " +
-                                       "(@id, @number, @date, @expenseType, @value, @description)";
-            var parameters = new Dictionary<string, object>
-            {
-                ["id"] = expenseReportId,
-                ["number"] = nextNumber,
-                ["date"] = source.Date,
-                ["expenseType"] = source.ExpenseType,
-                ["value"] = source.Value,
-                ["description"] = source.Description,
-            };
-
-            _sqlConnectionHandler.Execute(commandText, parameters);
-            
-            source.ExpenseReportId = expenseReportId;
-            source.ItemNumber = nextNumber;
+            _sqlDataProvider.Execute(commandText, parameters);
         }
 
         private int GetNextNumber(int id)
@@ -72,12 +73,7 @@ namespace XPenC.DataAccess.SqlServer.Sets
                 ["id"] = id,
             };
 
-            return _sqlConnectionHandler.ReadOne(commandText, parameters, ReadItemNumber) + 1;
-        }
-
-        private static int ReadItemNumber(SqlDataReader reader)
-        {
-            return reader.GetInt32(reader.GetOrdinal("ItemNumber"));
+            return _sqlDataProvider.ReadOne(commandText, parameters, ToItemNumber) + 1;
         }
     }
 }

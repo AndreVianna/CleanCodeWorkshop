@@ -1,0 +1,54 @@
+﻿@using System.Linq
+@using Microsoft.AspNetCore.Mvc.Localization
+@using XPenC.WebApp
+
+@inject IViewLocalizer Strings
+@inject IHtmlLocalizer<SharedResources> SharedStrings
+
+@model XPenC.WebApp.Models.ExpenseReportUpdate
+
+<h1>@Strings["Create Expense Report"]</h1>
+<hr />
+<div class="row">
+    <div class="col">
+        <form asp-action="Create">
+            <div class="text-danger">@ViewData["ErrorMessage"]</div>
+            <div class="form-group row">
+                <label asp-for="Client" class="col-12 col-md-1 col-form-label"></label>
+                <div class="col-12 col-md-6">
+                    <input asp-for="Client" class="form-control"
+                           data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Client)]"  />
+                    <span asp-validation-for="Client" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-12 col-md-1 col-form-label">@Strings["Items"]</label>
+                <div class="col-12 col-md-11">
+                    <div class="row">
+                        <label class="col-2 col-md-1 col-form-label">@Strings["#"]</label>
+                        <label class="col-5 col-md-3 col-form-label">@Html.DisplayNameFor(model => model.Items.FirstOrDefault().Date)</label>
+                        <label class="col-5 col-md-4 col-form-label">@Html.DisplayNameFor(model => model.Items.FirstOrDefault().ExpenseType)</label>
+                        <label class="d-none d-md-block col-md-2 col-form-label">@Html.DisplayNameFor(model => model.Items.FirstOrDefault().Value)</label>
+                        <label class="d-none d-md-block offset-md-1 col-md-1 col-form-label">&nbsp;</label>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col">
+                            <h4>@Strings["Save the current report to be able to add items."]</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="offset-1 col-11">
+                    <button type="submit" name="action" value="@ViewData["SaveAction"]" class="btn btn-primary">@Strings["Save"]</button>
+                    <button type="submit" name="action" value="@ViewData["FinishAction"]" class="btn btn-primary">@Strings["Finish"]</button>
+                    <a class="btn btn-secondary" asp-action="Index">@Strings["Cancel"]</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
