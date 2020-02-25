@@ -1,13 +1,13 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using XPenC.BusinessLogic.Contracts.Exceptions;
-using XPenC.UI.Mvc.Tests.TestDoubles;
 using XPenC.WebApp.Controllers;
 using XPenC.WebApp.Localization;
 using XPenC.WebApp.Models.ExpenseReports;
+using XPenC.WebApp.Tests.TestDoubles;
 using Xunit;
 
-namespace XPenC.UI.Mvc.Tests.Controllers
+namespace XPenC.WebApp.Tests.Controllers
 {
     public class ExpenseReportItemsControllerTests
     {

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Localization;
 
-namespace XPenC.UI.Mvc.Tests.TestDoubles
+namespace XPenC.WebApp.Tests.TestDoubles
 {
     public class FakeStringLocalizer<T> : DummyStringLocalizer<T>
     {

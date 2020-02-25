@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using XPenC.WebApp.Controllers;
 using Xunit;
 
-namespace XPenC.UI.Mvc.Tests.Controllers
+namespace XPenC.WebApp.Tests.Controllers
 {
     public class HomeControllerTests
     {
