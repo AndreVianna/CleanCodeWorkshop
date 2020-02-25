@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace XPenC.WebApp.Tests.TestDoubles
+namespace XPenC.Common.TestDoubles
 {
-    internal class FakeServiceCollection : IServiceCollection
+    public class FakeServiceCollection : IServiceCollection
     {
         private readonly IList<ServiceDescriptor> _services = new List<ServiceDescriptor>();
 

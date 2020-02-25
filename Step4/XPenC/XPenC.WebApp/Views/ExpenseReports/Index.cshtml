@@ -1,6 +1,4 @@
-﻿@using Microsoft.AspNetCore.Mvc.Localization
-
-@inject IViewLocalizer Strings
+﻿@inject IHtmlLocalizer<Strings> Strings
 
 @model IEnumerable<XPenC.WebApp.Models.ExpenseReports.ExpenseReportListItem>
 
@@ -27,22 +25,22 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ModifiedOn)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedOn)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Client)
-                </td>
-                <td>
-                    <a asp-action="Update" asp-route-id="@item.Id">@Strings["Update"]</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">@Strings["Report"]</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">@Strings["Delete"]</a>
-                </td>
-            </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ModifiedOn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedOn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Client)
+            </td>
+            <td>
+                <a asp-action="Update" asp-route-id="@item.Id">@Strings["Update"]</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">@Strings["Report"]</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">@Strings["Delete"]</a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>

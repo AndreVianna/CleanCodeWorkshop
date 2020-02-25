@@ -1,4 +1,4 @@
-namespace XPenC.WebApp.Tests.TestDoubles
+namespace XPenC.UI.Mvc.Tests.TestDoubles
 {
     internal class StubDataContext : DummyDataContext
     {

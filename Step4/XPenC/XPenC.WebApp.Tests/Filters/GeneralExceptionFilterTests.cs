@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Routing;
+using XPenC.UI.Mvc.Tests.TestDoubles;
 using XPenC.WebApp.Filters;
 using XPenC.WebApp.Models;
-using XPenC.WebApp.Tests.TestDoubles;
 using Xunit;
 
-namespace XPenC.WebApp.Tests.Filters
+namespace XPenC.UI.Mvc.Tests.Filters
 {
     public class GeneralExceptionFilterTests
     {

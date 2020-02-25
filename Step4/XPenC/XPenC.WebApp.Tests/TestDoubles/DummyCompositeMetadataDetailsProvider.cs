@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
-namespace XPenC.WebApp.Tests.TestDoubles
+namespace XPenC.UI.Mvc.Tests.TestDoubles
 {
     internal class DummyCompositeMetadataDetailsProvider : ICompositeMetadataDetailsProvider
     {

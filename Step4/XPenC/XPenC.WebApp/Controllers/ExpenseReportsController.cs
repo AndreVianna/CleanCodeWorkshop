@@ -4,6 +4,7 @@ using Microsoft.Extensions.Localization;
 using XPenC.BusinessLogic.Contracts;
 using XPenC.BusinessLogic.Contracts.Exceptions;
 using XPenC.DataAccess.Contracts;
+using XPenC.WebApp.Localization;
 using XPenC.WebApp.Filters;
 using XPenC.WebApp.Models.ExpenseReports;
 using static XPenC.WebApp.Models.ExpenseReports.ConversionHelper;
@@ -18,12 +19,12 @@ namespace XPenC.WebApp.Controllers
     {
         private readonly IDataContext _dataContext;
         private readonly IExpenseReportOperations _expenseReportOperations;
-        private readonly IStringLocalizer<ExpenseReportsController> _strings;
+        private readonly IStringLocalizer<Strings> _strings;
 
         private const string FINISH_ACTION_NAME = "Finish";
         private const string SAVE_ACTION_NAME = "Save";
 
-        public ExpenseReportsController(IDataContext dataContext, IExpenseReportOperations expenseReportOperations, IStringLocalizer<ExpenseReportsController> strings)
+        public ExpenseReportsController(IDataContext dataContext, IExpenseReportOperations expenseReportOperations, IStringLocalizer<Strings> strings)
         {
             _dataContext = dataContext;
             _expenseReportOperations = expenseReportOperations;

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using XPenC.Common.TestDoubles;
 using XPenC.DataAccess.Contracts;
 using XPenC.DataAccess.SqlServer.Extensions;
-using XPenC.DataAccess.SqlServer.Tests.TestDoubles;
 using Xunit;
 
 namespace XPenC.DataAccess.SqlServer.Tests.Extensions

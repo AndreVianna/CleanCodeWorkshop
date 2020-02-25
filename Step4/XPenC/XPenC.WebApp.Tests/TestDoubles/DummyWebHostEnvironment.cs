@@ -2,7 +2,7 @@ using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
 
-namespace XPenC.WebApp.Tests.TestDoubles
+namespace XPenC.UI.Mvc.Tests.TestDoubles
 {
     internal class DummyWebHostEnvironment : IWebHostEnvironment
     {

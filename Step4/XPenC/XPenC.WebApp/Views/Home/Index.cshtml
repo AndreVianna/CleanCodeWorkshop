@@ -1,6 +1,4 @@
-﻿@using Microsoft.AspNetCore.Mvc.Localization
-
-@inject IViewLocalizer Strings
+﻿@inject IHtmlLocalizer<Strings> Strings
 
 <div class="text-center">
     <h1 class="display-4">@Strings["Welcome"]</h1>

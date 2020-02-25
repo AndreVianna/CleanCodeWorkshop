@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
@@ -19,6 +15,7 @@
     <ProjectReference Include="..\XPenC.BusinessLogic\XPenC.BusinessLogic.csproj" />
     <ProjectReference Include="..\XPenC.DataAccess.Contracts\XPenC.DataAccess.Contracts.csproj" />
     <ProjectReference Include="..\XPenC.DataAccess.EntityFrameworkCore\XPenC.DataAccess.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\XPenC.WebApp.Localization\XPenC.WebApp.Localization.csproj" />
   </ItemGroup>
 
 </Project>

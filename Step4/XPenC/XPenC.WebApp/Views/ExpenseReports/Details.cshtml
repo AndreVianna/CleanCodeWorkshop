@@ -1,7 +1,6 @@
 ﻿@using System.Linq
-@using Microsoft.AspNetCore.Mvc.Localization
 
-@inject IViewLocalizer Strings
+@inject IHtmlLocalizer<Strings> Strings
 
 @model XPenC.WebApp.Models.ExpenseReports.ExpenseReportDetails
 
@@ -60,13 +59,13 @@
         </div>
         @foreach (var item in Model.Items)
         {
-            <div class="row@(item.IsAboveMaximum ? " red" : "")">
-                <div class="col-1">@Html.DisplayFor(model => item.Number)</div>
-                <div class="col-2">@Html.DisplayFor(model => item.Date)</div>
-                <div class="col-3">@Html.DisplayFor(model => item.ExpenseType)</div>
-                <div class="col-4">@Html.DisplayFor(model => item.Description)</div>
-                <div class="col-2 d-flex justify-content-end">@Html.DisplayFor(model => item.Value)</div>
-            </div>
+        <div class="row@(item.IsAboveMaximum ? " red" : "")">
+            <div class="col-1">@Html.DisplayFor(model => item.Number)</div>
+            <div class="col-2">@Html.DisplayFor(model => item.Date)</div>
+            <div class="col-3">@Html.DisplayFor(model => item.ExpenseType)</div>
+            <div class="col-4">@Html.DisplayFor(model => item.Description)</div>
+            <div class="col-2 d-flex justify-content-end">@Html.DisplayFor(model => item.Value)</div>
+        </div>
         }
     </section>
     <section>

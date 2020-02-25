@@ -1,9 +1,6 @@
 ﻿@using System.Linq
-@using Microsoft.AspNetCore.Mvc.Localization
-@using XPenC.WebApp
 
-@inject IViewLocalizer Strings
-@inject IHtmlLocalizer<SharedResources> SharedStrings
+@inject IHtmlLocalizer<Strings> Strings
 
 @model XPenC.WebApp.Models.ExpenseReports.ExpenseReportUpdate
 
@@ -17,7 +14,7 @@
                 <label asp-for="Client" class="col-12 col-md-1 col-form-label"></label>
                 <div class="col-12 col-md-6">
                     <input asp-for="Client" class="form-control"
-                           data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Client)]"  />
+                           data-val-required="@Strings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Client)]" />
                     <span asp-validation-for="Client" class="text-danger"></span>
                 </div>
             </div>

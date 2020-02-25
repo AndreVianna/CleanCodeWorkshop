@@ -1,8 +1,9 @@
+using XPenC.DataAccess.Contracts;
 using XPenC.DataAccess.Contracts.Sets;
 
 namespace XPenC.BusinessLogic.Tests.TestDoubles
 {
-    internal class InMemoryDataContext : DummyDataContext
+    internal class InMemoryDataContext : IDataContext
     {
         public InMemoryDataContext()
         {
@@ -10,7 +11,9 @@ namespace XPenC.BusinessLogic.Tests.TestDoubles
             ExpenseReportItems = new InMemoryExpenseReportItemSet();
         }
 
-        public override IExpenseReportSet ExpenseReports { get; }
-        public override IExpenseReportItemSet ExpenseReportItems { get; }
+        public IExpenseReportSet ExpenseReports { get; }
+        public IExpenseReportItemSet ExpenseReportItems { get; }
+
+        public void CommitChanges() { }
     }
 }

@@ -11,15 +11,16 @@ namespace XPenC.WebApp.Configuration
     [ExcludeFromCodeCoverage]
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddLocalizedMvc(this IServiceCollection services, IList<CultureInfo> supportedCultures)
+        public static IServiceCollection AddLocalizedMvc<TResources, TModels>(this IServiceCollection services, IList<CultureInfo> supportedCultures)
         {
-            services.AddControllersWithViews();
-
-            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            services.AddLocalization(options => options.ResourcesPath = typeof(TResources).Name);
 
             services.AddMvc()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-                .AddDataAnnotationsLocalization();
+                .AddDataAnnotationsLocalization(options => {
+                    options.DataAnnotationLocalizerProvider = (type, factory) =>
+                        factory.Create(typeof(TModels));
+                });
 
             services.Configure<RequestLocalizationOptions>(options =>
             {

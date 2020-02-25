@@ -2,14 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using XPenC.BusinessLogic.Contracts.Exceptions;
+using XPenC.UI.Mvc.Tests.TestDoubles;
 using XPenC.WebApp.Controllers;
+using XPenC.WebApp.Localization;
 using XPenC.WebApp.Models.ExpenseReports;
-using XPenC.WebApp.Tests.TestDoubles;
 using Xunit;
+using static XPenC.UI.Mvc.Tests.TestDoubles.FakeExpenseReportOperations;
 using static XPenC.WebApp.Controllers.ExpenseReportsController;
-using static XPenC.WebApp.Tests.TestDoubles.FakeExpenseReportOperations;
 
-namespace XPenC.WebApp.Tests.Controllers
+namespace XPenC.UI.Mvc.Tests.Controllers
 {
     public class ExpenseReportsControllerTests
     {
@@ -19,7 +20,7 @@ namespace XPenC.WebApp.Tests.Controllers
         public ExpenseReportsControllerTests()
         {
             var dataContext = new StubDataContext();
-            _controller = new ExpenseReportsController(dataContext, _expenseReportOperations, new FakeStringLocalizer<ExpenseReportsController>());
+            _controller = new ExpenseReportsController(dataContext, _expenseReportOperations, new FakeStringLocalizer<Strings>());
         }
 
         [Fact]

@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using XPenC.BusinessLogic;
 using XPenC.BusinessLogic.Contracts;
+using XPenC.Common.TestDoubles;
 using XPenC.DataAccess.Contracts;
 using XPenC.DataAccess.EntityFrameworkCore;
-using XPenC.WebApp.Tests.TestDoubles;
 using Xunit;
 
 namespace XPenC.WebApp.Tests

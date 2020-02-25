@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using XPenC.BusinessLogic.Contracts;
 using XPenC.BusinessLogic.Contracts.Models;
 
-namespace XPenC.WebApp.Tests.TestDoubles
+namespace XPenC.UI.Mvc.Tests.TestDoubles
 {
     internal class DummyExpenseReportOperations : IExpenseReportOperations
     {

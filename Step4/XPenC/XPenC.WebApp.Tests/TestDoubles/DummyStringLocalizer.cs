@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Extensions.Localization;
 
-namespace XPenC.WebApp.Tests.TestDoubles
+namespace XPenC.UI.Mvc.Tests.TestDoubles
 {
     public class DummyStringLocalizer<T> : IStringLocalizer<T>
     {

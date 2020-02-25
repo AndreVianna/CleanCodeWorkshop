@@ -1,10 +1,7 @@
 ﻿@using System.Globalization
-@using Microsoft.AspNetCore.Mvc.Localization
-@using XPenC.WebApp
 @using XPenC.WebApp.Models.ExpenseReports
 
-@inject IViewLocalizer Strings
-@inject IHtmlLocalizer<SharedResources> SharedStrings
+@inject IHtmlLocalizer<Strings> Strings
 
 @model XPenC.WebApp.Models.ExpenseReports.ExpenseReportItemUpdate
 
@@ -68,12 +65,12 @@
                                 </div>
                                 <div class="col-5 col-md-3">
                                     <input asp-for="Date" type="date" class="form-control"
-                                           data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Date)]" />
+                                           data-val-required="@Strings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Date)]" />
                                     <span asp-validation-for="Date" class="text-danger"></span>
                                 </div>
                                 <div class="col-5 col-md-4">
                                     <select asp-for="ExpenseType" asp-items="Html.GetEnumSelectList<ExpenseType>()" class="form-control"
-                                            data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.ExpenseType)]">
+                                            data-val-required="@Strings["The '{0}' field is required.", Html.DisplayNameFor(m => m.ExpenseType)]">
                                         <option value="">@Strings["Please select one..."]</option>
                                     </select>
                                     <span asp-validation-for="ExpenseType" class="text-danger"></span>
@@ -85,8 +82,8 @@
                                             <div class="input-group-text">@NumberFormatInfo.CurrentInfo.CurrencySymbol</div>
                                         </div>
                                         <input asp-for="Value" class="form-control"
-                                               data-val-required="@SharedStrings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Value)]"
-                                               data-val-number="@SharedStrings["The field '{0}' must be a number.", Html.DisplayNameFor(m => m.Value)]" />
+                                               data-val-required="@Strings["The '{0}' field is required.", Html.DisplayNameFor(m => m.Value)]"
+                                               data-val-number="@Strings["The field '{0}' must be a number.", Html.DisplayNameFor(m => m.Value)]" />
                                     </div>
                                     <span asp-validation-for="Value" class="text-danger"></span>
                                 </div>

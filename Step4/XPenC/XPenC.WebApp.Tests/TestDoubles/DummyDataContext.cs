@@ -1,7 +1,7 @@
 using XPenC.DataAccess.Contracts;
 using XPenC.DataAccess.Contracts.Sets;
 
-namespace XPenC.WebApp.Tests.TestDoubles
+namespace XPenC.UI.Mvc.Tests.TestDoubles
 {
     internal class DummyDataContext : IDataContext
     {

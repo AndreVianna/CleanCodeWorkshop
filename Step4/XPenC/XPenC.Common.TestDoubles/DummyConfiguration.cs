@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 
-namespace XPenC.DataAccess.EntityFrameworkCore.Tests.TestDoubles
+namespace XPenC.Common.TestDoubles
 {
-    internal class DummyConfiguration : IConfiguration
+    public class DummyConfiguration : IConfiguration
     {
         public virtual string this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 

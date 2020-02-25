@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\XPenC.Common.TestDoubles\XPenC.Common.TestDoubles.csproj" />
     <ProjectReference Include="..\XPenC.DataAccess.SqlServer\XPenC.DataAccess.SqlServer.csproj" />
   </ItemGroup>
 

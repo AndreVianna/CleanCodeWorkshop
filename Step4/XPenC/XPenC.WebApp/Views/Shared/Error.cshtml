@@ -1,6 +1,4 @@
-﻿@using Microsoft.AspNetCore.Mvc.Localization
-
-@inject IViewLocalizer Strings
+﻿@inject IHtmlLocalizer<Strings> Strings
 
 @model XPenC.WebApp.Models.ErrorData
 
@@ -13,19 +11,19 @@
 
 @if (Model.ShowException)
 {
-    <p>
-        <strong>@Strings["Exception"]:</strong> <code style="color: red">@Model.Exception.GetType().Name</code>
-    </p>
-    <p>
-        <strong>@Strings["Message"]:</strong> <code style="color: red">@Model.Exception.Message</code>
-    </p>
-    @if (Model.Exception.InnerException != null)
+<p>
+    <strong>@Strings["Exception"]:</strong> <code style="color: red">@Model.Exception.GetType().Name</code>
+</p>
+<p>
+    <strong>@Strings["Message"]:</strong> <code style="color: red">@Model.Exception.Message</code>
+</p>
+@if (Model.Exception.InnerException != null)
     {
-        <p>
-            <strong>@Strings["Inner Exception"]:</strong> <code style="color: red">@Model.Exception.InnerException.GetType().Name</code>
-        </p>
-        <p>
-            <strong>@Strings["Message"]:</strong> <code style="color: red">@Model.Exception.InnerException.Message</code>
-        </p>
+<p>
+    <strong>@Strings["Inner Exception"]:</strong> <code style="color: red">@Model.Exception.InnerException.GetType().Name</code>
+</p>
+<p>
+    <strong>@Strings["Message"]:</strong> <code style="color: red">@Model.Exception.InnerException.Message</code>
+</p>
     }
 }

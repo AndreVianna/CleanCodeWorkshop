@@ -20,6 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\XPenC.Common.TestDoubles\XPenC.Common.TestDoubles.csproj" />
+    <ProjectReference Include="..\XPenC.WebApp.Localization\XPenC.WebApp.Localization.csproj" />
     <ProjectReference Include="..\XPenC.WebApp\XPenC.WebApp.csproj" />
   </ItemGroup>
 

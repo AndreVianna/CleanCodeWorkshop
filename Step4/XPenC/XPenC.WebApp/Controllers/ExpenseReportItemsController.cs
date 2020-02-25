@@ -4,6 +4,7 @@ using Microsoft.Extensions.Localization;
 using XPenC.BusinessLogic.Contracts;
 using XPenC.BusinessLogic.Contracts.Exceptions;
 using XPenC.DataAccess.Contracts;
+using XPenC.WebApp.Localization;
 using XPenC.WebApp.Filters;
 using XPenC.WebApp.Models.ExpenseReports;
 using static XPenC.WebApp.Models.ExpenseReports.ConversionHelper;
@@ -17,9 +18,9 @@ namespace XPenC.WebApp.Controllers
         private readonly IDataContext _dataContext;
         private readonly IExpenseReportItemOperations _expenseReportItemOperations;
         private readonly IExpenseReportOperations _expenseReportOperations;
-        private readonly IStringLocalizer<ExpenseReportItemsController> _strings;
+        private readonly IStringLocalizer<Strings> _strings;
 
-        public ExpenseReportItemsController(IDataContext dataContext, IExpenseReportOperations expenseReportOperations, IExpenseReportItemOperations expenseReportItemOperations, IStringLocalizer<ExpenseReportItemsController> strings)
+        public ExpenseReportItemsController(IDataContext dataContext, IExpenseReportOperations expenseReportOperations, IExpenseReportItemOperations expenseReportItemOperations, IStringLocalizer<Strings> strings)
         {
             _dataContext = dataContext;
             _expenseReportOperations = expenseReportOperations;

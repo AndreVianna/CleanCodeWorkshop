@@ -117,10 +117,58 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="The '{0}' field is required." xml:space="preserve">
-    <value>O campo '{0}' é obrigatório.</value>
+  <data name="Client" xml:space="preserve">
+    <value>Cliente</value>
   </data>
-  <data name="The field '{0}' must be a number." xml:space="preserve">
-    <value>O campo '{0}' precisa ser numérico.</value>
+  <data name="Created On" xml:space="preserve">
+    <value>Criado Em</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Descrição</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>Itens</value>
+  </data>
+  <data name="Lodging (Hotel)" xml:space="preserve">
+    <value>Hospedagem (Hotel)</value>
+  </data>
+  <data name="Lodging (Other)" xml:space="preserve">
+    <value>Hospedagem (Outro)</value>
+  </data>
+  <data name="Meal" xml:space="preserve">
+    <value>Refeição</value>
+  </data>
+  <data name="Meal Total" xml:space="preserve">
+    <value>Total (Refeição)</value>
+  </data>
+  <data name="Modified On" xml:space="preserve">
+    <value>Modificado Em</value>
+  </data>
+  <data name="Number" xml:space="preserve">
+    <value>Número</value>
+  </data>
+  <data name="Office" xml:space="preserve">
+    <value>Escritório</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Outro</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Transportation (Air)" xml:space="preserve">
+    <value>Transporte (Aéreo)</value>
+  </data>
+  <data name="Transportation (Land)" xml:space="preserve">
+    <value>Transporte (Terrestre)</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="Value" xml:space="preserve">
+    <value>Valor</value>
   </data>
 </root>

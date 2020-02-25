@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using XPenC.BusinessLogic.Extensions;
 using XPenC.DataAccess.EntityFrameworkCore.Extensions;
+using XPenC.WebApp.Localization;
 using XPenC.WebApp.Configuration;
 
 namespace XPenC.WebApp
@@ -32,7 +33,7 @@ namespace XPenC.WebApp
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLocalizedMvc(_supportedCultures);
+            services.AddLocalizedMvc<Resources, Localization.Models>(_supportedCultures);
 
             services.AddEntityFrameworkDataContext(_configuration, "DataContext");
 
