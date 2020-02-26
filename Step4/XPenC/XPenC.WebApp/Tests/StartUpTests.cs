@@ -3,7 +3,7 @@ using XPenC.BusinessLogic;
 using XPenC.BusinessLogic.Contracts;
 using XPenC.Common.TestDoubles;
 using XPenC.DataAccess.Contracts;
-using XPenC.DataAccess.EntityFramework;
+using XPenC.DataAccess.SqlServer.EntityFramework;
 using Xunit;
 
 namespace XPenC.WebApp.Tests

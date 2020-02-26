@@ -14,7 +14,7 @@
     <ProjectReference Include="..\..\XPenC.BusinessLogic.Contracts\Source\XPenC.BusinessLogic.Contracts.csproj" />
     <ProjectReference Include="..\..\XPenC.BusinessLogic\Source\XPenC.BusinessLogic.csproj" />
     <ProjectReference Include="..\..\XPenC.DataAccess.Contracts\Source\XPenC.DataAccess.Contracts.csproj" />
-    <ProjectReference Include="..\..\XPenC.DataAccess.EntityFramework\Source\XPenC.DataAccess.EntityFramework.csproj" />
+    <ProjectReference Include="..\..\XPenC.DataAccess.SqlServer.EntityFramework\Source\XPenC.DataAccess.SqlServer.EntityFramework.csproj" />
     <ProjectReference Include="..\Localization\XPenC.WebApp.Localization.csproj" />
   </ItemGroup>
 

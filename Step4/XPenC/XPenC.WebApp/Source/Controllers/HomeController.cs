@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using XPenC.WebApp.Filters;
 
 namespace XPenC.WebApp.Controllers
 {
     [Route("")]
     [Route("Home")]
+    [TypeFilter(typeof(GeneralExceptionFilter))]
     public class HomeController : Controller
     {
         [HttpGet("")]

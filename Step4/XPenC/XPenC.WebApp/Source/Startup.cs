@@ -6,8 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using XPenC.BusinessLogic.Extensions;
-using XPenC.DataAccess.EntityFramework.Extensions;
-using XPenC.WebApp.Localization.Configuration;
+using XPenC.DataAccess.SqlServer.EntityFramework.Extensions;
+using XPenC.WebApp.Localization.Extensions;
 
 namespace XPenC.WebApp
 {
