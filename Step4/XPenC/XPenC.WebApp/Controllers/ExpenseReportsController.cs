@@ -4,12 +4,12 @@ using Microsoft.Extensions.Localization;
 using XPenC.BusinessLogic.Contracts;
 using XPenC.BusinessLogic.Contracts.Exceptions;
 using XPenC.DataAccess.Contracts;
-using XPenC.WebApp.Localization;
 using XPenC.WebApp.Filters;
+using XPenC.WebApp.Localization;
 using XPenC.WebApp.Models.ExpenseReports;
-using static XPenC.WebApp.Models.ExpenseReports.ConversionHelper;
+using static XPenC.WebApp.Models.ConversionHelper;
 using ExpenseType = XPenC.BusinessLogic.Contracts.Models.ExpenseType;
-using ViewExpenseType = XPenC.WebApp.Models.ExpenseReports.ExpenseType;
+using ViewExpenseType = XPenC.WebApp.Models.ExpenseReportItems.ExpenseType;
 
 namespace XPenC.WebApp.Controllers
 {
@@ -32,11 +32,11 @@ namespace XPenC.WebApp.Controllers
         }
 
         [HttpGet("")]
-        public IActionResult Index()
+        public IActionResult List()
         {
             var expenseReportList = _expenseReportOperations.GetList();
             
-            var result = expenseReportList.Select(ToExpenseReportListItem).ToArray();
+            var result = expenseReportList.Select(ToListItem).ToArray();
             
             return View(result);
         }
@@ -55,7 +55,7 @@ namespace XPenC.WebApp.Controllers
                 return NotFound();
             }
 
-            var result = ToExpenseReportDetails(existingReport);
+            var result = ToDetails(existingReport);
 
             return View(result);
         }
@@ -65,12 +65,12 @@ namespace XPenC.WebApp.Controllers
         {
             var expenseReport = _expenseReportOperations.CreateWithDefaults();
 
-            return View(ToExpenseReportUpdate(expenseReport));
+            return View(ToUpdate(expenseReport));
         }
 
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(string action, ExpenseReportUpdate input)
+        public IActionResult Create(string action, Update input)
         {
             if (input == null)
             {
@@ -93,7 +93,7 @@ namespace XPenC.WebApp.Controllers
                 _dataContext.CommitChanges();
 
                 return action == FINISH_ACTION_NAME
-                    ? RedirectToAction(nameof(Index))
+                    ? RedirectToAction(nameof(List))
                     : RedirectToAction(nameof(Update), new { newExpenseReport.Id });
             }
             catch (ValidationException ex)
@@ -116,14 +116,14 @@ namespace XPenC.WebApp.Controllers
                 return NotFound();
             }
 
-            var result = ToExpenseReportUpdate(existingReport);
+            var result = ToUpdate(existingReport);
             PrepareUpdateViewViewData();
             return View(result);
         }
 
         [HttpPost("Update/{id}")]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(int id, string action, ExpenseReportUpdate input)
+        public IActionResult Update(int id, string action, Update input)
         {
             if (!IsValidAction(action))
             {
@@ -155,7 +155,7 @@ namespace XPenC.WebApp.Controllers
                 _dataContext.CommitChanges();
 
                 return action == FINISH_ACTION_NAME
-                    ? RedirectToAction(nameof(Index))
+                    ? RedirectToAction(nameof(List))
                     : RedirectToAction(nameof(Update), new {id});
             }
             catch (ValidationException ex)
@@ -164,7 +164,7 @@ namespace XPenC.WebApp.Controllers
                 {
                     ModelState.AddModelError(validationError.Source, _strings[validationError.Message]);
                 }
-                UpdateExpenseReportUpdate(input, existingReport);
+                UpdateUpdate(input, existingReport);
                 PrepareUpdateViewViewData();
                 return View(input);
             }
@@ -185,7 +185,7 @@ namespace XPenC.WebApp.Controllers
                 return NotFound();
             }
 
-            var result = ToExpenseReportDetails(existingReport);
+            var result = ToDetails(existingReport);
             return View(result);
         }
 
@@ -198,7 +198,7 @@ namespace XPenC.WebApp.Controllers
 
             _dataContext.CommitChanges();
             
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(List));
         }
 
         public static ViewExpenseType GetExpenseTypeDisplayName(ExpenseType expenseType)

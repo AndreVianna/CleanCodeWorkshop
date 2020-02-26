@@ -9,8 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using XPenC.BusinessLogic.Extensions;
 using XPenC.DataAccess.EntityFrameworkCore.Extensions;
-using XPenC.WebApp.Localization;
 using XPenC.WebApp.Configuration;
+using XPenC.WebApp.Localization;
 
 namespace XPenC.WebApp
 {

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace XPenC.WebApp.Models.ExpenseReports
 {
-    public class ExpenseReportListItem
+    public class ListItem
     {
         public int Id { get; set; }
 

@@ -3,15 +3,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace XPenC.WebApp.Models.ExpenseReports
 {
-    public class ExpenseReportDetails : ExpenseReportListItem
+    public class Details : ListItem
     {
-        public ExpenseReportDetails()
+        public Details()
         {
-            Items = new List<ExpenseReportItemDetails>();
+            Items = new List<ExpenseReportItems.Details>();
         }
 
         [Display(Name = "Items")]
-        public IList<ExpenseReportItemDetails> Items { get; set; }
+        public IList<ExpenseReportItems.Details> Items { get; set; }
 
         [Display(Name = "Meal Total")]
         [DisplayFormat(DataFormatString = "{0:C}")]

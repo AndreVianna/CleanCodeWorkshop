@@ -26,12 +26,12 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Index_ShouldPass()
         {
-            var result = _controller.Index();
+            var result = _controller.List();
 
             var viewResult = Assert.IsType<ViewResult>(result);
 
             Assert.Null(viewResult.ViewName);
-            var model = Assert.IsAssignableFrom<IEnumerable<ExpenseReportListItem>>(viewResult.Model).ToList();
+            var model = Assert.IsAssignableFrom<IEnumerable<ListItem>>(viewResult.Model).ToList();
             Assert.Equal(ExistingReport1.Id, model[0].Id);
             Assert.Equal(ExistingReport1.Client, model[0].Client);
             Assert.Equal(ExistingReport1.CreatedOn, model[0].CreatedOn);
@@ -62,7 +62,7 @@ namespace XPenC.WebApp.Tests.Controllers
             var viewResult = Assert.IsType<ViewResult>(result);
             
             Assert.Null(viewResult.ViewName);
-            var model = Assert.IsType<ExpenseReportDetails>(viewResult.Model);
+            var model = Assert.IsType<Details>(viewResult.Model);
             Assert.Equal(ExistingReport1.Id, model.Id);
             Assert.Equal(ExistingReport1.MealTotal, model.MealTotal);
             Assert.Equal(ExistingReport1.Total, model.Total);
@@ -127,7 +127,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Create_Post_WithModelError_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
+            var input = new Update { Id = 1, Client = "Some Client" };
             _controller.ModelState.AddModelError("", "Some error");
             var result = _controller.Create("Save", input);
 
@@ -138,7 +138,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Create_Post_WithValidationError_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 1 };
+            var input = new Update { Id = 1 };
             var expectedError = new ValidationError
             {
                 Source = "Client",
@@ -154,7 +154,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Create_Post_ForSave_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
+            var input = new Update { Id = 1, Client = "Some Client" };
             var result = _controller.Create("Save", input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -164,7 +164,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Create_Post_ForFinish_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
+            var input = new Update { Id = 1, Client = "Some Client" };
             var result = _controller.Create( "Finish", input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -186,7 +186,7 @@ namespace XPenC.WebApp.Tests.Controllers
 
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Null(viewResult.ViewName);
-            var model = Assert.IsType<ExpenseReportUpdate>(viewResult.Model);
+            var model = Assert.IsType<Update>(viewResult.Model);
             Assert.Equal(ExistingReport1.Id, model.Id);
             Assert.Equal(ExistingReport1.Client, model.Client);
             Assert.Equal(ExistingReport1.Items.Count, model.Items.Count);
@@ -234,7 +234,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Update_Post_WithInputWithInvalidId_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 15 };
+            var input = new Update { Id = 15 };
             var result = _controller.Update(32, "Save", input);
 
             Assert.IsType<BadRequestObjectResult>(result);
@@ -243,7 +243,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Update_Post_WithNonExistingId_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 32 };
+            var input = new Update { Id = 32 };
             var result = _controller.Update(32, "Save", input);
 
             Assert.IsType<NotFoundResult>(result);
@@ -252,7 +252,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Update_Post_WithModelError_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
+            var input = new Update { Id = 1, Client = "Some Client" };
             _controller.ModelState.AddModelError("", "Some error");
             var result = _controller.Update(1, "Save", input);
 
@@ -263,7 +263,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Update_Post_WithValidationError_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 1 };
+            var input = new Update { Id = 1 };
             var expectedError = new ValidationError
             {
                 Source = "Client",
@@ -279,7 +279,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Update_Post_ForSave_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
+            var input = new Update { Id = 1, Client = "Some Client" };
             var result = _controller.Update(1, "Save", input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -289,7 +289,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportsController_Update_Post_ForFinish_ShouldPass()
         {
-            var input = new ExpenseReportUpdate { Id = 1, Client = "Some Client" };
+            var input = new Update { Id = 1, Client = "Some Client" };
             var result = _controller.Update(1, "Finish", input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);

@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace XPenC.WebApp.Models.ExpenseReports
 {
-    public class ExpenseReportUpdate
+    public class Update
     {
-        public ExpenseReportUpdate()
+        public Update()
         {
-            Items = new List<ExpenseReportItemDetails>();
+            Items = new List<ExpenseReportItems.Details>();
         }
 
         public int Id { get; set; }
@@ -16,6 +16,6 @@ namespace XPenC.WebApp.Models.ExpenseReports
         [Display(Name = "Client")]
         public string Client { get; set; }
 
-        public IList<ExpenseReportItemDetails> Items { get; set; }
+        public IList<ExpenseReportItems.Details> Items { get; set; }
     }
 }

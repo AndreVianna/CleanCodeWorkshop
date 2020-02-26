@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace XPenC.WebApp.Models.ExpenseReports
+namespace XPenC.WebApp.Models.ExpenseReportItems
 {
     public enum ExpenseType
     {

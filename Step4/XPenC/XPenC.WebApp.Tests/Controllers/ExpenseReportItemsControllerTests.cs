@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using XPenC.BusinessLogic.Contracts.Exceptions;
 using XPenC.WebApp.Controllers;
 using XPenC.WebApp.Localization;
-using XPenC.WebApp.Models.ExpenseReports;
+using XPenC.WebApp.Models.ExpenseReportItems;
 using XPenC.WebApp.Tests.TestDoubles;
 using Xunit;
 
@@ -28,7 +28,7 @@ namespace XPenC.WebApp.Tests.Controllers
 
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Null(viewResult.ViewName);
-            var model = Assert.IsType<ExpenseReportItemUpdate>(viewResult.Model);
+            var model = Assert.IsType<Update>(viewResult.Model);
             Assert.Equal(1, model.ExpenseReportId);
             Assert.NotNull(model.ExpenseReport);
         }
@@ -52,7 +52,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportItemsController_Create_Post_WithModelError_ShouldPass()
         {
-            var input = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Office, Value = 10, Description = "Some Description" };
+            var input = new Update { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Office, Value = 10, Description = "Some Description" };
             _controller.ModelState.AddModelError("", "Some error");
             var result = _controller.Create(1, input);
 
@@ -63,7 +63,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportItemsController_Create_Post_WithValidationError_ShouldPass()
         {
-            var input = new ExpenseReportItemUpdate { Date = DateTime.Now.AddHours(1) };
+            var input = new Update { Date = DateTime.Now.AddHours(1) };
             var expectedError = new ValidationError
             {
                 Source = "Date", 
@@ -79,7 +79,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportItemsController_Create_PostOffice_ShouldPass()
         {
-            var input = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Office, Value = 10, Description = "Some Description" };
+            var input = new Update { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Office, Value = 10, Description = "Some Description" };
             var result = _controller.Create(1, input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -91,7 +91,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportItemsController_Create_PostMeal_ShouldPass()
         {
-            var input = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Meal, Value = 10, Description = "Some Description" };
+            var input = new Update { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Meal, Value = 10, Description = "Some Description" };
             var result = _controller.Create(1, input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -103,7 +103,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportItemsController_Create_PostHotelLodging_ShouldPass()
         {
-            var input = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.HotelLodging, Value = 10, Description = "Some Description" };
+            var input = new Update { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.HotelLodging, Value = 10, Description = "Some Description" };
             var result = _controller.Create(1, input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -115,7 +115,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportItemsController_Create_PostOtherLodging_ShouldPass()
         {
-            var input = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.OtherLodging, Value = 10, Description = "Some Description" };
+            var input = new Update { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.OtherLodging, Value = 10, Description = "Some Description" };
             var result = _controller.Create(1, input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -127,7 +127,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportItemsController_Create_PostLandTransportation_ShouldPass()
         {
-            var input = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.LandTransportation, Value = 10, Description = "Some Description" };
+            var input = new Update { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.LandTransportation, Value = 10, Description = "Some Description" };
             var result = _controller.Create(1, input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -139,7 +139,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportItemsController_Create_PostAirTransportation_ShouldPass()
         {
-            var input = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.AirTransportation, Value = 10, Description = "Some Description" };
+            var input = new Update { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.AirTransportation, Value = 10, Description = "Some Description" };
             var result = _controller.Create(1, input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);
@@ -151,7 +151,7 @@ namespace XPenC.WebApp.Tests.Controllers
         [Fact]
         public void ExpenseReportItemsController_Create_Post_ForOther_ShouldPass()
         {
-            var input = new ExpenseReportItemUpdate { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Other, Value = 10, Description = "Some Description" };
+            var input = new Update { Date = DateTime.Now.AddDays(-1), ExpenseType = ExpenseType.Other, Value = 10, Description = "Some Description" };
             var result = _controller.Create(1, input);
 
             var viewResult = Assert.IsType<RedirectToActionResult>(result);

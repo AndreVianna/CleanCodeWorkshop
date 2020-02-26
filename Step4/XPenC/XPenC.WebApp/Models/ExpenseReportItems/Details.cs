@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace XPenC.WebApp.Models.ExpenseReports
+namespace XPenC.WebApp.Models.ExpenseReportItems
 {
-    public class ExpenseReportItemDetails
+    public class Details
     {
         [Display(Name = "Number")]
         public int Number { get; set; }

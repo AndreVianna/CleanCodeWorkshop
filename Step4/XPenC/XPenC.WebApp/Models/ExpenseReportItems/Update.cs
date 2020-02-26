@@ -1,17 +1,17 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace XPenC.WebApp.Models.ExpenseReports
+namespace XPenC.WebApp.Models.ExpenseReportItems
 {
-    public class ExpenseReportItemUpdate
+    public class Update
     {
-        public ExpenseReportItemUpdate()
+        public Update()
         {
             Date = DateTime.Now;
         }
 
         public int ExpenseReportId { get; set; }
-        public ExpenseReportDetails ExpenseReport { get; set; }
+        public ExpenseReports.Details ExpenseReport { get; set; }
 
         [Required]
         [Display(Name = "Date")]

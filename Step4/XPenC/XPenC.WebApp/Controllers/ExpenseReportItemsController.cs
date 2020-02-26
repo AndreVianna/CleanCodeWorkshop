@@ -6,8 +6,8 @@ using XPenC.BusinessLogic.Contracts.Exceptions;
 using XPenC.DataAccess.Contracts;
 using XPenC.WebApp.Localization;
 using XPenC.WebApp.Filters;
-using XPenC.WebApp.Models.ExpenseReports;
-using static XPenC.WebApp.Models.ExpenseReports.ConversionHelper;
+using XPenC.WebApp.Models.ExpenseReportItems;
+using static XPenC.WebApp.Models.ConversionHelper;
 
 namespace XPenC.WebApp.Controllers
 {
@@ -38,14 +38,14 @@ namespace XPenC.WebApp.Controllers
                 return NotFound();
             }
 
-            var result = ToExpenseReportItemUpdate(existingReport);
+            var result = ToItemUpdate(existingReport);
             return View(result);
         }
 
         // POST: ExpenseReports/Update/5/Items
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(int id, ExpenseReportItemUpdate input)
+        public IActionResult Create(int id, Update input)
         {
             if (input == null)
             {
@@ -72,7 +72,7 @@ namespace XPenC.WebApp.Controllers
                     ModelState.AddModelError(validationError.Source, _strings[validationError.Message]);
                 }
                 var existingReport = _expenseReportOperations.Find(id);
-                UpdateExpenseReportItemUpdate(input, existingReport);
+                UpdateItemUpdate(input, existingReport);
                 return View(input);
             }
         }
@@ -86,7 +86,7 @@ namespace XPenC.WebApp.Controllers
                 return NotFound();
             }
 
-            var result = ToExpenseReportDetails(existingReport);
+            var result = ToDetails(existingReport);
             ViewData["Number"] = number;
             return View(result);
         }
