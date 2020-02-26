@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\XPenC.BusinessLogic.Contracts\Source\XPenC.BusinessLogic.Contracts.csproj" />
+    <ProjectReference Include="..\..\XPenC.BusinessLogic\Source\XPenC.BusinessLogic.csproj" />
+    <ProjectReference Include="..\..\XPenC.DataAccess.Contracts\Source\XPenC.DataAccess.Contracts.csproj" />
+    <ProjectReference Include="..\..\XPenC.DataAccess.SqlServer\Source\XPenC.DataAccess.SqlServer.csproj" />
+  </ItemGroup>
+
+</Project>
