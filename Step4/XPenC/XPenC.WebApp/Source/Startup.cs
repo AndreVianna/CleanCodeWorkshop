@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,8 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using XPenC.BusinessLogic.Extensions;
 using XPenC.DataAccess.EntityFramework.Extensions;
-using XPenC.WebApp.Configuration;
-using XPenC.WebApp.Localization;
+using XPenC.WebApp.Localization.Configuration;
 
 namespace XPenC.WebApp
 {
@@ -24,16 +21,11 @@ namespace XPenC.WebApp
             _configuration = configuration;
         }
 
-        //The first supported culture is considered the default one.
-        private readonly IList<CultureInfo> _supportedCultures = new List<CultureInfo>
-        {
-            new CultureInfo("en-US"),
-            new CultureInfo("pt-Br"),
-        };
-
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLocalizedMvc<Resources, Localization.Models>(_supportedCultures);
+            services.AddMvc()
+                .AddLocalizedResources()
+                .AddViewLocalization();
 
             services.AddEntityFrameworkDataContext(_configuration, "DataContext");
 
