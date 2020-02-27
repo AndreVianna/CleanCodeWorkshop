@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Reflection;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using TrdP.Localization.Abstractions;
 
-namespace TrdP.ResourceManagerStringProvider
+namespace TrdP.Localization
 {
     public class ResourceManagerStringLocalizerFactory : IStringLocalizerFactory
     {
         private readonly string _resourcesRootName;
+        private readonly ConcurrentDictionary<string, ResourceManagerStringLocalizer> _localizerCache = new ConcurrentDictionary<string, ResourceManagerStringLocalizer>();
 
         public ResourceManagerStringLocalizerFactory(IOptions<LocalizerOptions> localizationOptions)
         {
@@ -31,16 +33,7 @@ namespace TrdP.ResourceManagerStringProvider
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var assembly = source.Assembly;
-            var assemblyName = new AssemblyName(assembly.FullName).Name;
-            var sourceRelativeName = TrimPrefix(source.FullName, $"{assemblyName}.");
-            var resourceRelativeName = $"{_resourcesRootName}{sourceRelativeName}";
-
-
-            //return _localizerCache.GetOrAdd(baseName, _ =>
-            //{
-            return new ResourceManagerStringLocalizer(assembly, resourceRelativeName);
-            //});
+            return GetOrCreateLocalizer(source.Assembly, source.FullName);
         }
 
         public IStringLocalizer Create(string sourceName, string assemblyName)
@@ -56,10 +49,15 @@ namespace TrdP.ResourceManagerStringProvider
             }
 
             var assembly = Assembly.Load(new AssemblyName(assemblyName));
-            sourceName = ConvertToResourceName(sourceName);
+            return GetOrCreateLocalizer(assembly, ConvertToResourceName(sourceName));
+        }
+
+        private IStringLocalizer GetOrCreateLocalizer(Assembly assembly, string sourceName)
+        {
+            var assemblyName = new AssemblyName(assembly.FullName).Name;
             var sourceRelativeName = TrimPrefix(sourceName, $"{assemblyName}.");
             var resourceRelativeName = $"{_resourcesRootName}{sourceRelativeName}";
-            return new ResourceManagerStringLocalizer(assembly, resourceRelativeName);
+            return _localizerCache.GetOrAdd(resourceRelativeName, key => new ResourceManagerStringLocalizer(assembly, key));
         }
 
         private static string ConvertToResourceName(string resourcePath)

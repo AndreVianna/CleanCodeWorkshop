@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7E91C14B-D2E0-490F-938F-061FA67C55B7}"
+	ProjectSection(SolutionItems) = preProject
+		ExecuteCleanUp.cmd = ExecuteCleanUp.cmd
+		TrdP.LocalizationProvider.runsettings = TrdP.LocalizationProvider.runsettings
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization", "ResourceManagerStringProvider\Source\TrdP.Localization.csproj", "{340D6FE0-7D83-4CF6-B3EA-66332477DF71}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.Tests", "ResourceManagerStringProvider\Tests\TrdP.Localization.Tests.csproj", "{BB2DA917-AD1A-482A-852A-E051AC889031}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.TestData", "ResourceManagerStringProvider\TestData\TrdP.Localization.TestData.csproj", "{907996CD-806B-43E2-9359-B9537BF88186}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Abstractions", "Abstractions", "{0542E833-6B7F-46C3-BD40-5C4FDCF95D9A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.Abstractions", "Abstractions\Source\TrdP.Localization.Abstractions.csproj", "{97AD8AA3-79A3-4EB0-AEC0-775B273B4671}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.Abstractions.Tests", "Abstractions\Tests\TrdP.Localization.Abstractions.Tests.csproj", "{E884BC1C-9A4D-475D-B3B4-A1799028A2CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{340D6FE0-7D83-4CF6-B3EA-66332477DF71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{340D6FE0-7D83-4CF6-B3EA-66332477DF71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{340D6FE0-7D83-4CF6-B3EA-66332477DF71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{340D6FE0-7D83-4CF6-B3EA-66332477DF71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB2DA917-AD1A-482A-852A-E051AC889031}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB2DA917-AD1A-482A-852A-E051AC889031}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB2DA917-AD1A-482A-852A-E051AC889031}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB2DA917-AD1A-482A-852A-E051AC889031}.Release|Any CPU.Build.0 = Release|Any CPU
+		{907996CD-806B-43E2-9359-B9537BF88186}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{907996CD-806B-43E2-9359-B9537BF88186}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{907996CD-806B-43E2-9359-B9537BF88186}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{907996CD-806B-43E2-9359-B9537BF88186}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97AD8AA3-79A3-4EB0-AEC0-775B273B4671}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97AD8AA3-79A3-4EB0-AEC0-775B273B4671}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97AD8AA3-79A3-4EB0-AEC0-775B273B4671}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97AD8AA3-79A3-4EB0-AEC0-775B273B4671}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E884BC1C-9A4D-475D-B3B4-A1799028A2CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E884BC1C-9A4D-475D-B3B4-A1799028A2CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E884BC1C-9A4D-475D-B3B4-A1799028A2CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E884BC1C-9A4D-475D-B3B4-A1799028A2CD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{97AD8AA3-79A3-4EB0-AEC0-775B273B4671} = {0542E833-6B7F-46C3-BD40-5C4FDCF95D9A}
+		{E884BC1C-9A4D-475D-B3B4-A1799028A2CD} = {0542E833-6B7F-46C3-BD40-5C4FDCF95D9A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EBB43EDD-4ACE-45BE-AF09-15041A38EDB7}
+	EndGlobalSection
+EndGlobal

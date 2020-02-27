@@ -1,4 +1,4 @@
-﻿namespace TrdP.ResourceManagerStringProvider
+﻿namespace TrdP.Localization
 {
     public class LocalizerOptions
     {

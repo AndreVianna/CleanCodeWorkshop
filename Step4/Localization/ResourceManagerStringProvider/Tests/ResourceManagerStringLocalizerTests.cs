@@ -1,24 +1,23 @@
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using Microsoft.Extensions.Localization;
+using TrdP.Localization.Abstractions;
 using Xunit;
 
-namespace TrdP.ResourceManagerStringProvider.Tests
+namespace TrdP.Localization.Tests
 {
-    public class ResourceMangerStringLocalizerTests
+    public class ResourceManagerStringLocalizerTests
     {
-        private const string SOURCE_ASSEMBLY_NAME = "TrdP.ResourceManagerStringProvider.Localization";
+        private const string SOURCE_ASSEMBLY_NAME = "TrdP.Localization.TestData";
         private readonly Assembly _sourceAssembly;
 
-        public ResourceMangerStringLocalizerTests()
+        public ResourceManagerStringLocalizerTests()
         {
             _sourceAssembly = Assembly.Load(SOURCE_ASSEMBLY_NAME);
         }
         
         [Fact]
-        public void ResourceMangerStringLocalizer_Constructor_WithNullAssembly_ShouldThrow()
+        public void ResourceManagerStringLocalizer_Constructor_WithNullAssembly_ShouldThrow()
         {
             Assert.Throws<ArgumentNullException>(() => new ResourceManagerStringLocalizer(null, null));
         }
@@ -27,13 +26,13 @@ namespace TrdP.ResourceManagerStringProvider.Tests
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void ResourceMangerStringLocalizer_Constructor_WithInvalidResourceFileRelativePath_ShouldThrow(string resourceFileRelativePath)
+        public void ResourceManagerStringLocalizer_Constructor_WithInvalidResourceFileRelativePath_ShouldThrow(string resourceFileRelativePath)
         {
             Assert.Throws<ArgumentException>(() => new ResourceManagerStringLocalizer(_sourceAssembly, resourceFileRelativePath));
         }
 
         [Fact]
-        public void ResourceMangerStringLocalizer_This_WithNullName_ShouldThrow()
+        public void ResourceManagerStringLocalizer_This_WithNullName_ShouldThrow()
         {
             var localizer = CreateLocalizer("TestResources");
             Assert.Throws<ArgumentNullException>(() => localizer[null]);
@@ -46,7 +45,7 @@ namespace TrdP.ResourceManagerStringProvider.Tests
         [InlineData("pt-BR", "NotFound", "NotFound", true)]
         [InlineData("fr", "TestString", "TestString", true)]
         [InlineData("fr", "NotFound", "NotFound", true)]
-        public void ResourceMangerStringLocalizer_This_FromRoot_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedResourceNotFound)
+        public void ResourceManagerStringLocalizer_This_FromRoot_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedResourceNotFound)
         {
             var localizer = CreateLocalizer("TestResources", cultureName);
             var result = localizer[resourceName];
@@ -63,7 +62,7 @@ namespace TrdP.ResourceManagerStringProvider.Tests
         [InlineData("fr", "TestString", "TestString", true)]
         [InlineData("fr", "OtherString", "OtherString", true)]
         [InlineData("fr", "NotFound", "NotFound", true)]
-        public void ResourceMangerStringLocalizer_This_FromInternalFolder_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedResourceNotFound)
+        public void ResourceManagerStringLocalizer_This_FromInternalFolder_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedResourceNotFound)
         {
             var localizer = CreateLocalizer("Internal.OtherResources", cultureName);
             var result = localizer[resourceName];
@@ -77,7 +76,7 @@ namespace TrdP.ResourceManagerStringProvider.Tests
         [InlineData("pt-BR", "NotFound {0}", "NotFound 3", true)]
         [InlineData("fr", "FormattedString {0}", "FormattedString 3", true)]
         [InlineData("fr", "NotFound {0}", "NotFound 3", true)]
-        public void ResourceMangerStringLocalizer_This_WithParams_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedResourceNotFound)
+        public void ResourceManagerStringLocalizer_This_WithParams_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedResourceNotFound)
         {
             var localizer = CreateLocalizer("TestResources", cultureName);
             var result = localizer[resourceName, 3];
@@ -85,40 +84,14 @@ namespace TrdP.ResourceManagerStringProvider.Tests
         }
 
         [Fact]
-        public void ResourceMangerStringLocalizer_This_FromRoot_WithInvalidFormat_ShouldThrow()
+        public void ResourceManagerStringLocalizer_This_FromRoot_WithInvalidFormat_ShouldThrow()
         {
             var localizer = new ResourceManagerStringLocalizer(_sourceAssembly, "TestResources");
             Assert.Throws<FormatException>(() => localizer["InvalidFormat {0} {1}", 3]);
         }
 
-        [Theory]
-        [InlineData(null, new string[] { }, new string[] { })]
-        [InlineData("pt-BR", new[] { "TestString", "FormattedString {0}" }, new[] { "TestValue", "FormattedValue {0}" })]
-        [InlineData("pt", new[] { "ParentString" }, new[] { "ParentValue" })]
-        [InlineData("fr", new string[] { }, new string[] { })]
-        public void ResourceMangerStringLocalizer_GetAllStrings_ShouldPass(string cultureName, string[] expectedNames, string[] expectedValues)
-        {
-            var localizer = CreateLocalizer("TestResources", cultureName);
-            var values = localizer.GetAllStrings(false).ToArray();
-            Assert.Equal(expectedNames, values.Select(i => i.Name));
-            Assert.Equal(expectedValues, values.Select(i => i.Value));
-        }
-
-        [Theory]
-        [InlineData(null, new string[] { }, new string[] { })]
-        [InlineData("pt-BR", new[] { "TestString", "FormattedString {0}", "ParentString" }, new[] { "TestValue", "FormattedValue {0}", "ParentValue" })]
-        [InlineData("pt", new[] { "ParentString" }, new[] { "ParentValue" })]
-        [InlineData("fr", new string[] { }, new string[] { })]
-        public void ResourceMangerStringLocalizer_GetAllStrings_WithIncludeParent_ShouldPass(string cultureName, string[] expectedNames, string[] expectedValues)
-        {
-            var localizer = CreateLocalizer("TestResources", cultureName);
-            var values = localizer.GetAllStrings(true).ToArray();
-            Assert.Equal(expectedNames, values.Select(i => i.Name));
-            Assert.Equal(expectedValues, values.Select(i => i.Value));
-        }
-
         [Fact]
-        public void ResourceMangerStringLocalizer_This_ForSwappingCultures_ShouldPass()
+        public void ResourceManagerStringLocalizer_This_ForSwappingCultures_ShouldPass()
         {
             var localizer = CreateLocalizer("TestResources");
             CultureInfo.CurrentUICulture = new CultureInfo("pt-BR");
@@ -133,7 +106,7 @@ namespace TrdP.ResourceManagerStringProvider.Tests
         [Theory]
         [InlineData("pt-BR")]
         [InlineData("fr")]
-        public void ResourceMangerStringLocalizer_WithCulture_ShouldThrow(string cultureName)
+        public void ResourceManagerStringLocalizer_WithCulture_ShouldThrow(string cultureName)
         {
             var localizer = CreateLocalizer("TestResources");
             var result = localizer.WithCulture(new CultureInfo(cultureName));
@@ -156,6 +129,7 @@ namespace TrdP.ResourceManagerStringProvider.Tests
             Assert.Equal(expectedValue, result);
             Assert.Equal(resourceName, result.Name);
             Assert.Equal(expectedValue, result.Value);
+            Assert.Equal(expectedValue, result.ToString());
             Assert.Equal(expectedFound, result.ResourceNotFound);
             Assert.Equal(BuildExpectedSearchedPath(baseName, cultureName), result.SearchedLocation);
         }

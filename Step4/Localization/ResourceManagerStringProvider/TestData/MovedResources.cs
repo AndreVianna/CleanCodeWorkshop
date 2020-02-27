@@ -1,4 +1,4 @@
-﻿namespace TrdP.ResourceManagerStringProvider.Localization
+﻿namespace TrdP.Localization.TestData
 {
     public class MovedResources
     {

@@ -1,4 +1,4 @@
-﻿namespace TrdP.ResourceManagerStringProvider.Localization.Internal
+﻿namespace TrdP.Localization.TestData.Internal
 {
     public class OtherResources
     {

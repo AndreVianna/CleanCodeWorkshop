@@ -14,8 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Source\TrdP.ResourceManagerStringProvider.csproj" />
-    <ProjectReference Include="..\TestData\TrdP.ResourceManagerStringProvider.Localization.csproj" />
+    <ProjectReference Include="..\Source\TrdP.Localization.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
