@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7E91C14B-D2E0-490F-938F-061FA67C55B7}"
+	ProjectSection(SolutionItems) = preProject
+		ExecuteCleanUp.cmd = ExecuteCleanUp.cmd
+		TrdP.LocalizationProvider.runsettings = TrdP.LocalizationProvider.runsettings
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.ResourceManagerStringProvider", "ResourceManagerStringProvider\Source\TrdP.ResourceManagerStringProvider.csproj", "{340D6FE0-7D83-4CF6-B3EA-66332477DF71}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.ResourceManagerStringProvider.Tests", "ResourceManagerStringProvider\Tests\TrdP.ResourceManagerStringProvider.Tests.csproj", "{BB2DA917-AD1A-482A-852A-E051AC889031}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.ResourceManagerStringProvider.Localization", "ResourceManagerStringProvider\TestData\TrdP.ResourceManagerStringProvider.Localization.csproj", "{907996CD-806B-43E2-9359-B9537BF88186}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{340D6FE0-7D83-4CF6-B3EA-66332477DF71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{340D6FE0-7D83-4CF6-B3EA-66332477DF71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{340D6FE0-7D83-4CF6-B3EA-66332477DF71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{340D6FE0-7D83-4CF6-B3EA-66332477DF71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB2DA917-AD1A-482A-852A-E051AC889031}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB2DA917-AD1A-482A-852A-E051AC889031}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB2DA917-AD1A-482A-852A-E051AC889031}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB2DA917-AD1A-482A-852A-E051AC889031}.Release|Any CPU.Build.0 = Release|Any CPU
+		{907996CD-806B-43E2-9359-B9537BF88186}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{907996CD-806B-43E2-9359-B9537BF88186}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{907996CD-806B-43E2-9359-B9537BF88186}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{907996CD-806B-43E2-9359-B9537BF88186}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EBB43EDD-4ACE-45BE-AF09-15041A38EDB7}
+	EndGlobalSection
+EndGlobal
