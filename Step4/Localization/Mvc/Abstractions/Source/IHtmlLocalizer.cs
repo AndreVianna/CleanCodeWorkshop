@@ -1,6 +1,7 @@
 ﻿namespace TrdP.Localization.Mvc.Abstractions
 {
-    public interface IHtmlLocalizer<TResource> : IHtmlLocalizer
+    // ReSharper disable once UnusedTypeParameter - Used during implementation
+    public interface IHtmlLocalizer<TResource> : IHtmlLocalizer where TResource : class
     {
     }
 

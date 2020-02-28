@@ -4,7 +4,7 @@ using TrdP.Localization.Mvc.Abstractions;
 
 namespace TrdP.Localization.Mvc
 {
-    public class HtmlLocalizer<TResource> : IHtmlLocalizer<TResource>
+    public class HtmlLocalizer<TResource> : IHtmlLocalizer<TResource> where TResource : class
     {
         private readonly IHtmlLocalizer _localizer;
 
@@ -18,11 +18,9 @@ namespace TrdP.Localization.Mvc
             _localizer = factory.Create(typeof(TResource));
         }
 
-        /// <inheritdoc />
-        public virtual LocalizedHtmlContent this[string name] => _localizer[name];
+        public LocalizedHtmlContent this[string name] => _localizer[name];
 
-        /// <inheritdoc />
-        public virtual LocalizedHtmlContent this[string name, params object[] arguments] => _localizer[name, arguments];
+        public LocalizedHtmlContent this[string name, params object[] arguments] => _localizer[name, arguments];
     }
 
     public class HtmlLocalizer : IHtmlLocalizer
@@ -34,11 +32,11 @@ namespace TrdP.Localization.Mvc
             _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
 
-        public virtual LocalizedHtmlContent this[string name] => ToHtmlContent(_localizer[name], Array.Empty<object>());
+        public LocalizedHtmlContent this[string name] => ToHtmlContent(_localizer[name], Array.Empty<object>());
 
-        public virtual LocalizedHtmlContent this[string name, params object[] arguments] => ToHtmlContent(_localizer[name], arguments);
+        public LocalizedHtmlContent this[string name, params object[] arguments] => ToHtmlContent(_localizer[name], arguments);
 
         private LocalizedHtmlContent ToHtmlContent(LocalizedString result, object[] arguments) =>
-            new LocalizedHtmlContent(result.Name, result.Value, arguments, result.ResourceNotFound, result.SearchedLocation);
+            new LocalizedHtmlContent(result.Name, result.Value, arguments, result.ResourceWasNotFound, result.SearchedLocation);
     }
 }

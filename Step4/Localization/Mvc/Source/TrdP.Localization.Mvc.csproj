@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Abstractions\TrdP.Localization.Mvc.Abstractions.csproj" />
+    <ProjectReference Include="..\Abstractions\Source\TrdP.Localization.Mvc.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

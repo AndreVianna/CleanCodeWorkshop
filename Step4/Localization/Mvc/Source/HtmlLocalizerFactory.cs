@@ -13,12 +13,12 @@ namespace TrdP.Localization.Mvc
             _factory = localizerFactory ?? throw new ArgumentNullException(nameof(localizerFactory));
         }
 
-        public virtual IHtmlLocalizer Create(Type resourceSource)
+        public IHtmlLocalizer Create(Type resourceSource)
         {
             return new HtmlLocalizer(_factory.Create(resourceSource));
         }
 
-        public virtual IHtmlLocalizer Create(string baseName, string location)
+        public IHtmlLocalizer Create(string baseName, string location)
         {
             return new HtmlLocalizer(_factory.Create(baseName, location));
         }

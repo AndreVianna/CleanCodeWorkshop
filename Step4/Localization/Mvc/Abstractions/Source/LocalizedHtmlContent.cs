@@ -14,12 +14,12 @@ namespace TrdP.Localization.Mvc.Abstractions
         {
         }
 
-        public LocalizedHtmlContent(string name, string value, object[] arguments, bool isResourceNotFound = false, string searchedLocation = null)
+        public LocalizedHtmlContent(string name, string value, object[] arguments, bool resourceWasNotFound = false, string searchedLocation = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Value = value ?? throw new ArgumentNullException(nameof(value));
             _arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
-            IsResourceNotFound = isResourceNotFound;
+            ResourceWasNotFound = resourceWasNotFound;
             SearchedLocation = searchedLocation;
         }
 
@@ -27,7 +27,7 @@ namespace TrdP.Localization.Mvc.Abstractions
 
         public string Value { get; }
 
-        public bool IsResourceNotFound { get; }
+        public bool ResourceWasNotFound { get; }
 
         public string SearchedLocation { get; }
 

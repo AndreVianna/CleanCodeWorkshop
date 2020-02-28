@@ -48,12 +48,12 @@ namespace TrdP.Localization.Tests
         [InlineData("pt-BR", "NotFound", "NotFound", true)]
         [InlineData("fr", "TestString", "TestString", true)]
         [InlineData("fr", "NotFound", "NotFound", true)]
-        public void StringLocalizer_This_FromRoot_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedResourceNotFound)
+        public void StringLocalizer_This_FromRoot_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedNotToBeFound)
         {
             var localizer = CreateLocalizer("TestResources");
             SetCurrentUiCulture(cultureName);
             var result = localizer[resourceName];
-            AssertLocalizedStringResult(result, resourceName, expectedValue, expectedResourceNotFound, "TestResources", cultureName);
+            AssertLocalizedStringResult(result, resourceName, expectedValue, expectedNotToBeFound, "TestResources", cultureName);
         }
 
         [Fact]
@@ -76,12 +76,12 @@ namespace TrdP.Localization.Tests
         [InlineData("fr", "TestString", "TestString", true)]
         [InlineData("fr", "OtherString", "OtherString", true)]
         [InlineData("fr", "NotFound", "NotFound", true)]
-        public void StringLocalizer_This_FromInternalFolder_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedResourceNotFound)
+        public void StringLocalizer_This_FromInternalFolder_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedNotToBeFound)
         {
             var localizer = CreateLocalizer("Internal.OtherResources");
             SetCurrentUiCulture(cultureName);
             var result = localizer[resourceName];
-            AssertLocalizedStringResult(result, resourceName, expectedValue, expectedResourceNotFound, "Internal.OtherResources", cultureName);
+            AssertLocalizedStringResult(result, resourceName, expectedValue, expectedNotToBeFound, "Internal.OtherResources", cultureName);
         }
 
         [Theory]
@@ -91,12 +91,12 @@ namespace TrdP.Localization.Tests
         [InlineData("pt-BR", "NotFound {0}", "NotFound 3", true)]
         [InlineData("fr", "FormattedString {0}", "FormattedString 3", true)]
         [InlineData("fr", "NotFound {0}", "NotFound 3", true)]
-        public void StringLocalizer_This_WithParams_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedResourceNotFound)
+        public void StringLocalizer_This_WithParams_ShouldPass(string cultureName, string resourceName, string expectedValue, bool expectedNotToBeFound)
         {
             var localizer = CreateLocalizer("TestResources");
             SetCurrentUiCulture(cultureName);
             var result = localizer[resourceName, 3];
-            AssertLocalizedStringResult(result, resourceName, expectedValue, expectedResourceNotFound, "TestResources", cultureName);
+            AssertLocalizedStringResult(result, resourceName, expectedValue, expectedNotToBeFound, "TestResources", cultureName);
         }
 
         [Fact]
@@ -117,25 +117,6 @@ namespace TrdP.Localization.Tests
 
             AssertLocalizedStringResult(result1, "TestString", "TestValue", false, "TestResources", "pt-BR");
             AssertLocalizedStringResult(result2, "TestString", "TestString", true, "TestResources", "fr");
-        }
-
-        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
-        private void AssertLocalizedStringResult(LocalizedString result, string resourceName, string expectedValue, 
-            bool expectedFound, string baseName, string cultureName)
-        {
-            Assert.Equal(expectedValue, result);
-            Assert.Equal(resourceName, result.Name);
-            Assert.Equal(expectedValue, result.Value);
-            Assert.Equal(expectedValue, result.ToString());
-            Assert.Equal(expectedFound, result.ResourceNotFound);
-            Assert.Equal(BuildExpectedSearchedPath(baseName, cultureName), result.SearchedLocation);
-        }
-        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Local
-
-        private static string BuildExpectedSearchedPath(string resourcesPath, string cultureName)
-        {
-            var finalCultureName = cultureName ?? CultureInfo.CurrentUICulture.Name;
-            return $"{SOURCE_ASSEMBLY_NAME}.{resourcesPath}.{finalCultureName}.resx";
         }
 
         [Fact]
@@ -167,11 +148,11 @@ namespace TrdP.Localization.Tests
             return new StringLocalizer(_sourceAssembly, resourcesPath);
         }
 
-        private StringLocalizer<T> CreateLocalizer<T>()
+        private StringLocalizer<TResource> CreateLocalizer<TResource>() where TResource : class
         {
             var emptyOptions = new OptionsWrapper<LocalizerOptions>(new LocalizerOptions());
             var factory = new StringLocalizerFactory(emptyOptions, NullLoggerFactory.Instance);
-            return new StringLocalizer<T>(factory);
+            return new StringLocalizer<TResource>(factory);
         }
 
         private static void SetCurrentUiCulture(string cultureName)
@@ -180,6 +161,24 @@ namespace TrdP.Localization.Tests
             {
                 CultureInfo.CurrentUICulture = new CultureInfo(cultureName);
             }
+        }
+
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
+        private void AssertLocalizedStringResult(LocalizedString result, string resourceName, string expectedValue, bool expectedNotToBeFound, string baseName, string cultureName)
+        {
+            Assert.Equal(expectedValue, result);
+            Assert.Equal(resourceName, result.Name);
+            Assert.Equal(expectedValue, result.Value);
+            Assert.Equal(expectedValue, result.ToString());
+            Assert.Equal(expectedNotToBeFound, result.ResourceWasNotFound);
+            Assert.Equal(BuildExpectedSearchedPath(baseName, cultureName), result.SearchedLocation);
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Local
+
+        private static string BuildExpectedSearchedPath(string resourcesPath, string cultureName)
+        {
+            var finalCultureName = cultureName ?? CultureInfo.CurrentUICulture.Name;
+            return $"{SOURCE_ASSEMBLY_NAME}.{resourcesPath}.{finalCultureName}.resx";
         }
     }
 }

@@ -1,8 +1,7 @@
 using System;
-using TrdP.Localization.Abstractions;
 using Xunit;
 
-namespace TrdP.Localization.Tests
+namespace TrdP.Localization.Abstractions.Tests
 {
     public class LocalizedStringTests
     {

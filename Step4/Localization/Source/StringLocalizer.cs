@@ -9,7 +9,7 @@ using TrdP.Localization.Abstractions;
 
 namespace TrdP.Localization
 {
-    public class StringLocalizer<TResourceSource> : IStringLocalizer<TResourceSource>
+    public class StringLocalizer<TResourceSource> : IStringLocalizer<TResourceSource> where TResourceSource : class
     {
         private readonly IStringLocalizer _localizer;
 

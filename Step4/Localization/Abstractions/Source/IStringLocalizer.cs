@@ -1,6 +1,7 @@
 ﻿namespace TrdP.Localization.Abstractions
 {
-    public interface IStringLocalizer<T> : IStringLocalizer
+    // ReSharper disable once UnusedTypeParameter - Used during implementation
+    public interface IStringLocalizer<TResource> : IStringLocalizer where TResource : class
     {
     }
 
