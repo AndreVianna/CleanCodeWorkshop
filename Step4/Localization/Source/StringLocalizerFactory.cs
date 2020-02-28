@@ -2,22 +2,26 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TrdP.Localization.Abstractions;
 
 namespace TrdP.Localization
 {
-    public class ResourceManagerStringLocalizerFactory : IStringLocalizerFactory
+    public class StringLocalizerFactory : IStringLocalizerFactory
     {
+        private readonly ILoggerFactory _loggerFactory;
         private readonly string _resourcesRootName;
-        private readonly ConcurrentDictionary<string, ResourceManagerStringLocalizer> _localizerCache = new ConcurrentDictionary<string, ResourceManagerStringLocalizer>();
+        private readonly ConcurrentDictionary<string, StringLocalizer> _localizerCache = new ConcurrentDictionary<string, StringLocalizer>();
 
-        public ResourceManagerStringLocalizerFactory(IOptions<LocalizerOptions> localizationOptions)
+        public StringLocalizerFactory(IOptions<LocalizerOptions> localizationOptions, ILoggerFactory loggerFactory)
         {
             if (localizationOptions == null)
             {
                 throw new ArgumentNullException(nameof(localizationOptions));
             }
+
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
 
             _resourcesRootName = localizationOptions.Value.ResourcesRoot ?? string.Empty;
             if (!string.IsNullOrEmpty(_resourcesRootName))
@@ -26,14 +30,14 @@ namespace TrdP.Localization
             }
         }
 
-        public IStringLocalizer Create(Type source)
+        public IStringLocalizer Create(Type resourceSource)
         {
-            if (source == null)
+            if (resourceSource == null)
             {
-                throw new ArgumentNullException(nameof(source));
+                throw new ArgumentNullException(nameof(resourceSource));
             }
 
-            return GetOrCreateLocalizer(source.Assembly, source.FullName);
+            return GetOrCreateLocalizer(resourceSource.Assembly, resourceSource.FullName);
         }
 
         public IStringLocalizer Create(string sourceName, string assemblyName)
@@ -57,7 +61,7 @@ namespace TrdP.Localization
             var assemblyName = new AssemblyName(assembly.FullName).Name;
             var sourceRelativeName = TrimPrefix(sourceName, $"{assemblyName}.");
             var resourceRelativeName = $"{_resourcesRootName}{sourceRelativeName}";
-            return _localizerCache.GetOrAdd(resourceRelativeName, key => new ResourceManagerStringLocalizer(assembly, key));
+            return _localizerCache.GetOrAdd(resourceRelativeName, key => new StringLocalizer(assembly, key, _loggerFactory.CreateLogger<StringLocalizer>()));
         }
 
         private static string ConvertToResourceName(string resourcePath)

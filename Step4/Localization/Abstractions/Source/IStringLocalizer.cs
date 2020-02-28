@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace TrdP.Localization.Abstractions
+﻿namespace TrdP.Localization.Abstractions
 {
     public interface IStringLocalizer<T> : IStringLocalizer
     {
@@ -11,7 +9,5 @@ namespace TrdP.Localization.Abstractions
         LocalizedString this[string name] { get; }
 
         LocalizedString this[string name, params object[] arguments] { get; }
-
-        IStringLocalizer WithCulture(CultureInfo culture);
     }
 }

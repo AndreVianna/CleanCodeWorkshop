@@ -9,17 +9,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TrdP.LocalizationProvider.runsettings = TrdP.LocalizationProvider.runsettings
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization", "ResourceManagerStringProvider\Source\TrdP.Localization.csproj", "{340D6FE0-7D83-4CF6-B3EA-66332477DF71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization", "Source\TrdP.Localization.csproj", "{340D6FE0-7D83-4CF6-B3EA-66332477DF71}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.Tests", "ResourceManagerStringProvider\Tests\TrdP.Localization.Tests.csproj", "{BB2DA917-AD1A-482A-852A-E051AC889031}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.Tests", "Tests\TrdP.Localization.Tests.csproj", "{BB2DA917-AD1A-482A-852A-E051AC889031}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.TestData", "ResourceManagerStringProvider\TestData\TrdP.Localization.TestData.csproj", "{907996CD-806B-43E2-9359-B9537BF88186}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.TestData", "TestData\TrdP.Localization.TestData.csproj", "{907996CD-806B-43E2-9359-B9537BF88186}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Abstractions", "Abstractions", "{0542E833-6B7F-46C3-BD40-5C4FDCF95D9A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.Abstractions", "Abstractions\Source\TrdP.Localization.Abstractions.csproj", "{97AD8AA3-79A3-4EB0-AEC0-775B273B4671}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.Abstractions.Tests", "Abstractions\Tests\TrdP.Localization.Abstractions.Tests.csproj", "{E884BC1C-9A4D-475D-B3B4-A1799028A2CD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mvc", "Mvc", "{8F9120FC-0D87-4A86-AA44-28E1B8D52FEE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.Mvc.Abstractions", "Mvc\Abstractions\TrdP.Localization.Mvc.Abstractions.csproj", "{88A48B84-0CC9-49A2-9686-D73586309790}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrdP.Localization.Mvc", "Mvc\Source\TrdP.Localization.Mvc.csproj", "{6634C640-182F-4815-B687-8DBACA143DEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +53,14 @@ Global
 		{E884BC1C-9A4D-475D-B3B4-A1799028A2CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E884BC1C-9A4D-475D-B3B4-A1799028A2CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E884BC1C-9A4D-475D-B3B4-A1799028A2CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88A48B84-0CC9-49A2-9686-D73586309790}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88A48B84-0CC9-49A2-9686-D73586309790}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88A48B84-0CC9-49A2-9686-D73586309790}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88A48B84-0CC9-49A2-9686-D73586309790}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6634C640-182F-4815-B687-8DBACA143DEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6634C640-182F-4815-B687-8DBACA143DEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6634C640-182F-4815-B687-8DBACA143DEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6634C640-182F-4815-B687-8DBACA143DEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +68,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{97AD8AA3-79A3-4EB0-AEC0-775B273B4671} = {0542E833-6B7F-46C3-BD40-5C4FDCF95D9A}
 		{E884BC1C-9A4D-475D-B3B4-A1799028A2CD} = {0542E833-6B7F-46C3-BD40-5C4FDCF95D9A}
+		{88A48B84-0CC9-49A2-9686-D73586309790} = {0542E833-6B7F-46C3-BD40-5C4FDCF95D9A}
+		{6634C640-182F-4815-B687-8DBACA143DEF} = {8F9120FC-0D87-4A86-AA44-28E1B8D52FEE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EBB43EDD-4ACE-45BE-AF09-15041A38EDB7}

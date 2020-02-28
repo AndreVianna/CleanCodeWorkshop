@@ -6,6 +6,6 @@ namespace TrdP.Localization.Abstractions
     {
         IStringLocalizer Create(Type resourceSource);
 
-        IStringLocalizer Create(string baseName, string location);
+        IStringLocalizer Create(string sourceName, string assemblyName);
     }
 }
