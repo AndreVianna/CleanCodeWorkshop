@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using TrdP.Localization.Mvc.Abstractions;
@@ -11,46 +8,16 @@ namespace TrdP.Localization.Mvc
 {
     public class ViewLocalizer : IViewLocalizer, IViewContextAware
     {
-        private readonly IHtmlLocalizerFactory _localizerFactory;
-        private readonly string _applicationName;
-        private IHtmlLocalizer _localizer;
+        private readonly IHtmlLocalizer _localizer;
 
-        public ViewLocalizer(IHtmlLocalizerFactory localizerFactory, IHostingEnvironment hostingEnvironment)
+        public ViewLocalizer(IHtmlLocalizer localizer)
         {
-            if (hostingEnvironment == null)
-            {
-                throw new ArgumentNullException(nameof(hostingEnvironment));
-            }
-
-            _applicationName = hostingEnvironment.ApplicationName;
-            _localizerFactory = localizerFactory ?? throw new ArgumentNullException(nameof(localizerFactory));
+            _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
         }
 
-        public virtual LocalizedHtmlContent this[string key]
-        {
-            get
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(nameof(key));
-                }
+        public LocalizedHtmlContent this[string name] => _localizer[name];
 
-                return _localizer[key];
-            }
-        }
-
-        public virtual LocalizedHtmlContent this[string key, params object[] arguments]
-        {
-            get
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(nameof(key));
-                }
-
-                return _localizer[key, arguments];
-            }
-        }
+        public LocalizedHtmlContent this[string name, params object[] arguments] => _localizer[name, arguments];
 
         public void Contextualize(ViewContext viewContext)
         {
@@ -59,34 +26,15 @@ namespace TrdP.Localization.Mvc
                 throw new ArgumentNullException(nameof(viewContext));
             }
 
-            // Given a view path "/Views/Home/Index.cshtml" we want a baseName like "MyApplication.Views.Home.Index"
-            var path = viewContext.ExecutingFilePath;
-
-            if (string.IsNullOrEmpty(path))
+            var viewPath = viewContext.ExecutingFilePath;
+            if (string.IsNullOrEmpty(viewPath))
             {
-                path = viewContext.View.Path;
+                viewPath = viewContext.View.Path;
             }
 
-            Debug.Assert(!string.IsNullOrEmpty(path), "Couldn't determine a path for the view");
-
-            _localizer = _localizerFactory.Create(BuildBaseName(path), _applicationName);
+            Debug.Assert(!string.IsNullOrEmpty(viewPath), "Couldn't determine a path for the view");
+            SetResourcesSource(viewPath);
         }
-
-        private string BuildBaseName(string path)
-        {
-            var extension = Path.GetExtension(path) ?? "";
-            var startIndex = path[0] == '/' || path[0] == '\\' ? 1 : 0;
-            var length = path.Length - startIndex - extension.Length;
-            var capacity = length + _applicationName.Length + 1;
-            var builder = new StringBuilder(path, startIndex, length, capacity);
-
-            builder.Replace('/', '.').Replace('\\', '.');
-
-            // Prepend the application name
-            builder.Insert(0, '.');
-            builder.Insert(0, _applicationName);
-
-            return builder.ToString();
-        }
+        private void SetResourcesSource(string newResourcesSourceRelativePath) => _localizer.SetResourcesSource(newResourcesSourceRelativePath);
     }
 }

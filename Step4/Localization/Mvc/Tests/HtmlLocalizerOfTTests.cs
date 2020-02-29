@@ -3,46 +3,59 @@ using System.Globalization;
 using NSubstitute;
 using TrdP.Localization.Abstractions;
 using TrdP.Localization.Mvc.Abstractions;
+using TrdP.Localization.TestData;
+using TrdP.Localization.TestData.Internal;
 using Xunit;
 
 namespace TrdP.Localization.Mvc.Tests
 {
-    public class HtmlLocalizerTests
+    public class HtmlLocalizerOfTTests
     {
         private const string SOURCE_ASSEMBLY_NAME = "TrdP.Localization.TestData";
         private readonly IStringLocalizer _mockedStringLocalizer;
+        private readonly IHtmlLocalizerFactory _mockedHtmlLocalizerFactory;
 
-        public HtmlLocalizerTests()
+        public HtmlLocalizerOfTTests()
         {
             _mockedStringLocalizer = Substitute.For<IStringLocalizer>();
             _mockedStringLocalizer["NotFound"].Returns(new LocalizedString("NotFound", "NotFound", true, BuildExpectedSearchedPath()));
             _mockedStringLocalizer["TestString"].Returns(new LocalizedString("TestString", "StringValue", false, BuildExpectedSearchedPath()));
             _mockedStringLocalizer["<b>TestHtml</b>"].Returns(new LocalizedString("<b>TestHtml</b>", "<b>HtmlValue</b>", false, BuildExpectedSearchedPath()));
             _mockedStringLocalizer["<b>FormattedHtml {0}</b>"].Returns(new LocalizedString("<b>FormattedHtml {0}</b>", "<b>FormattedValue {0}</b>", false, BuildExpectedSearchedPath()));
+
+            _mockedHtmlLocalizerFactory = Substitute.For<IHtmlLocalizerFactory>();
+            _mockedHtmlLocalizerFactory.Create(Arg.Any<Type>()).Returns(new HtmlLocalizer(_mockedStringLocalizer));
+            _mockedHtmlLocalizerFactory.Create(Arg.Any<string>(), Arg.Any<string>()).Returns(new HtmlLocalizer(_mockedStringLocalizer));
         }
 
         [Fact]
-        public void HtmlLocalizer_Constructor_WithNullLocalizer_ShouldThrow()
+        public void HtmlLocalizerOfT_Constructor_ShouldPass()
         {
-            Assert.Throws<ArgumentNullException>(() => new HtmlLocalizer(null));
+            var _ = new HtmlLocalizer<TestResources>(_mockedHtmlLocalizerFactory);
+        }
+
+        [Fact]
+        public void HtmlLocalizerOfT_Constructor_WithNullStringLocalizerFactory_ShouldThrow()
+        {
+            Assert.Throws<ArgumentNullException>(() => new HtmlLocalizer<TestResources>(null));
         }
 
         [Theory]
         [InlineData("NotFound", "NotFound", true)]
         [InlineData("TestString", "StringValue", false)]
         [InlineData("<b>TestHtml</b>", "<b>HtmlValue</b>", false)]
-        public void HtmlLocalizer_This_ShouldPass(string resourceName, string expectedValue, bool expectedNotToBeFound)
+        public void HtmlLocalizerOfT_This_ShouldPass(string resourceName, string expectedValue, bool expectedNotToBeFound)
         {
-            var localizer = CreateLocalizer();
+            var localizer = new HtmlLocalizer<TestResources>(_mockedHtmlLocalizerFactory);
             var subject = localizer[resourceName];
             var _ = _mockedStringLocalizer.Received()[resourceName];
             AssertLocalizedHtmlContentResult(subject, resourceName, expectedValue, expectedNotToBeFound);
         }
 
         [Fact]
-        public void HtmlLocalizer_This_WithArguments_ShouldPass()
+        public void HtmlLocalizerOfT_This_WithArguments_ShouldPass()
         {
-            var localizer = CreateLocalizer();
+            var localizer = new HtmlLocalizer<TestResources>(_mockedHtmlLocalizerFactory);
             var subject = localizer["<b>FormattedHtml {0}</b>", 3];
             var _ = _mockedStringLocalizer.Received()["<b>FormattedHtml {0}</b>"];
             AssertLocalizedHtmlContentResult(subject, "<b>FormattedHtml {0}</b>", "<b>FormattedValue {0}</b>", false);
@@ -51,14 +64,9 @@ namespace TrdP.Localization.Mvc.Tests
         [Fact]
         public void HtmlLocalizer_SetResourcesSource_ShouldPass()
         {
-            var localizer = CreateLocalizer();
-            localizer.SetResourcesSource("Internal.OtherResources");
-            _mockedStringLocalizer.Received().SetResourcesSource("Internal.OtherResources");
-        }
-
-        private HtmlLocalizer CreateLocalizer()
-        {
-            return new HtmlLocalizer(_mockedStringLocalizer);
+            var localizer = new HtmlLocalizer<TestResources>(_mockedHtmlLocalizerFactory);
+            localizer.SetResourcesSource<OtherResources>();
+            _mockedHtmlLocalizerFactory.Received().Create(typeof(OtherResources));
         }
 
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local

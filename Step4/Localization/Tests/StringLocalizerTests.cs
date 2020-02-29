@@ -1,10 +1,7 @@
 using System;
 using System.Globalization;
 using System.Reflection;
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
 using TrdP.Localization.Abstractions;
-using TrdP.Localization.TestData;
 using Xunit;
 
 namespace TrdP.Localization.Tests
@@ -120,39 +117,25 @@ namespace TrdP.Localization.Tests
         }
 
         [Fact]
-        public void StringLocalizerOfT_Constructor_WithNullFactory_ShouldThrow()
+        public void StringLocalizer_SetResourcesSource_ShouldPass()
         {
-            Assert.Throws<ArgumentNullException>(() => new StringLocalizer<TestResources>(null));
-        }
+            var localizer = CreateLocalizer("TestResources");
+            SetCurrentUiCulture("pt-Br");
+            var result1Before = localizer["TestString"];
+            var result2Before = localizer["OtherString"];
+            localizer.SetResourcesSource("Internal.OtherResources");
+            var result1After = localizer["TestString"];
+            var result2After = localizer["OtherString"];
 
-        [Fact]
-        public void StringLocalizerOfT_This_ShouldPass()
-        {
-            var localizer = CreateLocalizer<TestResources>();
-            CultureInfo.CurrentUICulture = new CultureInfo("pt-BR");
-            var subject = localizer["TestString"];
-            Assert.Equal("TestValue", subject);
-        }
-
-        [Fact]
-        public void StringLocalizerOfT_This_WithParams_ShouldPass()
-        {
-            var localizer = CreateLocalizer<TestResources>();
-            CultureInfo.CurrentUICulture = new CultureInfo("pt-BR");
-            var subject = localizer["FormattedString {0}", 3];
-            Assert.Equal("FormattedValue 3", subject);
+            AssertLocalizedStringResult(result1Before, "TestString", "TestValue", false, "TestResources", "pt-BR");
+            AssertLocalizedStringResult(result2Before, "OtherString", "OtherString", true, "TestResources", "pt-BR");
+            AssertLocalizedStringResult(result1After, "TestString", "TestString", true, "Internal.OtherResources", "pt-BR");
+            AssertLocalizedStringResult(result2After, "OtherString", "OtherValue", false, "Internal.OtherResources", "pt-BR");
         }
 
         private StringLocalizer CreateLocalizer(string resourcesPath)
         {
             return new StringLocalizer(_sourceAssembly, resourcesPath);
-        }
-
-        private StringLocalizer<TResource> CreateLocalizer<TResource>() where TResource : class
-        {
-            var emptyOptions = new OptionsWrapper<LocalizerOptions>(new LocalizerOptions());
-            var factory = new StringLocalizerFactory(emptyOptions, NullLoggerFactory.Instance);
-            return new StringLocalizer<TResource>(factory);
         }
 
         private static void SetCurrentUiCulture(string cultureName)

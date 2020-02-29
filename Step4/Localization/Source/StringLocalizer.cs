@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
 using System.Resources;
 using Microsoft.Extensions.Logging;
@@ -9,78 +10,88 @@ using TrdP.Localization.Abstractions;
 
 namespace TrdP.Localization
 {
-    public class StringLocalizer<TResourceSource> : IStringLocalizer<TResourceSource> where TResourceSource : class
-    {
-        private readonly IStringLocalizer _localizer;
-
-        public StringLocalizer(IStringLocalizerFactory factory)
-        {
-            if (factory == null)
-            {
-                throw new ArgumentNullException(nameof(factory));
-            }
-
-            _localizer = factory.Create(typeof(TResourceSource));
-        }
-
-        public LocalizedString this[string name] => _localizer[name];
-
-        public LocalizedString this[string name, params object[] arguments] => _localizer[name, arguments];
-    }
-
     public class StringLocalizer : IStringLocalizer
     {
-        private readonly ResourceManager _resourceManager;
-        private readonly string _sourcePath;
-        private readonly ILogger _logger;
-
         private readonly HashSet<string> _missingNames = new HashSet<string>();
 
-        public StringLocalizer(Assembly assembly, string resourceFileRelativePath, ILogger logger = null)
+        private Assembly _resourcesAssembly;
+        private string _resourcesAssemblyName;
+        private string _resourcesSourceRelativePath;
+        private ResourceManager _resourceManager;
+
+        private readonly ILogger _logger;
+
+        public StringLocalizer(Assembly assembly, string resourcesSourceRelativePath, ILogger logger = null)
         {
-            if (assembly == null)
-            {
-                throw new ArgumentNullException(nameof(assembly));
-            }
-
-            if (string.IsNullOrWhiteSpace(resourceFileRelativePath))
-            {
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(resourceFileRelativePath));
-            }
-
+            SetResourcesSource(assembly, resourcesSourceRelativePath);
             _logger = logger ?? NullLogger.Instance;
-
-            var assemblyPath = assembly.GetName().Name;
-            _sourcePath = $"{assemblyPath}.{resourceFileRelativePath}";
-            _resourceManager = new ResourceManager(_sourcePath, assembly);
         }
 
         public LocalizedString this[string name] => GetLocalizedString(name);
 
-        public LocalizedString this[string name, params object[] arguments] => GetLocalizedString(name, arguments, (k, v, a) => string.Format(v ?? k, a));
+        public LocalizedString this[string name, params object[] arguments] => GetFormattedLocalizedString(name, arguments);
 
-        private LocalizedString GetLocalizedString(string name, object[] arguments = null, Func<string, string, object[], string> format = null)
+        private string ResourcesSourceAbsolutePath => $"{_resourcesAssemblyName}.{_resourcesSourceRelativePath}";
+
+        public void SetResourcesSource(string resourcesSourceRelativePath)
+        {
+            SetResourcesSource(_resourcesAssembly, resourcesSourceRelativePath);
+        }
+
+        private void SetResourcesSource(Assembly assembly, string resourcesSourceRelativePath)
+        {
+            _resourcesAssembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
+            _resourcesAssemblyName = _resourcesAssembly.GetName().Name;
+
+            if (string.IsNullOrWhiteSpace(resourcesSourceRelativePath))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(resourcesSourceRelativePath));
+            }
+            _resourcesSourceRelativePath = ConvertToResourceName(resourcesSourceRelativePath);
+            _resourceManager = new ResourceManager(ResourcesSourceAbsolutePath, _resourcesAssembly);
+            _missingNames.Clear();
+        }
+
+        private static string ConvertToResourceName(string resourcePath)
+        {
+            //Expected to convert: '/path1/path2/filename.resx' to 'path1.path2.filename'
+            //Should also accept: '\\path1\\path2\\filename'
+            //Should also accept: 'path1.path2.filename'
+            return resourcePath
+                .Replace(".resx", "")
+                .Replace(Path.DirectorySeparatorChar, '.')
+                .Replace(Path.AltDirectorySeparatorChar, '.')
+                .TrimStart('.');
+        }
+
+        private LocalizedString GetFormattedLocalizedString(string name, params object[] arguments)
+        {
+            var result = GetLocalizedString(name);
+            return new LocalizedString(result.Name, string.Format(result.Value, arguments), result.ResourceWasNotFound, result.SearchedLocation);
+        }
+
+        private LocalizedString GetLocalizedString(string name)
         {
             if (name == null)
             {
                 throw new ArgumentNullException(nameof(name));
             }
 
-            var value = GetStringOrDefault(name);
-            var output = format?.Invoke(name, value, arguments) ?? value ?? name;
-            return new LocalizedString(name, output, value == null, $"{_sourcePath}.{CultureInfo.CurrentUICulture.Name}.resx");
+            var culture = CultureInfo.CurrentUICulture;
+            var searchedLocation = $"{ResourcesSourceAbsolutePath}.{culture.Name}.resx";
+            AddLog($"{nameof(StringLocalizer)}: Searching for '{name}' in '{searchedLocation}'.");
+
+            var value = GetStringOrDefault(name, culture);
+            return new LocalizedString(name, value ?? name, value == null, searchedLocation);
         }
 
 #pragma warning disable CA1031 // Do not catch general exception types
-        private string GetStringOrDefault(string name)
+        private string GetStringOrDefault(string name, CultureInfo culture)
         {
-            var culture = CultureInfo.CurrentUICulture;
-            AddLog($"{nameof(StringLocalizer)}: Searching for '{name}' in '{_sourcePath}.{culture.Name}'.");
-
             var cacheKey = $"culture={culture.Name};name={name}";
             if (_missingNames.Contains(cacheKey))
             {
-                AddLog($"{nameof(StringLocalizer)}: '{name}' not found. (from cached missing names)");
+                AddLog($"{nameof(StringLocalizer)}: '{name}' retrieved from missing names cache.");
                 return null;
             }
 
@@ -96,10 +107,10 @@ namespace TrdP.Localization
                 _missingNames.Add(cacheKey);
                 return null;
             }
-
-            void AddLog(string message) => _logger.LogDebug(GetStringOrDefaultEventId(), message);
-            static EventId GetStringOrDefaultEventId() => new EventId(1, nameof(GetStringOrDefault));
         }
 #pragma warning restore CA1031 // Do not catch general exception types
+
+        private void AddLog(string message) => _logger.LogDebug(GetStringOrDefaultEventId(), message);
+        private static EventId GetStringOrDefaultEventId() => new EventId(1, nameof(GetStringOrDefault));
     }
 }

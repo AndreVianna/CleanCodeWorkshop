@@ -1,6 +1,8 @@
-﻿namespace TrdP.Localization.Mvc.Abstractions
+﻿using TrdP.Localization.Abstractions;
+
+namespace TrdP.Localization.Mvc.Abstractions
 {
-    public interface IViewLocalizer : IHtmlLocalizer
+    public interface IViewLocalizer : ITextLocalizer<LocalizedHtmlContent>
     {
     }
 }

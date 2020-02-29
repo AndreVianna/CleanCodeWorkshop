@@ -12,7 +12,7 @@ namespace TrdP.Localization
     {
         private readonly ILoggerFactory _loggerFactory;
         private readonly string _resourcesRootName;
-        private readonly ConcurrentDictionary<string, StringLocalizer> _localizerCache = new ConcurrentDictionary<string, StringLocalizer>();
+        private readonly ConcurrentDictionary<string, IStringLocalizer> _localizerCache = new ConcurrentDictionary<string, IStringLocalizer>();
 
         public StringLocalizerFactory(IOptions<LocalizerOptions> localizationOptions, ILoggerFactory loggerFactory)
         {
