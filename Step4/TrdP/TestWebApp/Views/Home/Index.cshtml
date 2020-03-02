@@ -1,0 +1,12 @@
+﻿@using TrdP.Localization.Abstractions
+@using TrdP.TestWebAppResources
+
+@inject IStringLocalizer<SharedResources> Strings;
+
+@{
+    ViewData["Title"] = Strings["Home Page"];
+}
+
+<div class="text-center">
+    <h1 class="display-4">@Strings["Welcome"]</h1>
+</div>
