@@ -2,20 +2,20 @@ using System;
 using System.Globalization;
 using Microsoft.Extensions.Logging.Abstractions;
 using TrdP.Localization.Abstractions;
-using TrdP.UnitTestResources;
+using TrdP.UnitTestsResources;
 using Xunit;
 
 namespace TrdP.Localization.Tests
 {
     public class StringLocalizerTests
     {
-        private const string SOURCE_ASSEMBLY_NAME = "TrdP.Resources";
+        private const string SOURCE_ASSEMBLY_NAME = "TrdP.UnitTestsResources";
 
         [Fact]
         public void StringLocalizer_Constructor_WithLogger_ShouldPass()
         {
             var source = typeof(TestResources);
-            var _ = new StringLocalizer(source.Assembly, null, "/Some/Path", NullLogger.Instance);
+            var _ = new StringLocalizer(source.Assembly, null, "Some.Path", NullLogger.Instance);
         }
 
         [Fact]
@@ -111,27 +111,6 @@ namespace TrdP.Localization.Tests
 
             AssertLocalizedStringResult(result1, "TestString", "TestValue", false, "TestResources", "pt-BR");
             AssertLocalizedStringResult(result2, "TestString", "TestString", true, "TestResources", "fr");
-        }
-
-        [Theory]
-        [InlineData("Internal.OtherResources")]
-        [InlineData("/Internal/OtherResources")]
-        [InlineData("Internal\\OtherResources")]
-        [InlineData("Internal.OtherResources ")]
-        public void StringLocalizer_SetResourcesFileRelativePath_ShouldPass(string path)
-        {
-            var localizer = CreateLocalizer();
-            SetCurrentUiCulture("pt-Br");
-            var result1Before = localizer["TestString"];
-            var result2Before = localizer["OtherString"];
-            localizer.SetResourcesFileRelativePath(path);
-            var result1After = localizer["TestString"];
-            var result2After = localizer["OtherString"];
-
-            AssertLocalizedStringResult(result1Before, "TestString", "TestValue", false, "TestResources", "pt-BR");
-            AssertLocalizedStringResult(result2Before, "OtherString", "OtherString", true, "TestResources", "pt-BR");
-            AssertLocalizedStringResult(result1After, "TestString", "TestString", true, "Internal.OtherResources", "pt-BR");
-            AssertLocalizedStringResult(result2After, "OtherString", "OtherValue", false, "Internal.OtherResources", "pt-BR");
         }
 
         private static void SetCurrentUiCulture(string cultureName)

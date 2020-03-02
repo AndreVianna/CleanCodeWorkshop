@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using TrdP.UnitTestResources;
+using TrdP.UnitTestsResources;
 using Xunit;
 
 namespace TrdP.Localization.Tests
@@ -40,10 +43,42 @@ namespace TrdP.Localization.Tests
         }
 
         [Fact]
-        public void StringLocalizerFactory_Create_ShouldPass()
+        public void StringLocalizerFactory_Constructor_WithAvailableCultures_ShouldPass()
+        {
+            _optionsValue.Value.AvailableCultures = new List<CultureInfo>
+            {
+                new CultureInfo("en-US"),
+                new CultureInfo("pt-BR"),
+            };
+            var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
+            Assert.Equal(typeof(TestResources).Assembly.GetName().Name, factory.ProviderAssembly.GetName().Name);
+            Assert.Equal(2, factory.AvailableCultures.Count());
+            Assert.Equal("en-US", factory.AvailableCultures.ElementAt(0).Name);
+            Assert.Equal("pt-BR", factory.AvailableCultures.ElementAt(1).Name);
+        }
+
+        [Fact]
+        public void StringLocalizerFactory_Constructor_WithNullAvailableCultures_ShouldPass()
+        {
+            _optionsValue.Value.AvailableCultures = null;
+            var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
+            Assert.Equal(typeof(TestResources).Assembly.GetName().Name, factory.ProviderAssembly.GetName().Name);
+            Assert.Empty(factory.AvailableCultures);
+        }
+
+        [Fact]
+        public void StringLocalizerFactory_Create_ForType_ShouldPass()
         {
             var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
             var result = factory.Create<StringLocalizerFactoryTests>();
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void StringLocalizerFactory_Create_ForPath_ShouldPass()
+        {
+            var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
+            var result = factory.Create("Some.Path");
             Assert.NotNull(result);
         }
     }

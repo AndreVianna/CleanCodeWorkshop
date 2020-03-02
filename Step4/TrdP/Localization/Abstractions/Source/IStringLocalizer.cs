@@ -8,6 +8,5 @@
 
     public interface IStringLocalizer : ILocalizer<LocalizedString>
     {
-        void SetResourcesFileRelativePath(string resourcesLocatorRelativePath);
     }
 }

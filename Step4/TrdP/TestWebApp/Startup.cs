@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using TrdP.Localization;
+using TrdP.Mvc.Localization;
 using TrdP.TestWebAppResources;
 
 namespace TrdP.TestWebApp
@@ -14,14 +13,9 @@ namespace TrdP.TestWebApp
         {
             services.AddControllersWithViews();
 
-            services.AddLocalizationProvider<ResourcesProvider>();
-
-            var supportedCultures = ResourcesProvider.SupportedCultures;
-            services.Configure<RequestLocalizationOptions>(options =>
+            services.AddMvcLocalizationProvider<ResourcesProvider>(options =>
             {
-                options.DefaultRequestCulture = new RequestCulture(supportedCultures[0].Name);
-                options.SupportedCultures = supportedCultures;
-                options.SupportedUICultures = supportedCultures;
+                options.AvailableCultures = ResourcesProvider.AvailableCultures;
             });
         }
 

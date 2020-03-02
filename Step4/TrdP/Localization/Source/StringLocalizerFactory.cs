@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,12 +27,15 @@ namespace TrdP.Localization
 
             ProviderAssembly = typeof(TProviderLocator).Assembly;
             var resourcesRoot = (localizationOptions.Value.ResourcesRoot ?? string.Empty).Trim();
-            ResourcesRoot = GetReourcesLocatorRelativePath(resourcesRoot);
+            ResourcesRoot = GetResourcesLocatorRelativePath(resourcesRoot);
+            AvailableCultures = localizationOptions.Value.AvailableCultures ?? Enumerable.Empty<CultureInfo>();
         }
 
         internal Assembly ProviderAssembly { get; }
 
         internal string ResourcesRoot { get; }
+
+        internal IEnumerable<CultureInfo> AvailableCultures { get; }
 
         public IStringLocalizer Create<TResourcesLocator>()
             where TResourcesLocator : class
@@ -39,7 +45,12 @@ namespace TrdP.Localization
 
         public IStringLocalizer Create(Type resourcesLocator)
         {
-            return GetOrCreateLocalizer(GetReourcesLocatorRelativePath(resourcesLocator));
+            return GetOrCreateLocalizer(GetResourcesLocatorRelativePath(resourcesLocator));
+        }
+
+        public IStringLocalizer Create(string resourcesRelativePath)
+        {
+            return GetOrCreateLocalizer(GetResourcesLocatorRelativePath(resourcesRelativePath));
         }
 
         private IStringLocalizer GetOrCreateLocalizer(string targetRelativePath)

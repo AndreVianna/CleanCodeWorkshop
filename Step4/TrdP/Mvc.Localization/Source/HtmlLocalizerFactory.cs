@@ -18,5 +18,10 @@ namespace TrdP.Mvc.Localization
         {
             return new HtmlLocalizer(_factory.Create<TResourcesLocator>());
         }
+
+        public IHtmlLocalizer Create(string resourcesRelativePath)
+        {
+            return new HtmlLocalizer(_factory.Create(resourcesRelativePath));
+        }
     }
 }

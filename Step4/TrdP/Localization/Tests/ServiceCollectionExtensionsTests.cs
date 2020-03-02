@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TrdP.Common.TestDoubles;
-using TrdP.UnitTestResources;
+using TrdP.UnitTestsResources;
 using Xunit;
 
 namespace TrdP.Localization.Tests

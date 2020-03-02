@@ -1,4 +1,4 @@
-﻿namespace TrdP.UnitTestResources
+﻿namespace TrdP.UnitTestsResources
 {
     public class MovedResources
     {

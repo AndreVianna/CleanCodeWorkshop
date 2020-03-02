@@ -13,7 +13,6 @@ namespace TrdP.Localization
             services.TryAddSingleton<IStringLocalizerFactory, StringLocalizerFactory<TProviderLocator>>();
             services.TryAddTransient(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
             services.Configure<LocalizerProviderOptions>(opt => setupAction?.Invoke(opt));
-
             return services;
         }
     }

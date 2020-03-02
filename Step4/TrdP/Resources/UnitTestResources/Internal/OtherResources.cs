@@ -1,4 +1,4 @@
-﻿namespace TrdP.UnitTestResources.Internal
+﻿namespace TrdP.UnitTestsResources.Internal
 {
     public class OtherResources
     {

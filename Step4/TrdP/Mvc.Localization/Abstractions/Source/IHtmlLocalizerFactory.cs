@@ -4,5 +4,7 @@
     {
         IHtmlLocalizer Create<TResourcesLocator>()
             where TResourcesLocator : class;
+
+        IHtmlLocalizer Create(string resourcesRelativePath);
     }
 }

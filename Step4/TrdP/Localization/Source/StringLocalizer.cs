@@ -6,7 +6,6 @@ using System.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using TrdP.Localization.Abstractions;
-using static TrdP.Common.Helpers.ResourcesPathHelper;
 
 namespace TrdP.Localization
 {
@@ -27,44 +26,33 @@ namespace TrdP.Localization
         public LocalizedString this[string name] => _localizer[name];
 
         public LocalizedString this[string name, params object[] arguments] => _localizer[name, arguments];
-
-        public void SetResourcesLocator<TNewResourcesLocator>() where TNewResourcesLocator : class
-        {
-            _localizer.SetResourcesFileRelativePath(GetReourcesLocatorRelativePath<TNewResourcesLocator>());
-        }
     }
 
     internal class StringLocalizer : IStringLocalizer
     {
         private readonly HashSet<string> _missingNames = new HashSet<string>();
 
-        private readonly Assembly _resourcesAssembly;
         private readonly string _resourcesRootPath;
         private readonly string _resourcesAssemblyName;
-        private string _resourcesFileRelativePath;
-        private ResourceManager _resourceManager;
+        private readonly string _resourcesFileRelativePath;
+        private readonly ResourceManager _resourceManager;
 
         private readonly ILogger _logger;
 
-        public StringLocalizer(Assembly assembly, string resourcesRootPath, string targetRelativePath, ILogger logger = null)
+        public StringLocalizer(Assembly assembly, string resourcesRootPath, string resourcesLocatorRelativePath, ILogger logger = null)
         {
-            _resourcesAssembly = assembly;
-            _resourcesAssemblyName = $"{_resourcesAssembly.GetName().Name}.";
+            var resourcesAssembly = assembly;
+            _resourcesAssemblyName = $"{resourcesAssembly.GetName().Name}.";
             _resourcesRootPath = string.IsNullOrWhiteSpace(resourcesRootPath) ? "" : $"{resourcesRootPath}.";
-            SetResourcesFileRelativePath(targetRelativePath);
+            _resourcesFileRelativePath = resourcesLocatorRelativePath;
+            _resourceManager = new ResourceManager(ResourceFileFinalPath, resourcesAssembly);
+            _missingNames.Clear();
             _logger = logger ?? NullLogger.Instance;
         }
 
         public LocalizedString this[string name] => GetLocalizedString(name);
 
         public LocalizedString this[string name, params object[] arguments] => GetFormattedLocalizedString(name, arguments);
-
-        public void SetResourcesFileRelativePath(string resourcesLocatorRelativePath)
-        {
-            _resourcesFileRelativePath = GetReourcesLocatorRelativePath(resourcesLocatorRelativePath);
-            _resourceManager = new ResourceManager(ResourceFileFinalPath, _resourcesAssembly);
-            _missingNames.Clear();
-        }
 
         private string ResourceFileFinalPath => $"{_resourcesAssemblyName}{_resourcesRootPath}{_resourcesFileRelativePath}";
 

@@ -3,15 +3,15 @@ using System.Globalization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using TrdP.Localization.Abstractions;
-using TrdP.UnitTestResources;
-using TrdP.UnitTestResources.Internal;
+using TrdP.UnitTestsResources;
+using TrdP.UnitTestsResources.Internal;
 using Xunit;
 
 namespace TrdP.Localization.Tests
 {
     public class StringLocalizerOfResourcesLocatorTests
     {
-        private const string SOURCE_ASSEMBLY_NAME = "TrdP.Resources";
+        private const string SOURCE_ASSEMBLY_NAME = "TrdP.UnitTestsResources";
 
         [Fact]
         public void StringLocalizerOfResourcesLocator_Constructor_WithNullFactory_ShouldThrow()
@@ -61,23 +61,6 @@ namespace TrdP.Localization.Tests
             SetCurrentUiCulture(cultureName);
             var result = localizer[resourceName, 3];
             AssertLocalizedStringResult(result, resourceName, expectedValue, expectedNotToBeFound, "TestResources", cultureName);
-        }
-
-        [Fact]
-        public void StringLocalizerOfResourcesLocator_SetResourcesLocator_ShouldPass()
-        {
-            var localizer = CreateLocalizer<TestResources>();
-            SetCurrentUiCulture("pt-Br");
-            var result1Before = localizer["TestString"];
-            var result2Before = localizer["OtherString"];
-            localizer.SetResourcesLocator<OtherResources>();
-            var result1After = localizer["TestString"];
-            var result2After = localizer["OtherString"];
-
-            AssertLocalizedStringResult(result1Before, "TestString", "TestValue", false, "TestResources", "pt-BR");
-            AssertLocalizedStringResult(result2Before, "OtherString", "OtherString", true, "TestResources", "pt-BR");
-            AssertLocalizedStringResult(result1After, "TestString", "TestString", true, "Internal.OtherResources", "pt-BR");
-            AssertLocalizedStringResult(result2After, "OtherString", "OtherValue", false, "Internal.OtherResources", "pt-BR");
         }
 
         private static void SetCurrentUiCulture(string cultureName)

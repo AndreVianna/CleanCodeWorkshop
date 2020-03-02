@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using TrdP.Mvc.Localization.Abstractions;
@@ -8,11 +9,12 @@ namespace TrdP.Mvc.Localization
 {
     public class ViewLocalizer : IViewLocalizer, IViewContextAware
     {
-        private readonly IHtmlLocalizer _localizer;
+        private readonly IHtmlLocalizerFactory _factory;
+        private IHtmlLocalizer _localizer;
 
-        public ViewLocalizer(IHtmlLocalizer localizer)
+        public ViewLocalizer(IHtmlLocalizerFactory factory)
         {
-            _localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
+            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
         public LocalizedHtmlContent this[string name] => _localizer[name];
@@ -26,14 +28,19 @@ namespace TrdP.Mvc.Localization
                 throw new ArgumentNullException(nameof(viewContext));
             }
 
-            var viewPath = viewContext.ExecutingFilePath;
+            var viewPath = viewContext.ExecutingFilePath?.Trim();
             if (string.IsNullOrEmpty(viewPath))
             {
-                viewPath = viewContext.View.Path;
+                viewPath = viewContext.View.Path.Trim();
+            }
+
+            if (Path.HasExtension(viewPath))
+            {
+                viewPath = viewPath.Replace(Path.GetExtension(viewPath), "");
             }
 
             Debug.Assert(!string.IsNullOrEmpty(viewPath), "Couldn't determine a path for the view");
-            _localizer.SetResourcesFileRelativePath(viewPath);
+            _localizer = _factory.Create(viewPath);
         }
     }
 }

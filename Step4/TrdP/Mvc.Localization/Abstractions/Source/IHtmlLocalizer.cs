@@ -10,6 +10,5 @@ namespace TrdP.Mvc.Localization.Abstractions
 
     public interface IHtmlLocalizer : ILocalizer<LocalizedHtmlContent>
     {
-        void SetResourcesFileRelativePath(string targetRelativePath);
     }
 }

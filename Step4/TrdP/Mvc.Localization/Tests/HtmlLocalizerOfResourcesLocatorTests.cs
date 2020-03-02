@@ -3,7 +3,7 @@ using System.Globalization;
 using NSubstitute;
 using TrdP.Localization.Abstractions;
 using TrdP.Mvc.Localization.Abstractions;
-using TrdP.UnitTestResources;
+using TrdP.UnitTestsResources;
 using Xunit;
 
 namespace TrdP.Mvc.Localization.Tests

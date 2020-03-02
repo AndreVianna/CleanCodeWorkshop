@@ -12,6 +12,7 @@ namespace TrdP.Mvc.Localization.Tests
     {
         private const string SOURCE_ASSEMBLY_NAME = "TrdP.Localization.TestData";
         private readonly IHtmlLocalizer _mockedHtmlLocalizer;
+        private readonly IHtmlLocalizerFactory _mockedHtmlLocalizerFactory;
 
         public ViewLocalizerTests()
         {
@@ -20,6 +21,9 @@ namespace TrdP.Mvc.Localization.Tests
             _mockedHtmlLocalizer["TestString"].Returns(new LocalizedHtmlContent("TestString", "StringValue", false, BuildExpectedSearchedPath()));
             _mockedHtmlLocalizer["<b>TestHtml</b>"].Returns(new LocalizedHtmlContent("<b>TestHtml</b>", "<b>HtmlValue</b>", new object[] { 3 }, false, BuildExpectedSearchedPath()));
             _mockedHtmlLocalizer["<b>FormattedHtml {0}</b>", 3].Returns(new LocalizedHtmlContent("<b>FormattedHtml {0}</b>", "<b>FormattedValue {0}</b>", new object[] { 3 }, false, BuildExpectedSearchedPath()));
+
+            _mockedHtmlLocalizerFactory = Substitute.For<IHtmlLocalizerFactory>();
+            _mockedHtmlLocalizerFactory.Create(Arg.Any<string>()).Returns(_mockedHtmlLocalizer);
         }
 
         [Fact]
@@ -28,13 +32,44 @@ namespace TrdP.Mvc.Localization.Tests
             Assert.Throws<ArgumentNullException>(() => new ViewLocalizer(null));
         }
 
+        [Fact]
+        public void ViewLocalizer_Contextualize_WithNullViewContext_ShouldThrow()
+        {
+            var localizer = new ViewLocalizer(_mockedHtmlLocalizerFactory);
+            Assert.Throws<ArgumentNullException>(() => localizer.Contextualize(null));
+        }
+
+        [Fact]
+        public void ViewLocalizer_Contextualize_WithExecutingFilePath_ShouldPass()
+        {
+            var localizer = new ViewLocalizer(_mockedHtmlLocalizerFactory);
+            var viewContext = new ViewContext { ExecutingFilePath = "/Controller/Action.cshtml" };
+
+            localizer.Contextualize(viewContext);
+            
+            _mockedHtmlLocalizerFactory.Received().Create("/Controller/Action");
+        }
+
+        [Fact]
+        public void ViewLocalizer_Contextualize_WithViewPath_ShouldPass()
+        {
+            var localizer = new ViewLocalizer(_mockedHtmlLocalizerFactory);
+            var mockedView = Substitute.For<IView>();
+            mockedView.Path.Returns("/Controller/Action");
+            var viewContext = new ViewContext { View = mockedView, };
+
+            localizer.Contextualize(viewContext);
+
+            _mockedHtmlLocalizerFactory.Received().Create("/Controller/Action");
+        }
+
         [Theory]
         [InlineData("NotFound", "NotFound", true)]
         [InlineData("TestString", "StringValue", false)]
         [InlineData("<b>TestHtml</b>", "<b>HtmlValue</b>", false)]
         public void ViewLocalizer_This_ShouldPass(string resourceName, string expectedValue, bool expectedNotToBeFound)
         {
-            var localizer = CreateLocalizer();
+            var localizer = CreateContextualizedLocalizer();
             var subject = localizer[resourceName];
             var _ = _mockedHtmlLocalizer.Received()[resourceName];
             AssertLocalizedHtmlContentResult(subject, resourceName, expectedValue, expectedNotToBeFound);
@@ -43,48 +78,22 @@ namespace TrdP.Mvc.Localization.Tests
         [Fact]
         public void ViewLocalizer_This_WithArguments_ShouldPass()
         {
-            var localizer = CreateLocalizer();
+            var localizer = CreateContextualizedLocalizer();
             var subject = localizer["<b>FormattedHtml {0}</b>", 3];
             var _ = _mockedHtmlLocalizer.Received()["<b>FormattedHtml {0}</b>", 3];
             AssertLocalizedHtmlContentResult(subject, "<b>FormattedHtml {0}</b>", "<b>FormattedValue {0}</b>", false);
         }
 
-        [Fact]
-        public void ViewLocalizer_Contextualize_WithNullViewContext_ShouldThrow()
+        private ViewLocalizer CreateContextualizedLocalizer()
         {
-            var localizer = CreateLocalizer();
-            Assert.Throws<ArgumentNullException>(() => localizer.Contextualize(null));
-        }
-
-        [Fact]
-        public void ViewLocalizer_Contextualize_WithExecutingFilePath_ShouldPass()
-        {
-            var localizer = CreateLocalizer();
+            var localizer = new ViewLocalizer(_mockedHtmlLocalizerFactory);
             var viewContext = new ViewContext
             {
-                ExecutingFilePath = "/Controller/Action"
+                ExecutingFilePath = "/Controller/Action.cshtml"
             };
-            
-            localizer.Contextualize(viewContext);
-            _mockedHtmlLocalizer.Received().SetResourcesFileRelativePath("/Controller/Action");
-        }
-
-        [Fact]
-        public void ViewLocalizer_Contextualize_ViewPath_ShouldPass()
-        {
-            var localizer = CreateLocalizer();
-            var mockedView = Substitute.For<IView>();
-            mockedView.Path.Returns("/Controller/Action");
-            var viewContext = new ViewContext { View = mockedView, };
 
             localizer.Contextualize(viewContext);
-            
-            _mockedHtmlLocalizer.Received().SetResourcesFileRelativePath("/Controller/Action");
-        }
-
-        private ViewLocalizer CreateLocalizer()
-        {
-            return new ViewLocalizer(_mockedHtmlLocalizer);
+            return localizer;
         }
 
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local

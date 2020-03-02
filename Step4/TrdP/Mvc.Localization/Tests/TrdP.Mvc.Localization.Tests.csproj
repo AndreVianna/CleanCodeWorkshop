@@ -21,7 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Resources\UnitTestResources\TrdP.UnitTestResources.csproj" />
+    <ProjectReference Include="..\..\Common\Tests\TestDoubles\TrdP.Common.TestDoubles.csproj" />
+    <ProjectReference Include="..\..\Resources\UnitTestResources\TrdP.UnitTestsResources.csproj" />
     <ProjectReference Include="..\Source\TrdP.Mvc.Localization.csproj" />
   </ItemGroup>
 

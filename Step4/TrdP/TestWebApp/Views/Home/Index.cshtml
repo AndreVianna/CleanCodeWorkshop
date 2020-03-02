@@ -1,7 +1,7 @@
-﻿@using TrdP.Localization.Abstractions
+﻿@using TrdP.Mvc.Localization.Abstractions
 @using TrdP.TestWebAppResources
 
-@inject IStringLocalizer<SharedResources> Strings;
+@inject IViewLocalizer Strings;
 
 @{
     ViewData["Title"] = Strings["Home Page"];

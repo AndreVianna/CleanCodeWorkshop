@@ -3,9 +3,9 @@ using System.Globalization;
 
 namespace TrdP.TestWebAppResources
 {
-    public class ResourcesProvider
+    public abstract class ResourcesProvider
     {
-        public static IList<CultureInfo> SupportedCultures => new List<CultureInfo>
+        public static IList<CultureInfo> AvailableCultures => new List<CultureInfo>
         {
             new CultureInfo("en-US"),
             new CultureInfo("pt-Br"),

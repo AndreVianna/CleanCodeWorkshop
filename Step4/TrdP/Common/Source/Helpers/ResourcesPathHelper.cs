@@ -5,18 +5,18 @@ namespace TrdP.Common.Helpers
 {
     public static class ResourcesPathHelper
     {
-        public static string GetReourcesLocatorRelativePath<TResourcesLocator>()
+        public static string GetResourcesLocatorRelativePath(Type resourcesLocator)
         {
-            return GetReourcesLocatorRelativePath(typeof(TResourcesLocator));
+            return GetResourcesLocatorRelativePath(resourcesLocator.FullName, resourcesLocator.Assembly.GetName().Name);
         }
 
-        public static string GetReourcesLocatorRelativePath(Type resourcesLocator)
+        public static string GetResourcesLocatorRelativePath(string targetName, string prefix = null)
         {
-            return GetReourcesLocatorRelativePath(resourcesLocator.FullName, resourcesLocator.Assembly.GetName().Name);
-        }
+            if (string.IsNullOrEmpty(targetName))
+            {
+                return string.Empty;
+            }
 
-        public static string GetReourcesLocatorRelativePath(string targetName, string prefix = null)
-        {
             var result = targetName
                 .Trim()
                 .Replace(Path.DirectorySeparatorChar, '.')

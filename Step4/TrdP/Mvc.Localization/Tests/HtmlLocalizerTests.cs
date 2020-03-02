@@ -48,14 +48,6 @@ namespace TrdP.Mvc.Localization.Tests
             AssertLocalizedHtmlContentResult(subject, "<b>FormattedHtml {0}</b>", "<b>FormattedValue {0}</b>", false);
         }
 
-        [Fact]
-        public void HtmlLocalizer_SetResourcesFileRelativePath_ShouldPass()
-        {
-            var localizer = CreateLocalizer();
-            localizer.SetResourcesFileRelativePath("Internal.OtherResources");
-            _mockedStringLocalizer.Received().SetResourcesFileRelativePath("Internal.OtherResources");
-        }
-
         private HtmlLocalizer CreateLocalizer()
         {
             return new HtmlLocalizer(_mockedStringLocalizer);

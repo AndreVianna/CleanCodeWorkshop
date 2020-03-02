@@ -1,7 +1,7 @@
 using System;
 using NSubstitute;
 using TrdP.Localization.Abstractions;
-using TrdP.UnitTestResources;
+using TrdP.UnitTestsResources;
 using Xunit;
 
 namespace TrdP.Mvc.Localization.Tests
@@ -30,12 +30,21 @@ namespace TrdP.Mvc.Localization.Tests
         }
 
         [Fact]
-        public void HtmlLocalizerFactory_Create_WithType_ShouldPass()
+        public void HtmlLocalizerFactory_Create_ForType_ShouldPass()
         {
             var factory = new HtmlLocalizerFactory(_mockedStringLocalizerFactory);
             var result = factory.Create<TestResources>();
             Assert.NotNull(result);
             _mockedStringLocalizerFactory.Received().Create<TestResources>();
+        }
+
+        [Fact]
+        public void HtmlLocalizerFactory_Create_ForPathType_ShouldPass()
+        {
+            var factory = new HtmlLocalizerFactory(_mockedStringLocalizerFactory);
+            var result = factory.Create("TestResources");
+            Assert.NotNull(result);
+            _mockedStringLocalizerFactory.Received().Create("TestResources");
         }
     }
 }

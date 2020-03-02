@@ -36,7 +36,7 @@ namespace TrdP.Mvc.Localization
 
         public LocalizedHtmlContent this[string name, params object[] arguments] => ToHtmlContent(_localizer[name], arguments);
 
-        public void SetResourcesFileRelativePath(string targetRelativePath) => _localizer.SetResourcesFileRelativePath(targetRelativePath);
+        //public void SetResourcesFileRelativePath(string targetRelativePath) => _localizer.SetResourcesFileRelativePath(targetRelativePath);
 
         private LocalizedHtmlContent ToHtmlContent(LocalizedString result, object[] arguments) =>
             new LocalizedHtmlContent(result.Name, result.Value, arguments, result.ResourceWasNotFound, result.SearchedLocation);
