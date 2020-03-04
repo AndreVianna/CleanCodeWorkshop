@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Globalization;
-using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +26,8 @@ namespace TrdP.Mvc.Localization
             services.TryAddTransient(typeof(IHtmlLocalizerFactory), typeof(HtmlLocalizerFactory));
             services.TryAddTransient(typeof(IHtmlLocalizer<>), typeof(HtmlLocalizer<>));
             services.TryAddTransient(typeof(IViewLocalizer), typeof(ViewLocalizer));
+            services.Configure<LocalizationProviderOptions>(options => setupAction?.Invoke(options));
+
             SetRequestLocalizationOptions(services, setupAction);
             SetDataAnnotationsLocalizationServices(services);
         }
@@ -36,13 +36,11 @@ namespace TrdP.Mvc.Localization
         {
             var options = new LocalizationProviderOptions();
             setupAction?.Invoke(options);
-            var availableCultures = options.AvailableCultures.ToList();
-            var defaultRequestCulture = (availableCultures.FirstOrDefault() ?? CultureInfo.CurrentUICulture);
             services.Configure<RequestLocalizationOptions>(o =>
             {
-                o.DefaultRequestCulture = new RequestCulture(defaultRequestCulture.Name);
-                o.SupportedCultures = availableCultures;
-                o.SupportedUICultures = availableCultures;
+                o.DefaultRequestCulture = new RequestCulture(options.DefaultUiCulture);
+                o.SupportedCultures = options.AvailableCultures;
+                o.SupportedUICultures = options.AvailableCultures;
             });
         }
     }

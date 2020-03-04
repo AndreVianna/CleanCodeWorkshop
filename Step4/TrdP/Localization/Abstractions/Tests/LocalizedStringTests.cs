@@ -11,12 +11,6 @@ namespace TrdP.Localization.Abstractions.Tests
             Assert.Throws<ArgumentNullException>(() => new LocalizedString(null, null));
         }
 
-        [Fact]
-        public void LocalizedString_Constructor_WithNullValue_ShouldThrow()
-        {
-            Assert.Throws<ArgumentNullException>(() => new LocalizedString("SomeName", null));
-        }
-
         [Theory]
         [InlineData("")]
         [InlineData("SomeValue")]

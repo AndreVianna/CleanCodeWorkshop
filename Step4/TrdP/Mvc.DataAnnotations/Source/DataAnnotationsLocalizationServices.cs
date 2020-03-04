@@ -11,8 +11,8 @@ namespace TrdP.Mvc.DataAnnotations.Localization
         public static void SetDataAnnotationsLocalizationServices(IServiceCollection services)
         {
             services.TryAddSingleton<IValidationAttributeAdapterProvider, ValidationAttributeAdapterProvider>();
-            services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
-            services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcViewOptions>, MvcViewOptionsSetup>());
+            services.TryAddTransient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>();
+            services.TryAddTransient<IConfigureOptions<MvcViewOptions>, MvcViewOptionsSetup>();
         }
     }
 }

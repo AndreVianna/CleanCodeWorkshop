@@ -17,9 +17,9 @@ namespace TrdP.Localization.Abstractions
             return localizedString?.Value;
         }
 
-        public static LocalizedString NullString => new LocalizedString(string.Empty, null, true, string.Empty);
+        public static LocalizedString NullLocalizedString => new LocalizedString(string.Empty, null, true, string.Empty);
 
-        public static LocalizedString EmptyString => new LocalizedString(string.Empty, string.Empty, true, string.Empty);
+        public static LocalizedString EmptyLocalizedString => new LocalizedString(string.Empty, string.Empty, true, string.Empty);
 
         public string Name { get; }
 

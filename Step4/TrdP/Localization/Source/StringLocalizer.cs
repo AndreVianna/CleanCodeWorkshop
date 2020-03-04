@@ -67,13 +67,13 @@ namespace TrdP.Localization
             if (name == null)
             {
                 AddLog("Null string.");
-                return LocalizedString.NullString;
+                return LocalizedString.NullLocalizedString;
             }
 
             if (name.Length == 0)
             {
                 AddLog("Empty string.");
-                return LocalizedString.EmptyString;
+                return LocalizedString.EmptyLocalizedString;
             }
 
             var culture = CultureInfo.CurrentUICulture;

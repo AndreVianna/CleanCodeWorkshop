@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -28,7 +27,7 @@ namespace TrdP.Localization
             ProviderAssembly = typeof(TProviderLocator).Assembly;
             var resourcesRoot = (localizationOptions.Value.ResourcesRoot ?? string.Empty).Trim();
             ResourcesRoot = GetResourcesLocatorRelativePath(resourcesRoot);
-            AvailableCultures = localizationOptions.Value.AvailableCultures ?? Enumerable.Empty<CultureInfo>();
+            AvailableCultures = localizationOptions.Value.AvailableCultures;
         }
 
         internal Assembly ProviderAssembly { get; }

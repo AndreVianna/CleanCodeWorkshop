@@ -19,10 +19,29 @@ namespace TrdP.Localization.Tests
         }
 
         [Fact]
-        public void StringLocalizer_This_WithNullName_ShouldThrow()
+        public void StringLocalizer_This_WithNullName_ShouldPass()
         {
             var localizer = CreateLocalizer();
-            Assert.Throws<ArgumentNullException>(() => localizer[null]);
+            var result = localizer[null];
+            Assert.Equal((string)null, result);
+            Assert.Equal(string.Empty, result.Name);
+            Assert.Null(result.Value);
+            Assert.Null(result.ToString());
+            Assert.True(result.ResourceWasNotFound);
+            Assert.Equal(string.Empty, result.SearchedLocation);
+        }
+
+        [Fact]
+        public void StringLocalizer_This_WithEmptyName_ShouldPass()
+        {
+            var localizer = CreateLocalizer();
+            var result = localizer[string.Empty];
+            Assert.Equal(string.Empty, result);
+            Assert.Equal(string.Empty, result.Name);
+            Assert.Equal(string.Empty, result.Value);
+            Assert.Equal(string.Empty, result.ToString());
+            Assert.True(result.ResourceWasNotFound);
+            Assert.Equal(string.Empty, result.SearchedLocation);
         }
 
         [Theory]

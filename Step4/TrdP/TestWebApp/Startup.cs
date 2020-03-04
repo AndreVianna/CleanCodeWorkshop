@@ -17,7 +17,7 @@ namespace TrdP.TestWebApp
                 .AddMvc()
                 .AddLocalizationProvider<Resources>(options =>
                 {
-                    options.AvailableCultures = Resources.AvailableCultures;
+                    options.AddCultures(Resources.AvailableCultures);
                 });
         }
 

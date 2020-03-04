@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -45,11 +44,8 @@ namespace TrdP.Localization.Tests
         [Fact]
         public void StringLocalizerFactory_Constructor_WithAvailableCultures_ShouldPass()
         {
-            _optionsValue.Value.AvailableCultures = new List<CultureInfo>
-            {
-                new CultureInfo("en-US"),
-                new CultureInfo("pt-BR"),
-            };
+            _optionsValue.Value.AddCulture(new CultureInfo("en-US"));
+            _optionsValue.Value.AddCulture(new CultureInfo("pt-BR"));
             var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
             Assert.Equal(typeof(TestResources).Assembly.GetName().Name, factory.ProviderAssembly.GetName().Name);
             Assert.Equal(2, factory.AvailableCultures.Count());
@@ -60,7 +56,6 @@ namespace TrdP.Localization.Tests
         [Fact]
         public void StringLocalizerFactory_Constructor_WithNullAvailableCultures_ShouldPass()
         {
-            _optionsValue.Value.AvailableCultures = null;
             var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
             Assert.Equal(typeof(TestResources).Assembly.GetName().Name, factory.ProviderAssembly.GetName().Name);
             Assert.Empty(factory.AvailableCultures);
@@ -79,6 +74,14 @@ namespace TrdP.Localization.Tests
         {
             var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
             var result = factory.Create("Some.Path");
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void StringLocalizerFactory_CreateForSharedResources_ShouldPass()
+        {
+            var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
+            var result = factory.CreateForSharedResources();
             Assert.NotNull(result);
         }
     }
