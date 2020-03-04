@@ -9,5 +9,7 @@ namespace TrdP.Localization.Abstractions
         IStringLocalizer Create(Type resourcesLocator);
 
         IStringLocalizer Create(string resourcesRelativePath);
+
+        IStringLocalizer CreateForSharedResources();
     }
 }

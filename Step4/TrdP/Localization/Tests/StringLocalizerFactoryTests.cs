@@ -11,7 +11,7 @@ namespace TrdP.Localization.Tests
 {
     public class StringLocalizerFactoryTests
     {
-        private static readonly IOptions<LocalizerProviderOptions> _optionsValue = new OptionsWrapper<LocalizerProviderOptions>(new LocalizerProviderOptions());
+        private static readonly IOptions<LocalizationProviderOptions> _optionsValue = new OptionsWrapper<LocalizationProviderOptions>(new LocalizationProviderOptions());
 
         [Fact]
         public void StringLocalizerFactory_Constructor_WithNullOptions_ShouldThrow()

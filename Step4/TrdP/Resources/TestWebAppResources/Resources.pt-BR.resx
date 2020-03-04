@@ -126,11 +126,8 @@
   <data name="Send" xml:space="preserve">
     <value>Enviar</value>
   </data>
-  <data name="The value '{0}' is invalid." xml:space="preserve">
-    <value>O valor '' é invalido.</value>
-  </data>
-  <data name="The value cannot not be null." xml:space="preserve">
-    <value>O campo é obrigatório.</value>
+  <data name="The value cannot be null." xml:space="preserve">
+    <value>O valor não pode ser nulo.</value>
   </data>
   <data name="The {0} field is not a valid e-mail address." xml:space="preserve">
     <value>O campo {0} não é um endereço de email válido.</value>

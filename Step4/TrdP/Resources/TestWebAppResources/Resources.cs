@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace TrdP.TestWebAppResources
 {
-    public abstract class ResourcesProvider
+    public class Resources
     {
         public static IList<CultureInfo> AvailableCultures => new List<CultureInfo>
         {

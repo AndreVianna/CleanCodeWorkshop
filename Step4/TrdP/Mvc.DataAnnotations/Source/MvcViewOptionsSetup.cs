@@ -6,18 +6,18 @@ using TrdP.Mvc.DataAnnotations.Localization.ValidationProviders;
 
 namespace TrdP.Mvc.DataAnnotations.Localization
 {
-    internal class DataAnnotationsMvcViewOptionsSetup : IConfigureOptions<MvcViewOptions>
+    internal class MvcViewOptionsSetup : IConfigureOptions<MvcViewOptions>
     {
         private readonly IStringLocalizerFactory _stringLocalizerFactory;
         private readonly IValidationAttributeAdapterProvider _validationAttributeAdapterProvider;
 
-        public DataAnnotationsMvcViewOptionsSetup(
+        public MvcViewOptionsSetup(
             IValidationAttributeAdapterProvider validationAttributeAdapterProvider)
         {
             _validationAttributeAdapterProvider = validationAttributeAdapterProvider ?? throw new ArgumentNullException(nameof(validationAttributeAdapterProvider));
         }
 
-        public DataAnnotationsMvcViewOptionsSetup(
+        public MvcViewOptionsSetup(
             IValidationAttributeAdapterProvider validationAttributeAdapterProvider,
             IStringLocalizerFactory stringLocalizerFactory)
             : this(validationAttributeAdapterProvider)

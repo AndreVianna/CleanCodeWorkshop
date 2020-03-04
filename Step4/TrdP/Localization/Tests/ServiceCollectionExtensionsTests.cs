@@ -32,8 +32,8 @@ namespace TrdP.Localization.Tests
         private static void AssertConfiguration(string expectedResourceRoot)
         {
             var provider = _fakeServiceCollection.BuildServiceProvider();
-            var configurationService = provider.GetRequiredService<IConfigureOptions<LocalizerProviderOptions>>();
-            var options = new LocalizerProviderOptions();
+            var configurationService = provider.GetRequiredService<IConfigureOptions<LocalizationProviderOptions>>();
+            var options = new LocalizationProviderOptions();
             configurationService.Configure(options);
             Assert.Equal(expectedResourceRoot, options.ResourcesRoot);
         }

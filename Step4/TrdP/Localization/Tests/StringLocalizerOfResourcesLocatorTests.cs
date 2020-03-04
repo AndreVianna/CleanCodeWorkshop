@@ -74,7 +74,7 @@ namespace TrdP.Localization.Tests
         private StringLocalizer<TResourcesLocator> CreateLocalizer<TResourcesLocator>(string resourcesRoot = null)
             where TResourcesLocator : class
         {
-            var options = new OptionsWrapper<LocalizerProviderOptions>(new LocalizerProviderOptions
+            var options = new OptionsWrapper<LocalizationProviderOptions>(new LocalizationProviderOptions
             {
                 ResourcesRoot = resourcesRoot
             });

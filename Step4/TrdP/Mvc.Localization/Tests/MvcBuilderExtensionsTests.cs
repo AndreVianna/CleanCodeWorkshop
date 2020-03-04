@@ -10,22 +10,23 @@ using Xunit;
 
 namespace TrdP.Mvc.Localization.Tests
 {
-    public class ServiceCollectionExtensionsTests
+    public class MvcBuilderExtensionsTests
     {
         private static readonly IServiceCollection _fakeServiceCollection = new FakeServiceCollection();
+        private static readonly IMvcBuilder _mockedMvcBuilder = new FakeMvcBuilder();
 
         [Fact]
-        public void ServiceCollectionExtensions_AddLocalization_ShouldPass()
+        public void MvcBuilderExtensions_AddLocalizationProvider_ShouldPass()
         {
-            _fakeServiceCollection.AddMvcLocalizationProvider<TestResources>();
+            _mockedMvcBuilder.AddLocalizationProvider<TestResources>();
 
             AssertConfiguration("", false);
         }
 
         [Fact]
-        public void ServiceCollectionExtensions_AddLocalization_WithConfiguration_ShouldPass()
+        public void MvcBuilderExtensions_AddLocalizationProvider_WithConfiguration_ShouldPass()
         {
-            _fakeServiceCollection.AddMvcLocalizationProvider<TestResources>(opt =>
+            _mockedMvcBuilder.AddLocalizationProvider<TestResources>(opt =>
             {
                 opt.ResourcesRoot = "Resources";
                 opt.AvailableCultures = new List<CultureInfo> { new CultureInfo("pt-BR") };
@@ -37,8 +38,8 @@ namespace TrdP.Mvc.Localization.Tests
         private static void AssertConfiguration(string expectedResourceRoot, bool hasCultures)
         {
             var provider = _fakeServiceCollection.BuildServiceProvider();
-            var localizerProviderOptionsConfigurator = provider.GetRequiredService<IConfigureOptions<LocalizerProviderOptions>>();
-            var localizerProviderOptions = new LocalizerProviderOptions();
+            var localizerProviderOptionsConfigurator = provider.GetRequiredService<IConfigureOptions<LocalizationProviderOptions>>();
+            var localizerProviderOptions = new LocalizationProviderOptions();
             localizerProviderOptionsConfigurator.Configure(localizerProviderOptions);
 
             var requestLocalizationConfigurator = provider.GetRequiredService<IConfigureOptions<RequestLocalizationOptions>>();

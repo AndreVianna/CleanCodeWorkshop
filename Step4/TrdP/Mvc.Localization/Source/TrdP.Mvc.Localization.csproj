@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Source\TrdP.Common.csproj" />
     <ProjectReference Include="..\..\Localization\Source\TrdP.Localization.csproj" />
+    <ProjectReference Include="..\..\Mvc.DataAnnotations\Source\TrdP.Mvc.DataAnnotations.Localization.csproj" />
     <ProjectReference Include="..\Abstractions\Source\TrdP.Mvc.Localization.Abstractions.csproj" />
   </ItemGroup>
 

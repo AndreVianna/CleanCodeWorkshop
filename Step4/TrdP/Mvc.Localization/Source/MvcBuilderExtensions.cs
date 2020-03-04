@@ -7,12 +7,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TrdP.Localization;
 using TrdP.Mvc.Localization.Abstractions;
+using static TrdP.Mvc.DataAnnotations.Localization.DataAnnotationsLocalizationServices;
 
 namespace TrdP.Mvc.Localization
 {
-    public static class ServiceCollectionExtensions
+    public static class MvcBuilderExtensions
     {
-        public static IServiceCollection AddMvcLocalizationProvider<TProviderLocator>(this IServiceCollection services, Action<LocalizerProviderOptions> setupAction = null)
+        public static IMvcBuilder AddLocalizationProvider<TProviderLocator>(this IMvcBuilder builder, Action<LocalizationProviderOptions> setupAction = null)
+            where TProviderLocator : class
+        {
+            ConfigureServices<TProviderLocator>(builder.Services, setupAction);
+            return builder;
+        }
+
+        private static void ConfigureServices<TProviderLocator>(IServiceCollection services, Action<LocalizationProviderOptions> setupAction = null)
             where TProviderLocator : class
         {
             services.AddLocalizationProvider<TProviderLocator>(setupAction);
@@ -21,13 +29,12 @@ namespace TrdP.Mvc.Localization
             services.TryAddTransient(typeof(IHtmlLocalizer<>), typeof(HtmlLocalizer<>));
             services.TryAddTransient(typeof(IViewLocalizer), typeof(ViewLocalizer));
             SetRequestLocalizationOptions(services, setupAction);
-
-            return services;
+            SetDataAnnotationsLocalizationServices(services);
         }
 
-        private static void SetRequestLocalizationOptions(IServiceCollection services, Action<LocalizerProviderOptions> setupAction)
+        private static void SetRequestLocalizationOptions(IServiceCollection services, Action<LocalizationProviderOptions> setupAction)
         {
-            var options = new LocalizerProviderOptions();
+            var options = new LocalizationProviderOptions();
             setupAction?.Invoke(options);
             var availableCultures = options.AvailableCultures.ToList();
             var defaultRequestCulture = (availableCultures.FirstOrDefault() ?? CultureInfo.CurrentUICulture);

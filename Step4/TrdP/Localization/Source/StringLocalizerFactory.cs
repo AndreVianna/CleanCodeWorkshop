@@ -16,7 +16,7 @@ namespace TrdP.Localization
         private readonly ILoggerFactory _loggerFactory;
         private readonly ConcurrentDictionary<string, IStringLocalizer> _localizerCache = new ConcurrentDictionary<string, IStringLocalizer>();
 
-        public StringLocalizerFactory(IOptions<LocalizerProviderOptions> localizationOptions, ILoggerFactory loggerFactory)
+        public StringLocalizerFactory(IOptions<LocalizationProviderOptions> localizationOptions, ILoggerFactory loggerFactory)
         {
             if (localizationOptions == null)
             {
@@ -51,6 +51,11 @@ namespace TrdP.Localization
         public IStringLocalizer Create(string resourcesRelativePath)
         {
             return GetOrCreateLocalizer(GetResourcesLocatorRelativePath(resourcesRelativePath));
+        }
+
+        public IStringLocalizer CreateForSharedResources()
+        {
+            return Create(typeof(TProviderLocator));
         }
 
         private IStringLocalizer GetOrCreateLocalizer(string targetRelativePath)
