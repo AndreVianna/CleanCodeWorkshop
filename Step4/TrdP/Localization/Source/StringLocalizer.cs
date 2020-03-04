@@ -66,7 +66,14 @@ namespace TrdP.Localization
         {
             if (name == null)
             {
-                throw new ArgumentNullException(nameof(name));
+                AddLog("Null string.");
+                return LocalizedString.NullString;
+            }
+
+            if (name.Length == 0)
+            {
+                AddLog("Empty string.");
+                return LocalizedString.EmptyString;
             }
 
             var culture = CultureInfo.CurrentUICulture;

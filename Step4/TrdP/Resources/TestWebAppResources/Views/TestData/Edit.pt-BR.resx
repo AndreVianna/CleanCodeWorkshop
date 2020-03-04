@@ -117,7 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Language:" xml:space="preserve">
-    <value>Idioma:</value>
+  <data name="Back to home" xml:space="preserve">
+    <value>Voltar à página inicial</value>
+  </data>
+  <data name="Please inform your full name with no abbreviations." xml:space="preserve">
+    <value>Por favor informe  seu nome completo sem abreviações.</value>
   </data>
 </root>

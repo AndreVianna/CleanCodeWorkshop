@@ -7,7 +7,7 @@ namespace TrdP.Localization.Abstractions
         public LocalizedString(string name, string value, bool resourceWasNotFound = false, string searchedLocation = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            Value = value ?? throw new ArgumentNullException(nameof(value));
+            Value = value;
             ResourceWasNotFound = resourceWasNotFound;
             SearchedLocation = searchedLocation;
         }
@@ -16,6 +16,10 @@ namespace TrdP.Localization.Abstractions
         {
             return localizedString?.Value;
         }
+
+        public static LocalizedString NullString => new LocalizedString(string.Empty, null, true, string.Empty);
+
+        public static LocalizedString EmptyString => new LocalizedString(string.Empty, string.Empty, true, string.Empty);
 
         public string Name { get; }
 

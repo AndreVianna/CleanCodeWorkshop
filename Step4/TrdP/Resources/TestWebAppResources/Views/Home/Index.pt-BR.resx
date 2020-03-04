@@ -123,6 +123,9 @@
   <data name="Home Page" xml:space="preserve">
     <value>Página Inicial</value>
   </data>
+  <data name="Show Form" xml:space="preserve">
+    <value>Mostrar Formulário</value>
+  </data>
   <data name="Welcome" xml:space="preserve">
     <value>Bem-Vindo</value>
   </data>

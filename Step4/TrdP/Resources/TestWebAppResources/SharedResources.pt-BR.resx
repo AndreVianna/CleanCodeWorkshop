@@ -117,13 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Home" xml:space="preserve">
-    <value>Início</value>
+  <data name="Edit" xml:space="preserve">
+    <value>Editar</value>
   </data>
-  <data name="Home Page" xml:space="preserve">
-    <value>Página Inicial</value>
+  <data name="Save" xml:space="preserve">
+    <value>Salvar</value>
   </data>
-  <data name="Welcome" xml:space="preserve">
-    <value>Bem-Vindo</value>
+  <data name="Send" xml:space="preserve">
+    <value>Enviar</value>
+  </data>
+  <data name="The value '{0}' is invalid." xml:space="preserve">
+    <value>O valor '' é invalido.</value>
+  </data>
+  <data name="The value cannot not be null." xml:space="preserve">
+    <value>O campo é obrigatório.</value>
+  </data>
+  <data name="The {0} field is not a valid e-mail address." xml:space="preserve">
+    <value>O campo {0} não é um endereço de email válido.</value>
   </data>
 </root>

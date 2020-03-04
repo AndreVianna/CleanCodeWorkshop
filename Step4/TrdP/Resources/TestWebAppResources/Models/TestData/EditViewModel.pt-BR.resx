@@ -117,7 +117,31 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Language:" xml:space="preserve">
-    <value>Idioma:</value>
+  <data name="Age" xml:space="preserve">
+    <value>Idade</value>
+  </data>
+  <data name="Credit Card" xml:space="preserve">
+    <value>Cartão de Crédito</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>e-mail</value>
+  </data>
+  <data name="Email Confirmation" xml:space="preserve">
+    <value>Confirmação do e-mail</value>
+  </data>
+  <data name="Full Name" xml:space="preserve">
+    <value>Nome Completo</value>
+  </data>
+  <data name="Gender" xml:space="preserve">
+    <value>Sexo</value>
+  </data>
+  <data name="LinkedIn Profile" xml:space="preserve">
+    <value>Perfil do LinkedIn</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Telefone</value>
+  </data>
+  <data name="The {0} field is required." xml:space="preserve">
+    <value>O campo {0} é obrigatório.</value>
   </data>
 </root>
