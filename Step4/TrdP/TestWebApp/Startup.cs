@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using TrdP.Localization;
 using TrdP.Mvc.Localization;
 using TrdP.TestWebAppResources;
 
@@ -14,11 +15,11 @@ namespace TrdP.TestWebApp
             services.AddControllersWithViews();
 
             services
+                .AddLocalizationProvider<Resources>();
+
+            services
                 .AddMvc()
-                .AddLocalizationProvider<Resources>(options =>
-                {
-                    options.AddCultures(Resources.AvailableCultures);
-                });
+                .AddLocalization(options => options.AddCultures(Resources.AvailableCultures));
         }
 
         // ReSharper disable once UnusedMember.Global - Called at runtime.

@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Localization\Source\TrdP.Localization.csproj" />
     <ProjectReference Include="..\Mvc.DataAnnotations\Source\TrdP.Mvc.DataAnnotations.Localization.csproj" />
     <ProjectReference Include="..\Mvc.Localization\Source\TrdP.Mvc.Localization.csproj" />
     <ProjectReference Include="..\Resources\TestWebAppResources\TrdP.TestWebAppResources.csproj" />

@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TrdP.Common.TestDoubles;
-using TrdP.Localization;
-using TrdP.UnitTestsResources;
 using Xunit;
 
 namespace TrdP.Mvc.Localization.Tests
@@ -16,7 +14,7 @@ namespace TrdP.Mvc.Localization.Tests
         [Fact]
         public void MvcBuilderExtensions_AddLocalizationProvider_ShouldPass()
         {
-            _mockedMvcBuilder.AddLocalizationProvider<TestResources>();
+            _mockedMvcBuilder.AddLocalization();
 
             AssertConfiguration("", false);
         }
@@ -24,9 +22,8 @@ namespace TrdP.Mvc.Localization.Tests
         [Fact]
         public void MvcBuilderExtensions_AddLocalizationProvider_WithConfiguration_ShouldPass()
         {
-            _mockedMvcBuilder.AddLocalizationProvider<TestResources>(opt =>
+            _mockedMvcBuilder.AddLocalization(opt =>
             {
-                opt.ResourcesRoot = "Resources";
                 opt.AddCulture(new CultureInfo("pt-BR"));
             });
 
@@ -36,9 +33,8 @@ namespace TrdP.Mvc.Localization.Tests
         [Fact]
         public void MvcBuilderExtensions_AddLocalizationProvider_WithMultipleCultures_ShouldPass()
         {
-            _mockedMvcBuilder.AddLocalizationProvider<TestResources>(opt =>
+            _mockedMvcBuilder.AddLocalization(opt =>
             {
-                opt.ResourcesRoot = "Resources";
                 opt.AddCultures(new [] { new CultureInfo("pt-BR"), new CultureInfo("en-US") });
             });
 
@@ -48,14 +44,13 @@ namespace TrdP.Mvc.Localization.Tests
         private static void AssertConfiguration(string expectedResourceRoot, bool hasCultures)
         {
             var provider = _mockedMvcBuilder.Services.BuildServiceProvider();
-            var localizerProviderOptionsConfigurator = provider.GetRequiredService<IConfigureOptions<LocalizationProviderOptions>>();
-            var localizerProviderOptions = new LocalizationProviderOptions();
+            var localizerProviderOptionsConfigurator = provider.GetRequiredService<IConfigureOptions<MvcLocalizationOptions>>();
+            var localizerProviderOptions = new MvcLocalizationOptions();
             localizerProviderOptionsConfigurator.Configure(localizerProviderOptions);
 
             var requestLocalizationConfigurator = provider.GetRequiredService<IConfigureOptions<RequestLocalizationOptions>>();
             var requestLocalizationOptions = new RequestLocalizationOptions();
             requestLocalizationConfigurator.Configure(requestLocalizationOptions);
-            Assert.Equal(expectedResourceRoot, localizerProviderOptions.ResourcesRoot);
             if (hasCultures)
             {
                 Assert.NotEmpty(localizerProviderOptions.AvailableCultures);

@@ -1,6 +1,4 @@
 using System;
-using System.Globalization;
-using System.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using TrdP.UnitTestsResources;
@@ -39,26 +37,6 @@ namespace TrdP.Localization.Tests
             var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
             Assert.Equal(typeof(TestResources).Assembly.GetName().Name, factory.ProviderAssembly.GetName().Name);
             Assert.Equal(expectedResourcesRoot, factory.ResourcesRoot);
-        }
-
-        [Fact]
-        public void StringLocalizerFactory_Constructor_WithAvailableCultures_ShouldPass()
-        {
-            _optionsValue.Value.AddCulture(new CultureInfo("en-US"));
-            _optionsValue.Value.AddCulture(new CultureInfo("pt-BR"));
-            var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
-            Assert.Equal(typeof(TestResources).Assembly.GetName().Name, factory.ProviderAssembly.GetName().Name);
-            Assert.Equal(2, factory.AvailableCultures.Count());
-            Assert.Equal("en-US", factory.AvailableCultures.ElementAt(0).Name);
-            Assert.Equal("pt-BR", factory.AvailableCultures.ElementAt(1).Name);
-        }
-
-        [Fact]
-        public void StringLocalizerFactory_Constructor_WithNullAvailableCultures_ShouldPass()
-        {
-            var factory = new StringLocalizerFactory<TestResources>(_optionsValue, NullLoggerFactory.Instance);
-            Assert.Equal(typeof(TestResources).Assembly.GetName().Name, factory.ProviderAssembly.GetName().Name);
-            Assert.Empty(factory.AvailableCultures);
         }
 
         [Fact]
