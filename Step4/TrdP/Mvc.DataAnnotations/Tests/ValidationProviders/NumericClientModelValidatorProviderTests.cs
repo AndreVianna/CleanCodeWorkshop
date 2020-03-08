@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using TrdP.Mvc.DataAnnotations.Localization.ClientModelValidators;
-using TrdP.Mvc.DataAnnotations.Localization.ModelValidators;
 using TrdP.Mvc.DataAnnotations.Localization.Tests.TestDoubles;
 using Xunit;
 using NumericClientModelValidatorProvider = TrdP.Mvc.DataAnnotations.Localization.ValidationProviders.NumericClientModelValidatorProvider;

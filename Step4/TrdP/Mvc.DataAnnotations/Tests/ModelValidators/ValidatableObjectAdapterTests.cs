@@ -76,7 +76,7 @@ namespace TrdP.Mvc.DataAnnotations.Localization.Tests.ModelValidators
         {
             var errors = new List<ValidationResult>
             {
-                (ValidationResult)null,
+                null,
                 ValidationResult.Success,
                 new ValidationResult("ErrorMessage1"),
                 new ValidationResult("ErrorMessage2", new [] {"Member1", "Member2", null}),

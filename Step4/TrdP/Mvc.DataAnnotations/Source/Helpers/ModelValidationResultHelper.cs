@@ -38,6 +38,7 @@ namespace TrdP.Mvc.DataAnnotations.Localization.Helpers
             return GenerateModelValidationResults(validationResult, validationResult?.ErrorMessage, null);
         }
 
+#pragma warning disable IDE0046 // Convert to conditional expression
         public static IEnumerable<ModelValidationResult> GenerateModelValidationResults(ValidationResult validationResult, string errorMessage, string memberName)
         {
             if (validationResult == null || validationResult == ValidationResult.Success)
@@ -54,14 +55,23 @@ namespace TrdP.Mvc.DataAnnotations.Localization.Helpers
                     in validationResult.MemberNames
                 select new ModelValidationResult(GetFinalValidationResultMemberName(candidate, memberName), errorMessage);
         }
+#pragma warning restore IDE0046 // Convert to conditional expression
 
+#pragma warning disable IDE0046 // Convert to conditional expression
         private static string GetFinalValidationResultMemberName(string candidate, string memberName)
         {
-            return candidate == null
-                ? memberName
-                : !candidate.Equals(memberName, StringComparison.Ordinal)
-                    ? candidate
-                    : null;
+            if (candidate == null)
+            {
+                return memberName;
+            }
+
+            if (!candidate.Equals(memberName, StringComparison.Ordinal))
+            {
+                return candidate;
+            }
+
+            return null;
         }
+#pragma warning restore IDE0046 // Convert to conditional expression
     }
 }

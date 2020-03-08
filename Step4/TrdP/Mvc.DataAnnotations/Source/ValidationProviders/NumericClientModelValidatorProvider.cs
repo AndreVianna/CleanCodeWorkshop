@@ -2,7 +2,6 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using TrdP.Mvc.DataAnnotations.Localization.ClientModelValidators;
-using TrdP.Mvc.DataAnnotations.Localization.ModelValidators;
 
 namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
 {

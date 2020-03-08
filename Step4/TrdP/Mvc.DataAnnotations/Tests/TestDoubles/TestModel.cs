@@ -7,7 +7,7 @@ namespace TrdP.Mvc.DataAnnotations.Localization.Tests.TestDoubles
     {
         public string TestProperty { get; set; }
 
-        public string OtherProperty => "OtherValue";
+        public static string OtherProperty => "OtherValue";
     }
 
     internal class TestValidatableObject : IValidatableObject
