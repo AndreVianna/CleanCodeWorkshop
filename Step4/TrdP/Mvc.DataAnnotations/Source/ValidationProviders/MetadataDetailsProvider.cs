@@ -5,21 +5,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using TrdP.Localization.Abstractions;
-using TrdP.Mvc.DataAnnotations.Localization.Attributes;
 
 namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
 {
-    internal class DataAnnotationsMetadataProvider :
-        IBindingMetadataProvider,
-        IDisplayMetadataProvider,
-        IValidationMetadataProvider
+    internal class MetadataDetailsProvider :
+        ICompositeMetadataDetailsProvider
     {
         private readonly IStringLocalizerFactory _stringLocalizerFactory;
 
-        public DataAnnotationsMetadataProvider(IStringLocalizerFactory stringLocalizerFactory)
+        public MetadataDetailsProvider(IStringLocalizerFactory stringLocalizerFactory)
         {
             _stringLocalizerFactory = stringLocalizerFactory ?? throw new ArgumentNullException(nameof(stringLocalizerFactory));
         }
@@ -47,36 +45,25 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var attributes = new List<object>();
-            for (var i = 0; i < context.Attributes.Count; i++)
-            {
-                var attribute = context.Attributes[i];
-                if (attribute is ValidationProviderAttribute validationProviderAttribute)
-                {
-                    attributes.AddRange(validationProviderAttribute.GetValidationAttributes());
-                    continue;
-                }
-                attributes.Add(attribute);
-            }
-
-            var requiredAttribute = attributes.OfType<RequiredAttribute>().FirstOrDefault();
-            if (requiredAttribute != null)
+            if (context.Attributes.OfType<RequiredAttribute>().Any())
             {
                 context.ValidationMetadata.IsRequired = true;
             }
 
-            foreach (var attribute in attributes.OfType<ValidationAttribute>())
+            foreach (var attribute in context.Attributes)
             {
-                // If another provider has already added this attribute, do not repeat it.
-                // This will prevent attributes like RemoteAttribute (which implement ValidationAttribute and
-                // IClientModelValidator) to be added to the ValidationMetadata twice.
-                // This is to ensure we do not end up with duplication validation rules on the client side.
-                if (context.ValidationMetadata.ValidatorMetadata.Contains(attribute))
+                switch (attribute)
                 {
-                    continue;
+                    case ValidationProviderAttribute validationProviderAttribute:
+                        foreach (var validationAttribute in validationProviderAttribute.GetValidationAttributes())
+                        {
+                            AddValidationAttribute(context, validationAttribute);
+                        }
+                        break;
+                    case ValidationAttribute validationAttribute:
+                        AddValidationAttribute(context, validationAttribute);
+                        break;
                 }
-
-                context.ValidationMetadata.ValidatorMetadata.Add(attribute);
             }
         }
 
@@ -133,6 +120,14 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
             SetDisplayMetadataEnumProperties(context.DisplayMetadata, context);
         }
 
+        private static void AddValidationAttribute(ValidationMetadataProviderContext context, ValidationAttribute validationAttribute)
+        {
+            if (!context.ValidationMetadata.ValidatorMetadata.Contains(validationAttribute))
+            {
+                context.ValidationMetadata.ValidatorMetadata.Add(validationAttribute);
+            }
+        }
+
         private static void SetDisplayMetadataConvertEmptyStringToNull(DisplayMetadata displayMetadata, DisplayFormatAttribute displayFormatAttribute)
         {
             if (displayFormatAttribute == null)
@@ -169,13 +164,7 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
                 return;
             }
 
-            if (displayAttribute.ResourceType != null)
-            {
-                displayMetadata.Description = displayAttribute.GetDescription;
-                return;
-            }
-
-            displayMetadata.Description = () => stringLocalizer?[displayAttribute.Description] ?? displayAttribute.GetDescription();
+            displayMetadata.Description = () => stringLocalizer[displayAttribute.Description];
         }
 
         private static void SetDisplayMetadataDisplayFormatString(DisplayMetadata displayMetadata, DisplayFormatAttribute displayFormatAttribute)
@@ -188,33 +177,21 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
             displayMetadata.DisplayFormatString = displayFormatAttribute.DataFormatString;
         }
 
-        private static void SetDisplayMetadataDisplayName(DisplayMetadata displayMetadata, DisplayAttribute displayAttribute, DisplayNameAttribute displayNameAttribute, string fieldName, IStringLocalizer localizer)
+        private static void SetDisplayMetadataDisplayName(DisplayMetadata displayMetadata, DisplayAttribute displayAttribute, DisplayNameAttribute displayNameAttribute, string fieldName, IStringLocalizer stringLocalizer)
         {
-            if (displayAttribute == null && displayNameAttribute == null)
+            if (displayAttribute?.Name != null)
             {
-                displayMetadata.DisplayName = () => localizer?[fieldName] ?? fieldName;
-                return;
-            }
-
-            if (displayAttribute?.ResourceType != null)
-            {
-                displayMetadata.DisplayName = displayAttribute.GetName;
-                return;
-            }
-
-            if (displayAttribute?.GetName() != null)
-            {
-                displayMetadata.DisplayName = () => localizer?[displayAttribute.Name] ?? displayAttribute.GetName();
+                displayMetadata.DisplayName = () => stringLocalizer[displayAttribute.Name];
                 return;
             }
 
             if (displayNameAttribute?.DisplayName != null)
             {
-                displayMetadata.DisplayName = () => localizer?[displayNameAttribute.DisplayName] ?? displayNameAttribute.DisplayName;
+                displayMetadata.DisplayName = () => stringLocalizer[displayNameAttribute.DisplayName];
                 return;
             }
 
-            displayMetadata.DisplayName = () => localizer?[fieldName] ?? fieldName;
+            displayMetadata.DisplayName = () => stringLocalizer[fieldName];
         }
 
         private static void SetDisplayMetadataEditFormatString(DisplayMetadata displayMetadata, DisplayFormatAttribute displayFormatAttribute)
@@ -281,8 +258,8 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
                 displayMetadata.HasNonDefaultEditFormat = true;
                 return;
             }
-            
-            if (!dataTypeAttribute.DisplayFormat.Equals(displayFormatAttribute))
+
+            if (!Equals(dataTypeAttribute.DisplayFormat, displayFormatAttribute))
             {
                 // Attributes include separate [DataType] and [DisplayFormat]; [DisplayFormat] provided override.
                 displayMetadata.HasNonDefaultEditFormat = true;
@@ -346,13 +323,7 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
                 return;
             }
 
-            if (displayAttribute.ResourceType != null)
-            {
-                displayMetadata.Placeholder = displayAttribute.GetPrompt;
-                return;
-            }
-
-            displayMetadata.Placeholder = () => stringLocalizer?[displayAttribute.Prompt] ?? displayAttribute.GetPrompt();
+            displayMetadata.Placeholder = () => stringLocalizer[displayAttribute.Prompt];
         }
 
         private static void SetDisplayMetadataScaffolding(DisplayMetadata displayMetadata, ScaffoldColumnAttribute scaffoldColumnAttribute)
@@ -392,32 +363,18 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
             displayMetadata.TemplateHint = "HiddenInput";
         }
 
+#pragma warning disable IDE0046 // Convert to conditional expression
         private static string GetEnumDisplayName(FieldInfo field, IStringLocalizer stringLocalizer)
         {
             var displayAttribute = field.GetCustomAttribute<DisplayAttribute>(inherit: false);
-            var displayNameAttribute = field.GetCustomAttribute<DisplayNameAttribute>(inherit: false);
-            if (displayAttribute == null && displayNameAttribute == null)
+            if (displayAttribute?.Name == null)
             {
-                return stringLocalizer?[field.Name] ?? field.Name;
+                return stringLocalizer[field.Name];
             }
 
-            if (displayAttribute?.ResourceType != null)
-            {
-                return displayAttribute.GetName();
-            }
-
-            if (displayAttribute?.GetName() != null)
-            {
-                return stringLocalizer?[displayAttribute.Name] ?? displayAttribute.GetName();
-            }
-
-            if (displayNameAttribute?.DisplayName != null)
-            {
-                return stringLocalizer?[displayNameAttribute.DisplayName] ?? displayNameAttribute.DisplayName;
-            }
-
-            return stringLocalizer?[field.Name] ?? field.Name;
+            return stringLocalizer[displayAttribute.Name];
         }
+#pragma warning restore IDE0046 // Convert to conditional expression
 
         private static string GetDisplayGroup(FieldInfo field)
         {

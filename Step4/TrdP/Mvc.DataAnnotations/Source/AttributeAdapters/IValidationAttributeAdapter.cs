@@ -4,6 +4,6 @@ namespace TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters
 {
     public interface IValidationAttributeAdapter : IClientModelValidator
     {
-        string GetErrorMessage(ModelValidationContextBase validationContext);
+        string GetErrorMessage(ModelValidationContextBase context);
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using static TrdP.Mvc.DataAnnotations.Localization.Helpers.ModelValidationResultHelper;
 
 namespace TrdP.Mvc.DataAnnotations.Localization.ModelValidators
 {
@@ -10,49 +10,32 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ModelValidators
     {
         public IEnumerable<ModelValidationResult> Validate(ModelValidationContext context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             var model = context.Model;
             if (model == null)
             {
-                return Enumerable.Empty<ModelValidationResult>();
+                return NoResults();
             }
 
-            if (!(model is IValidatableObject validatable))
+            if (!(model is IValidatableObject subject))
             {
                 var message = $"The model object inside the metadata claimed to be compatible with '{typeof(IValidatableObject).Name}', but was actually '{model.GetType()}'.";
                 throw new InvalidOperationException(message);
             }
+            var serviceProvider = context.ActionContext.HttpContext?.RequestServices;
 
-            // The constructed ValidationContext is intentionally slightly different from what
-            // DataAnnotationsModelValidator creates. The instance parameter would be context.Container
-            // (if non-null) in that class. But, DataAnnotationsModelValidator _also_ passes context.Model
-            // separately to any ValidationAttribute.
-            var validationContext = new ValidationContext(
-                instance: validatable,
-                serviceProvider: context.ActionContext?.HttpContext?.RequestServices,
-                items: null)
+            var validationContext = new ValidationContext(subject, serviceProvider, null)
             {
                 DisplayName = context.ModelMetadata.GetDisplayName(),
                 MemberName = context.ModelMetadata.Name,
             };
+            var validationResult = subject.Validate(validationContext);
 
-            return ConvertResults(validatable.Validate(validationContext));
-        }
-
-        private IEnumerable<ModelValidationResult> ConvertResults(IEnumerable<ValidationResult> results)
-        {
-            foreach (var result in results.Where(i => i != ValidationResult.Success))
-            {
-                if (result.MemberNames == null || !result.MemberNames.Any())
-                {
-                    yield return new ModelValidationResult(memberName: null, message: result.ErrorMessage);
-                    continue;
-                }
-
-                foreach (var memberName in result.MemberNames)
-                {
-                    yield return new ModelValidationResult(memberName, result.ErrorMessage);
-                }
-            }
+            return GenerateModelValidationResults(validationResult);
         }
     }
 }

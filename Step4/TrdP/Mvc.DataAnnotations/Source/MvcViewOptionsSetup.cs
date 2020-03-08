@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using TrdP.Localization.Abstractions;
 using TrdP.Mvc.DataAnnotations.Localization.ValidationProviders;
@@ -9,32 +8,27 @@ namespace TrdP.Mvc.DataAnnotations.Localization
     internal class MvcViewOptionsSetup : IConfigureOptions<MvcViewOptions>
     {
         private readonly IStringLocalizerFactory _stringLocalizerFactory;
-        private readonly IValidationAttributeAdapterProvider _validationAttributeAdapterProvider;
+        private readonly IValidationAttributeAdapterFactory _validationAttributeAdapterFactory;
 
         public MvcViewOptionsSetup(
-            IValidationAttributeAdapterProvider validationAttributeAdapterProvider)
+            IValidationAttributeAdapterFactory validationAttributeAdapterFactory)
         {
-            _validationAttributeAdapterProvider = validationAttributeAdapterProvider ?? throw new ArgumentNullException(nameof(validationAttributeAdapterProvider));
+            _validationAttributeAdapterFactory = validationAttributeAdapterFactory;
         }
 
         public MvcViewOptionsSetup(
-            IValidationAttributeAdapterProvider validationAttributeAdapterProvider,
+            IValidationAttributeAdapterFactory validationAttributeAdapterFactory,
             IStringLocalizerFactory stringLocalizerFactory)
-            : this(validationAttributeAdapterProvider)
+            : this(validationAttributeAdapterFactory)
         {
             _stringLocalizerFactory = stringLocalizerFactory;
         }
 
         public void Configure(MvcViewOptions options)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
             options.ClientModelValidatorProviders.Clear();
             options.ClientModelValidatorProviders.Add(new DefaultClientModelValidatorProvider());
-            options.ClientModelValidatorProviders.Add(new DataAnnotationsClientModelValidatorProvider(_validationAttributeAdapterProvider, _stringLocalizerFactory));
+            options.ClientModelValidatorProviders.Add(new ClientModelValidatorProvider(_validationAttributeAdapterFactory, _stringLocalizerFactory));
             options.ClientModelValidatorProviders.Add(new NumericClientModelValidatorProvider());
         }
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace TrdP.Mvc.DataAnnotations.Localization.ModelValidators
+namespace TrdP.Mvc.DataAnnotations.Localization.ClientModelValidators
 {
     internal class NumericClientModelValidator : IClientModelValidator
     {
@@ -28,11 +28,6 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ModelValidators
 
         private string GetErrorMessage(ModelMetadata modelMetadata)
         {
-            if (modelMetadata == null)
-            {
-                throw new ArgumentNullException(nameof(modelMetadata));
-            }
-
             var messageProvider = modelMetadata.ModelBindingMessageProvider;
             var name = modelMetadata.DisplayName ?? modelMetadata.Name;
             return name == null

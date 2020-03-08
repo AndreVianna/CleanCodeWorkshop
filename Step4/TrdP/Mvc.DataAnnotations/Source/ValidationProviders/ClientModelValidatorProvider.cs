@@ -7,16 +7,16 @@ using TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters;
 
 namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
 {
-    internal class DataAnnotationsClientModelValidatorProvider : IClientModelValidatorProvider
+    internal class ClientModelValidatorProvider : IClientModelValidatorProvider
     {
         private readonly IStringLocalizerFactory _stringLocalizerFactory;
-        private readonly IValidationAttributeAdapterProvider _validationAttributeAdapterProvider;
+        private readonly IValidationAttributeAdapterFactory _validationAttributeAdapterFactory;
 
-        public DataAnnotationsClientModelValidatorProvider(
-            IValidationAttributeAdapterProvider validationAttributeAdapterProvider,
+        public ClientModelValidatorProvider(
+            IValidationAttributeAdapterFactory validationAttributeAdapterFactory,
             IStringLocalizerFactory stringLocalizerFactory)
         {
-            _validationAttributeAdapterProvider = validationAttributeAdapterProvider ?? throw new ArgumentNullException(nameof(validationAttributeAdapterProvider));
+            _validationAttributeAdapterFactory = validationAttributeAdapterFactory ?? throw new ArgumentNullException(nameof(validationAttributeAdapterFactory));
             _stringLocalizerFactory = stringLocalizerFactory ?? throw new ArgumentNullException(nameof(stringLocalizerFactory));
         }
 
@@ -34,24 +34,19 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
             var validatorItems = context.Results.Where(i => i.Validator == null).ToArray();
             foreach (var validatorItem in validatorItems)
             {
-                hasRequiredAttribute |= CreateValidator(context, validatorItem, stringLocalizer);
+                if (!(validatorItem.ValidatorMetadata is ValidationAttribute validationAttribute))
+                {
+                    continue;
+                }
+
+                SetValidator(validatorItem, validationAttribute, stringLocalizer);
+
+                MoveRequiredAttributeToTop(context, validationAttribute, validatorItem);
+
+                hasRequiredAttribute |= validationAttribute is RequiredAttribute;
             }
 
             EnsureHasRequiredAttribute(context, hasRequiredAttribute, stringLocalizer);
-        }
-
-        private bool CreateValidator(ClientValidatorProviderContext context, ClientValidatorItem validatorItem, IStringLocalizer stringLocalizer)
-        {
-            if (!(validatorItem.ValidatorMetadata is ValidationAttribute validationAttribute))
-            {
-                return false;
-            }
-
-            SetValidator(validatorItem, validationAttribute, stringLocalizer);
-
-            MoveRequiredAttributeToTop(context, validationAttribute, validatorItem);
-
-            return validationAttribute is RequiredAttribute;
         }
 
         private static void MoveRequiredAttributeToTop(ClientValidatorProviderContext context, ValidationAttribute validationAttribute, ClientValidatorItem validatorItem)
@@ -67,7 +62,7 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
 
         private void SetValidator(ClientValidatorItem validatorItem, ValidationAttribute validationAttribute, IStringLocalizer stringLocalizer)
         {
-            validatorItem.Validator = _validationAttributeAdapterProvider.GetAttributeAdapter(validationAttribute, stringLocalizer);
+            validatorItem.Validator = _validationAttributeAdapterFactory.Create(validationAttribute, stringLocalizer);
             validatorItem.IsReusable = true;
         }
 

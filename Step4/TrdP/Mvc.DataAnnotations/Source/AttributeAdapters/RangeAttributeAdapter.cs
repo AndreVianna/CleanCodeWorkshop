@@ -25,28 +25,16 @@ namespace TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters
             _minValue = Convert.ToString(Attribute.Minimum, CultureInfo.InvariantCulture);
         }
 
-        public override void AddValidation(ClientModelValidationContext context)
+        protected override void AddAdapterValidation(ClientModelValidationContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            MergeAttribute(context.Attributes, "data-val", "true");
             MergeAttribute(context.Attributes, "data-val-range", GetErrorMessage(context));
             MergeAttribute(context.Attributes, "data-val-range-max", _maxValue);
             MergeAttribute(context.Attributes, "data-val-range-min", _minValue);
         }
 
-        /// <inheritdoc />
-        public override string GetErrorMessage(ModelValidationContextBase validationContext)
+        protected override string GetAdapterErrorMessage(ModelValidationContextBase context)
         {
-            if (validationContext == null)
-            {
-                throw new ArgumentNullException(nameof(validationContext));
-            }
-
-            var displayName = validationContext.ModelMetadata.GetDisplayName();
+            var displayName = context.ModelMetadata.GetDisplayName();
             return GetLocalizedErrorMessage(displayName, Attribute.Minimum, Attribute.Maximum);
         }
     }

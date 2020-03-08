@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using TrdP.Localization.Abstractions;
@@ -16,48 +15,23 @@ namespace TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters
             _otherProperty = "*." + attribute.OtherProperty;
         }
 
-        public override void AddValidation(ClientModelValidationContext context)
+        protected override void AddAdapterValidation(ClientModelValidationContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            MergeAttribute(context.Attributes, "data-val", "true");
             MergeAttribute(context.Attributes, "data-val-equalto", GetErrorMessage(context));
             MergeAttribute(context.Attributes, "data-val-equalto-other", _otherProperty);
         }
 
-        public override string GetErrorMessage(ModelValidationContextBase validationContext)
+        protected override string GetAdapterErrorMessage(ModelValidationContextBase context)
         {
-            if (validationContext == null)
-            {
-                throw new ArgumentNullException(nameof(validationContext));
-            }
-
-            var displayName = validationContext.ModelMetadata.GetDisplayName();
-            var otherPropertyDisplayName = GetOtherPropertyDisplayName(validationContext, Attribute);
-
+            var displayName = context.ModelMetadata.GetDisplayName();
+            var otherPropertyDisplayName = GetOtherPropertyDisplayName(context, Attribute);
             return GetLocalizedErrorMessage(displayName, otherPropertyDisplayName);
         }
 
-        private string GetOtherPropertyDisplayName(ModelValidationContextBase validationContext, CompareAttribute attribute)
+        private string GetOtherPropertyDisplayName(ModelValidationContextBase context, CompareAttribute attribute)
         {
-            // The System.ComponentModel.DataAnnotations.CompareAttribute doesn't populate the
-            // OtherPropertyDisplayName until after IsValid() is called. Therefore, at the time we get
-            // the error message for client validation, the display name is not populated and won't be used.
-            var otherPropertyDisplayName = attribute.OtherPropertyDisplayName;
-            if (otherPropertyDisplayName != null || validationContext.ModelMetadata.ContainerType == null)
-            {
-                return attribute.OtherProperty;
-            }
-
-            var otherProperty = validationContext.MetadataProvider.GetMetadataForProperty(
-                validationContext.ModelMetadata.ContainerType,
-                attribute.OtherProperty);
-            return otherProperty != null
-                ? otherProperty.GetDisplayName()
-                : attribute.OtherProperty;
+            var otherPropertyMetadata = context.MetadataProvider.GetMetadataForProperty(context.ModelMetadata.ContainerType, attribute.OtherProperty);
+            return otherPropertyMetadata.GetDisplayName();
         }
     }
 }

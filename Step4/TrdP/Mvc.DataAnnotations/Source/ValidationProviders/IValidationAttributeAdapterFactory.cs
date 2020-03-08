@@ -4,8 +4,8 @@ using TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters;
 
 namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
 {
-    public interface IValidationAttributeAdapterProvider
+    public interface IValidationAttributeAdapterFactory
     {
-        IValidationAttributeAdapter GetAttributeAdapter(ValidationAttribute attribute, IStringLocalizer stringLocalizer);
+        IValidationAttributeAdapter Create(ValidationAttribute attribute, IStringLocalizer stringLocalizer);
     }
 }

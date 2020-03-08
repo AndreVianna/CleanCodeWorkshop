@@ -10,7 +10,7 @@ namespace TrdP.Mvc.DataAnnotations.Localization
     {
         public static void SetDataAnnotationsLocalizationServices(IServiceCollection services)
         {
-            services.TryAddSingleton<IValidationAttributeAdapterProvider, ValidationAttributeAdapterProvider>();
+            services.TryAddSingleton<IValidationAttributeAdapterFactory, ValidationAttributeAdapterFactory>();
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, MvcOptionsSetup>());
             services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcViewOptions>, MvcViewOptionsSetup>());
         }

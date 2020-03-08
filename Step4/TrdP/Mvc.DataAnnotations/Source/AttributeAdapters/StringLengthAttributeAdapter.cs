@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using TrdP.Localization.Abstractions;
@@ -18,21 +17,10 @@ namespace TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters
             _minLength = Attribute.MinimumLength.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <inheritdoc />
-        public override void AddValidation(ClientModelValidationContext context)
+        protected override void AddAdapterValidation(ClientModelValidationContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            MergeAttribute(context.Attributes, "data-val", "true");
             MergeAttribute(context.Attributes, "data-val-length", GetErrorMessage(context));
-
-            if (Attribute.MaximumLength != int.MaxValue)
-            {
-                MergeAttribute(context.Attributes, "data-val-length-max", _maxLength);
-            }
+            MergeAttribute(context.Attributes, "data-val-length-max", _maxLength);
 
             if (Attribute.MinimumLength != 0)
             {
@@ -40,15 +28,15 @@ namespace TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters
             }
         }
 
-        public override string GetErrorMessage(ModelValidationContextBase validationContext)
+        protected override string GetAdapterErrorMessage(ModelValidationContextBase context)
         {
-            if (validationContext == null)
-            {
-                throw new ArgumentNullException(nameof(validationContext));
-            }
-
-            var displayName = validationContext.ModelMetadata.GetDisplayName();
-            return GetLocalizedErrorMessage(displayName, Attribute.MaximumLength, Attribute.MinimumLength);
+            var displayName = context.ModelMetadata.GetDisplayName();
+            return Attribute.MinimumLength != 0
+                ? StringLocalizer[ERROR_MESSAGE_WITH_MINIMUM, displayName, Attribute.MaximumLength, Attribute.MinimumLength]
+                : GetLocalizedErrorMessage(displayName, Attribute.MaximumLength);
         }
+
+        private const string ERROR_MESSAGE_WITH_MINIMUM =
+            "The field {0} must be a string with a minimum length of {2} and a maximum length of {1}.";
     }
 }

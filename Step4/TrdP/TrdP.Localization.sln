@@ -49,6 +49,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{79318B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Localization", "Localization", "{C33D43D1-8F4F-411E-A0D2-661FDC1001A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrdP.Mvc.DataAnnotations.Localization.Tests", "Mvc.DataAnnotations\Tests\TrdP.Mvc.DataAnnotations.Localization.Tests.csproj", "{5A738CD6-E80C-4761-9F24-5AF7AAC9AA45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{55EB0745-AE77-48A1-A071-A8A90B715B23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55EB0745-AE77-48A1-A071-A8A90B715B23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55EB0745-AE77-48A1-A071-A8A90B715B23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A738CD6-E80C-4761-9F24-5AF7AAC9AA45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A738CD6-E80C-4761-9F24-5AF7AAC9AA45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A738CD6-E80C-4761-9F24-5AF7AAC9AA45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A738CD6-E80C-4761-9F24-5AF7AAC9AA45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -131,6 +137,7 @@ Global
 		{DDDC6080-E565-49C1-8207-9A73EF245407} = {79318BAC-36F3-4873-85AF-42AE25D43A0E}
 		{A8E1C122-C5C8-4DD4-872D-B30779C97B6A} = {79318BAC-36F3-4873-85AF-42AE25D43A0E}
 		{B91AB024-9255-47EA-93D2-A811C2BCEC34} = {79318BAC-36F3-4873-85AF-42AE25D43A0E}
+		{5A738CD6-E80C-4761-9F24-5AF7AAC9AA45} = {E371DD5D-9F22-447F-BEDE-BC17C5BC5730}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EBB43EDD-4ACE-45BE-AF09-15041A38EDB7}

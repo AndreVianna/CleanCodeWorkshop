@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TrdP.TestWebApp.Models.TestData;
 
-namespace TrdP.TestWebApp.Models
+namespace TrdP.TestWebApp.Controllers
 {
     public class TestDataController : Controller
     {

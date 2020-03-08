@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using TrdP.Localization.Abstractions;
 using TrdP.Mvc.DataAnnotations.Localization.ValidationProviders;
@@ -9,28 +8,23 @@ namespace TrdP.Mvc.DataAnnotations.Localization
     public class MvcOptionsSetup : IConfigureOptions<MvcOptions>
     {
         private readonly IStringLocalizerFactory _stringLocalizerFactory;
-        private readonly IValidationAttributeAdapterProvider _validationAttributeAdapterProvider;
+        private readonly IValidationAttributeAdapterFactory _validationAttributeAdapterFactory;
 
         public MvcOptionsSetup(
-            IValidationAttributeAdapterProvider validationAttributeAdapterProvider,
+            IValidationAttributeAdapterFactory validationAttributeAdapterFactory,
             IStringLocalizerFactory stringLocalizerFactory)
         {
-            _validationAttributeAdapterProvider = validationAttributeAdapterProvider ?? throw new ArgumentNullException(nameof(validationAttributeAdapterProvider));
+            _validationAttributeAdapterFactory = validationAttributeAdapterFactory;
             _stringLocalizerFactory = stringLocalizerFactory;
         }
 
         public void Configure(MvcOptions options)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            options.ModelMetadataDetailsProviders.Add(new DataAnnotationsMetadataProvider(_stringLocalizerFactory));
+            options.ModelMetadataDetailsProviders.Add(new MetadataDetailsProvider(_stringLocalizerFactory));
 
             options.ModelValidatorProviders.Clear();
             options.ModelValidatorProviders.Add(new DefaultModelValidatorProvider());
-            options.ModelValidatorProviders.Add(new DataAnnotationsModelValidatorProvider(_validationAttributeAdapterProvider, _stringLocalizerFactory));
+            options.ModelValidatorProviders.Add(new ModelValidatorProvider(_validationAttributeAdapterFactory, _stringLocalizerFactory));
 
             LocalizeModelBindingMessages(options);
         }

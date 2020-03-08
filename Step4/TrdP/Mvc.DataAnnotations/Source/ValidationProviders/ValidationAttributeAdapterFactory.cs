@@ -5,9 +5,9 @@ using TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters;
 
 namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
 {
-    public class ValidationAttributeAdapterProvider : IValidationAttributeAdapterProvider
+    public class ValidationAttributeAdapterFactory : IValidationAttributeAdapterFactory
     {
-        public IValidationAttributeAdapter GetAttributeAdapter(ValidationAttribute attribute, IStringLocalizer stringLocalizer)
+        public IValidationAttributeAdapter Create(ValidationAttribute attribute, IStringLocalizer stringLocalizer)
         {
             if (attribute == null)
             {
@@ -21,12 +21,12 @@ namespace TrdP.Mvc.DataAnnotations.Localization.ValidationProviders
                 RequiredAttribute requiredAttribute => (IValidationAttributeAdapter)new RequiredAttributeAdapter(requiredAttribute, stringLocalizer),
                 CompareAttribute compareAttribute => (IValidationAttributeAdapter)new CompareAttributeAdapter(compareAttribute, stringLocalizer),
                 MinLengthAttribute minLengthAttribute => (IValidationAttributeAdapter)new MinLengthAttributeAdapter(minLengthAttribute, stringLocalizer),
-                CreditCardAttribute creditCardAttribute => (IValidationAttributeAdapter)new DataTypeAttributeAdapter(creditCardAttribute, "data-val-creditcard", stringLocalizer),
+                CreditCardAttribute creditCardAttribute => (IValidationAttributeAdapter)new DataTypeAttributeAdapter(creditCardAttribute, "creditcard", stringLocalizer),
                 StringLengthAttribute stringLengthAttribute => (IValidationAttributeAdapter)new StringLengthAttributeAdapter(stringLengthAttribute, stringLocalizer),
                 RangeAttribute rangeAttribute => (IValidationAttributeAdapter)new RangeAttributeAdapter(rangeAttribute, stringLocalizer),
-                EmailAddressAttribute emailAddressAttribute => (IValidationAttributeAdapter)new DataTypeAttributeAdapter(emailAddressAttribute, "data-val-email", stringLocalizer),
-                PhoneAttribute phoneAttribute => (IValidationAttributeAdapter)new DataTypeAttributeAdapter(phoneAttribute, "data-val-phone", stringLocalizer),
-                UrlAttribute urlAttribute => (IValidationAttributeAdapter)new DataTypeAttributeAdapter(urlAttribute, "data-val-url", stringLocalizer),
+                EmailAddressAttribute emailAddressAttribute => (IValidationAttributeAdapter)new DataTypeAttributeAdapter(emailAddressAttribute, "email", stringLocalizer),
+                PhoneAttribute phoneAttribute => (IValidationAttributeAdapter)new DataTypeAttributeAdapter(phoneAttribute, "phone", stringLocalizer),
+                UrlAttribute urlAttribute => (IValidationAttributeAdapter)new DataTypeAttributeAdapter(urlAttribute, "url", stringLocalizer),
                 FileExtensionsAttribute fileExtensionsAttribute => (IValidationAttributeAdapter)new FileExtensionsAttributeAdapter(fileExtensionsAttribute, stringLocalizer),
                 _ => null,
             };

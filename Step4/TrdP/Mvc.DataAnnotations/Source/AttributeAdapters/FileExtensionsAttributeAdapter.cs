@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using TrdP.Localization.Abstractions;
@@ -19,31 +18,20 @@ namespace TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters
 
             // These lines follow the same approach as the FileExtensionsAttribute.
             var normalizedExtensions = Attribute.Extensions.Replace(" ", string.Empty).Replace(".", string.Empty).ToLowerInvariant();
-            var parsedExtensions = normalizedExtensions.Split(',').Select(e => "." + e);
+            var parsedExtensions = normalizedExtensions.Split(',').Select(e => "." + e).ToArray();
             _formattedExtensions = string.Join(", ", parsedExtensions);
             _extensions = string.Join(",", parsedExtensions);
         }
 
-        public override void AddValidation(ClientModelValidationContext context)
+        protected override void AddAdapterValidation(ClientModelValidationContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            MergeAttribute(context.Attributes, "data-val", "true");
             MergeAttribute(context.Attributes, "data-val-fileextensions", GetErrorMessage(context));
             MergeAttribute(context.Attributes, "data-val-fileextensions-extensions", _extensions);
         }
 
-        public override string GetErrorMessage(ModelValidationContextBase validationContext)
+        protected override string GetAdapterErrorMessage(ModelValidationContextBase context)
         {
-            if (validationContext == null)
-            {
-                throw new ArgumentNullException(nameof(validationContext));
-            }
-
-            var displayName = validationContext.ModelMetadata.GetDisplayName();
+            var displayName = context.ModelMetadata.GetDisplayName();
             return GetLocalizedErrorMessage(displayName, _formattedExtensions);
         }
     }

@@ -9,48 +9,43 @@ namespace TrdP.Mvc.Localization.Tests
 {
     public class MvcBuilderExtensionsTests
     {
-        private static readonly IMvcBuilder _mockedMvcBuilder = new FakeMvcBuilder();
+        private readonly IMvcBuilder _mockedMvcBuilder = new FakeMvcBuilder();
 
         [Fact]
         public void MvcBuilderExtensions_AddLocalizationProvider_ShouldPass()
         {
             _mockedMvcBuilder.AddLocalization();
 
-            AssertConfiguration("", false);
+            AssertConfiguration(false);
         }
 
         [Fact]
         public void MvcBuilderExtensions_AddLocalizationProvider_WithConfiguration_ShouldPass()
         {
-            _mockedMvcBuilder.AddLocalization(opt =>
-            {
-                opt.AddCulture(new CultureInfo("pt-BR"));
-            });
+            _mockedMvcBuilder.AddLocalization(opt => opt.AddCulture(new CultureInfo("pt-BR")));
 
-            AssertConfiguration("Resources", true);
+            AssertConfiguration(true);
         }
 
         [Fact]
         public void MvcBuilderExtensions_AddLocalizationProvider_WithMultipleCultures_ShouldPass()
         {
-            _mockedMvcBuilder.AddLocalization(opt =>
-            {
-                opt.AddCultures(new [] { new CultureInfo("pt-BR"), new CultureInfo("en-US") });
-            });
+            _mockedMvcBuilder.AddLocalization(opt => 
+                opt.AddCultures(new [] { new CultureInfo("pt-BR"), new CultureInfo("en-US") }));
 
-            AssertConfiguration("Resources", true);
+            AssertConfiguration(true);
         }
 
-        private static void AssertConfiguration(string expectedResourceRoot, bool hasCultures)
+        private void AssertConfiguration(bool hasCultures)
         {
             var provider = _mockedMvcBuilder.Services.BuildServiceProvider();
             var localizerProviderOptionsConfigurator = provider.GetRequiredService<IConfigureOptions<MvcLocalizationOptions>>();
             var localizerProviderOptions = new MvcLocalizationOptions();
             localizerProviderOptionsConfigurator.Configure(localizerProviderOptions);
 
-            var requestLocalizationConfigurator = provider.GetRequiredService<IConfigureOptions<RequestLocalizationOptions>>();
+            var requestLocalizationConfigurator = provider.GetRequiredService<IPostConfigureOptions<RequestLocalizationOptions>>();
             var requestLocalizationOptions = new RequestLocalizationOptions();
-            requestLocalizationConfigurator.Configure(requestLocalizationOptions);
+            requestLocalizationConfigurator.PostConfigure("", requestLocalizationOptions);
             if (hasCultures)
             {
                 Assert.NotEmpty(localizerProviderOptions.AvailableCultures);

@@ -7,38 +7,27 @@ namespace TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters
 {
     internal class DataTypeAttributeAdapter : ValidationAttributeAdapter<DataTypeAttribute>
     {
+        private readonly string _ruleName;
+
         public DataTypeAttributeAdapter(DataTypeAttribute attribute, string ruleName, IStringLocalizer stringLocalizer)
             : base(attribute, stringLocalizer)
         {
-            if (string.IsNullOrEmpty(ruleName))
+            if (string.IsNullOrWhiteSpace(ruleName))
             {
-                throw new ArgumentException("Argument cannot be null or empty", nameof(ruleName));
+                throw new ArgumentException("Argument cannot be null or empty.", nameof(ruleName));
             }
 
-            RuleName = ruleName;
+            _ruleName = ruleName;
         }
 
-        public string RuleName { get; }
-
-        public override void AddValidation(ClientModelValidationContext context)
+        protected override void AddAdapterValidation(ClientModelValidationContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            MergeAttribute(context.Attributes, "data-val", "true");
-            MergeAttribute(context.Attributes, RuleName, GetErrorMessage(context));
+            MergeAttribute(context.Attributes, $"data-val-{_ruleName}", GetErrorMessage(context));
         }
 
-        public override string GetErrorMessage(ModelValidationContextBase validationContext)
+        protected override string GetAdapterErrorMessage(ModelValidationContextBase context)
         {
-            if (validationContext == null)
-            {
-                throw new ArgumentNullException(nameof(validationContext));
-            }
-
-            var displayName = validationContext.ModelMetadata.GetDisplayName();
+            var displayName = context.ModelMetadata.GetDisplayName();
             return GetLocalizedErrorMessage(displayName, Attribute.GetDataTypeName());
         }
     }

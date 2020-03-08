@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using TrdP.Localization.Abstractions;
@@ -16,26 +15,15 @@ namespace TrdP.Mvc.DataAnnotations.Localization.AttributeAdapters
             _minLengthValue = Attribute.Length.ToString(CultureInfo.InvariantCulture);
         }
 
-        public override void AddValidation(ClientModelValidationContext context)
+        protected override void AddAdapterValidation(ClientModelValidationContext context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            MergeAttribute(context.Attributes, "data-val", "true");
             MergeAttribute(context.Attributes, "data-val-minlength", GetErrorMessage(context));
             MergeAttribute(context.Attributes, "data-val-minlength-min", _minLengthValue);
         }
 
-        public override string GetErrorMessage(ModelValidationContextBase validationContext)
+        protected override string GetAdapterErrorMessage(ModelValidationContextBase context)
         {
-            if (validationContext == null)
-            {
-                throw new ArgumentNullException(nameof(validationContext));
-            }
-
-            var displayName = validationContext.ModelMetadata.GetDisplayName();
+            var displayName = context.ModelMetadata.GetDisplayName();
             return GetLocalizedErrorMessage(displayName, Attribute.Length);
         }
     }
